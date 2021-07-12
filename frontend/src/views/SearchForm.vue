@@ -48,7 +48,6 @@
             ></b-form-input>
           </b-col>
         </b-row>
-        {{ wholeData }}
         <!--<b-row align-v="center" class="input-row">
           <b-col md="2">
             <label for="researchtitle">연구 제목</label>
