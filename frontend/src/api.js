@@ -3,7 +3,7 @@ import axios from 'axios'
 // import AxiosPlugin from 'vue-axios-cors'
 
 Vue.prototype.$http = axios
-axios.defaults.baseURL = 'localhost:8000/search/'
+axios.defaults.baseURL = 'http://localhost:8000/search/'
 
 export default {
   async getData () {
