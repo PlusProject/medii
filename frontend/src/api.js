@@ -8,7 +8,7 @@ axios.defaults.baseURL = 'http://ec2-52-79-52-192.ap-northeast-2.compute.amazona
 export default {
   async getData () {
     try {
-        const response = await axios.get()
+        const response = await axios.get('name', {data: {'doctor_name': '이해영'}})
         console.log(response)
         return response
     } catch (error) {
