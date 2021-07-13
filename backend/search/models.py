@@ -17,9 +17,17 @@ class ClinicalTrials(models.Model):
         managed = False
         db_table = 'clinical_trials'
 
+class Person(models.Model):
+    pid = models.AutoField(primary_key=True)
+    name_kor = models.CharField(max_length=255, blank=True, null=True)
+    belong = models.CharField(max_length=255, blank=True, null=True)
+    job = models.CharField(max_length=255, blank=True, null=True)
 
+    class Meta:
+        managed = False
+        db_table = 'person'
 class Doctor(models.Model):
-    pid = models.OneToOneField('Person', models.DO_NOTHING, db_column='pid', primary_key=True)
+    pid = models.OneToOneField(Person, models.DO_NOTHING, db_column='pid', primary_key=True)
     major = models.CharField(max_length=255, blank=True, null=True)
     education = models.TextField(blank=True, null=True)
     career = models.TextField(blank=True, null=True)
@@ -32,7 +40,7 @@ class Doctor(models.Model):
 
 class Participate(models.Model):
     pcid = models.AutoField(primary_key=True)
-    pid = models.ForeignKey('Person', models.DO_NOTHING, db_column='pid')
+    pid = models.ForeignKey(Person, models.DO_NOTHING, db_column='pid')
     cid = models.ForeignKey(ClinicalTrials, models.DO_NOTHING, db_column='cid')
     position = models.CharField(max_length=255, blank=True, null=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
@@ -40,18 +48,6 @@ class Participate(models.Model):
     class Meta:
         managed = False
         db_table = 'participate'
-
-
-class Person(models.Model):
-    pid = models.AutoField(primary_key=True)
-    name_kor = models.CharField(max_length=255, blank=True, null=True)
-    belong = models.CharField(max_length=255, blank=True, null=True)
-    job = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'person'
-
 
 class Thesis(models.Model):
     tid = models.AutoField(primary_key=True)
