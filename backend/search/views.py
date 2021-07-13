@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Doctor, Person
-from .serializers import DoctorSerializer
+from .serializers import DoctorSerializer, PersonSerializer
 from .serializers import serializers
 # Create your views here.
 
@@ -15,6 +15,6 @@ class DoctorTest(APIView):
 
 class SearchName(APIView):
     def get(self, request):
-        queryset = Person.objects.filter(name_kor=request.data['doctor_name'])
-        serializer = DoctorSerializer(queryset, many=True)
+        queryset = Person.objects.filter(name_kor=request.GET.get('doctor_name'))
+        serializer = PersonSerializer(queryset, many=True)
         return Response(serializer.data)
