@@ -23,7 +23,7 @@ class Doctor(models.Model):
     major = models.CharField(max_length=255, blank=True, null=True)
     education = models.TextField(blank=True, null=True)
     career = models.TextField(blank=True, null=True)
-    url = models.CharField(max_length=255, blank=True, null=True)
+    url = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
