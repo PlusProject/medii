@@ -6,11 +6,11 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ['major', 'education', 'career', 'url']
+        fields = '__all__'
 
 
 class PersonSerializer(serializers.ModelSerializer):
-    doctor_info = DoctorSerializer(source='pid', read_only=True)
+    # doctor_info = DoctorSerializer(source='pid', read_only=True)
 
     class Meta:
         model = Person

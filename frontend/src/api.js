@@ -10,7 +10,7 @@ export default {
     try {
         const response = await axios.get('name', {
           params: {
-            doctor_name : '이해영'
+            doctor_name : '이'
           }
         })
         console.log(response)
