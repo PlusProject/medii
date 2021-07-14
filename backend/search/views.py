@@ -15,20 +15,21 @@ class DoctorTest(APIView):
 
 class SearchName(APIView):
     def get(self, request):
-        personQuery = Person.objects.get(name_kor=request.GET.get('doctor_name'))
-        person = PersonSerializer(personQuery)
+        personQuery = Person.objects.filter(name_kor__contains=request.GET.get('doctor_name'))
+        #person = PersonSerializer(personQuery, many=True)
 
-        doctorQuery = Doctor.objects.get(pid=personQuery.pid)
-        doctor = DoctorSerializer(doctorQuery)
+        # doctorQuery = Doctor.objects.get(pid=personQuery.pid)
+        # doctor = DoctorSerializer(doctorQuery)
 
-        participateQuery = Participate.objects.filter(pid=personQuery.pid)
+        pids = set(person.pid for person in personQuery)
+        participateQuery = Participate.objects.filter(pid__in=pids)
         participation = ParticipateSerializer(participateQuery, many=True)
 
-        writesQuery = Writes.objects.filter(pid=personQuery.pid)
+        writesQuery = Writes.objects.filter(pid__in=pids)
         writes = WritesSerializer(writesQuery, many=True)
         return Response({
-            'person': person.data,
-            'doctor_info': doctor.data,
+            #'person': person.data,
+            # 'doctor_info': doctor.data,
             'participate': participation.data,
             'writes': writes.data
         })
