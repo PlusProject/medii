@@ -32,12 +32,12 @@ class ThesisSerializer(serializers.ModelSerializer):
 
 
 class ParticipateSerializer(serializers.ModelSerializer):
-    person = PersonSerializer(source='pid', read_only=True)
+    # person = PersonSerializer(source='pid', read_only=True)
     clinical_trials = ClinicalTrialsSerializer(source='cid', read_only=True)
 
     class Meta:
         model = Participate
-        fields = ['person', 'clinical_trials', 'position', 'source_name']
+        fields = ['pid', 'clinical_trials', 'position', 'source_name']
 
 
 class WritesSerializer(serializers.ModelSerializer):
@@ -46,4 +46,4 @@ class WritesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Writes
-        fields = ['thesis']
+        fields = ['pid', 'thesis']

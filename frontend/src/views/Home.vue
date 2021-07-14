@@ -1,16 +1,18 @@
 <template>
   <div class="container">
-    <div>
-      <SearchForm />
-    </div>
-    <div class="content-app">
-      <transition
-        name="fadeInUp"
-        mode="out-in"
-      >
-        <router-view />
-      </transition>
-    </div>
+    <b-card>
+      <div>
+        <SearchForm />
+      </div>
+      <div class="content-app">
+        <transition
+          name="fadeInUp"
+          mode="out-in"
+        >
+          <router-view />
+        </transition>
+      </div>
+    </b-card>
   </div>
 </template>
 <script>

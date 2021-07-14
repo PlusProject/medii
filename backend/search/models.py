@@ -22,13 +22,13 @@ class Person(models.Model):
     name_kor = models.CharField(max_length=255, blank=True, null=True)
     belong = models.CharField(max_length=255, blank=True, null=True)
     job = models.CharField(max_length=255, blank=True, null=True)
-
+    major = models.TextField(blank=True, null=True)
     class Meta:
         managed = False
         db_table = 'person'
 class Doctor(models.Model):
     pid = models.OneToOneField(Person, models.DO_NOTHING, db_column='pid', primary_key=True)
-    major = models.CharField(max_length=255, blank=True, null=True)
+    major = models.TextField(blank=True, null=True)
     education = models.TextField(blank=True, null=True)
     career = models.TextField(blank=True, null=True)
     url = models.TextField(blank=True, null=True)
@@ -58,6 +58,7 @@ class Thesis(models.Model):
     year = models.CharField(max_length=255, blank=True, null=True)
     citation = models.CharField(max_length=255, blank=True, null=True)
     coworker = models.TextField(blank=True, null=True)
+    journal_index = models.CharField(max_length=45, null=True)
 
     class Meta:
         managed = False
