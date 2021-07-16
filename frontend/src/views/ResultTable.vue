@@ -7,16 +7,9 @@
       :current-page="personCurrentPage"
       :per-page="personPerPage"
     >
-      <!-- <template #cell(thesis)="row">
-        <b-button size="md" @click="info(row.item, row.index, $event.target)" class="mr-1">
-          show
-        </b-button>
-      </template> -->
-
       <template #cell(clinical_trials)="row">
         <b-button v-b-modal.clinical-trials-modal size="md" @click="renderClinicalTrialsTable(row.item.pid)" class="mr-1">
-          show
-          <!-- show <b-badge variant="light">pid</b-badge> -->
+          show <b-badge variant="light">{{ row.item.participate_num }}</b-badge>
         </b-button>
         <!-- <b-dropdown id="clinical-trials-dropdown" dropleft class="mt-2">
           <b-card>
@@ -41,8 +34,7 @@
 
       <template #cell(thesis)="row">
         <b-button v-b-modal.thesis-modal size="md" @click="renderthesisTable(row.item.pid)" class="mr-1">
-          show
-          <!-- show <b-badge variant="light">pid</b-badge> -->
+          show <b-badge variant="light">{{ row.item.thesis_num }}</b-badge>
         </b-button>
       </template>
       
@@ -143,11 +135,6 @@ export default {
         { key: 'journal', label: 'Journal', sortable: true },
         { key: 'citation', label: 'Citation', sortable: true }
       ],
-      infoModal: {
-        id: 'info-modal',
-        title: '',
-        content: ''
-      },
       hidedetails: true,
       personPerPage: 10,
       personCurrentPage: 1,
@@ -172,23 +159,9 @@ export default {
       return this.thesisItems.length
     }
   },
-  // watch: {
-  //   'getParticipate' () {
-  //     this.participateData = JSON.parse(JSON.stringify(this.getParticipate))
-  //   }
-  // },
   methods: {
-    info(item, index, button) {
-      this.infoModal.title = `${item.id}`
-      this.infoModal.content = item.nameofthesis
-      this.$root.$emit('bv::show::modal', this.infoModal.id, button)
-    },
-    resetInfoModal () {
-      this.infoModal.title = ''
-      this.infoModal.content = ''
-    },
     renderClinicalTrialsTable (pid) {
-      // pid로 임상 데이터 가져오기
+      // pid로 임상 데이터 가져오기, api 추가
       let participateItems = []
       this.participateData = JSON.parse(JSON.stringify(this.getParticipate))
       console.log(this.participateData)
@@ -200,6 +173,7 @@ export default {
       this.participateItems = participateItems
     },
     renderthesisTable (pid) {
+      // api 추가
       let thesisItems = []
       this.thesisData = JSON.parse(JSON.stringify(this.getWrites))
       for (let i=0; i<this.thesisData.length; i++) {

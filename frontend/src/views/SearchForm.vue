@@ -9,7 +9,7 @@
           <b-col md="4">
             <b-form-input id="name"
               v-model="search.name"
-              v-on:keydown.enter="getByNameAndHospital"
+              v-on:keydown.enter="submit"
               placeholder="의사명"
             ></b-form-input>
           </b-col>
@@ -19,56 +19,35 @@
           <b-col md="4">
             <b-form-input id="belong"
               v-model="search.hospital"
-              v-on:keydown.enter="getByNameAndHospital"
+              v-on:keydown.enter="submit"
               placeholder="병원"
             ></b-form-input>
           </b-col> 
         </b-row>
 
-        <!-- <b-row align-v="center" class="input-row">
+        <b-row align-v="center" class="input-row">
           <b-col md="2">
             <label for="major">진료 분야</label>
           </b-col>
           <b-col md="4">
             <b-form-input id="major"
               v-model="search.major"
-              v-on:keydown.enter="dispatchResults"
+              v-on:keydown.enter="submit"
               placeholder="심장, 폐, 동맥..."
             ></b-form-input>
           </b-col>
 
           <b-col md="2">
-            <label for="disease_code">질환 분류</label>
+            <label for="disease">연관 질병</label>
           </b-col>
           <b-col md="4">
-            <b-form-input id="disease_code"
-              v-model="search.disease_code"
-              v-on:keydown.enter="dispatchResults"
+            <b-form-input id="disease"
+              v-model="search.disease"
+              v-on:keydown.enter="submit"
               placeholder="I00, K00... / 동맥질환, 순환계통.."
             ></b-form-input>
           </b-col>
-        </b-row> -->
-
-        <!--<b-row align-v="center" class="input-row">
-          <b-col md="2">
-            <label for="researchtitle">연구 제목</label>
-          </b-col>
-          <b-col md="4">
-            <b-form-input id="researchtitle"
-              v-model="search.researchtitle"
-              v-on:keydown.enter="dispatchResults"
-            ></b-form-input>
-          </b-col>
-          <b-col md="2">
-            <label for="diseasecode">질환 분류</label>
-          </b-col>
-          <b-col md="4">
-            <b-form-input id="diseasecode"
-              v-model="search.diseasecode"
-              v-on:keydown.enter="dispatchResults"
-            ></b-form-input>
-          </b-col> 
-        </b-row>-->
+        </b-row>
 
         <!--<b-row align-v="center" class="input-row">
           <b-col md="4">
@@ -119,7 +98,7 @@ export default {
         hospital: '',
         major: '',
         // researchTitle_ko_field: '',
-        disease_code: ''
+        disease: ''
       },
       data: {
         person: '',
@@ -139,12 +118,14 @@ export default {
       this.search.hospital = ''
       // this.search.researchTitle_ko_field = '',
       this.search.major = ''
-      this.search.disease_code = ''
+      this.search.disease = ''
       this.$store.dispatch('clearState')
     },
     async getByNameAndHospital () {
       const res = await api.getByNameAndHospital(this.search.name, this.search.hospital)
+      console.log("data from Original")
       console.log(res.data)
+      await this.getSearchResults()
       const data = {}
       data.person = res.data.person
       data.doctor_info = res.data.doctor_info
@@ -152,20 +133,22 @@ export default {
       data.writes = res.data.writes
       this.dispatchResults(data)
     },
-    submit () {
-      this.getByNameAndHospital()
+    async getSearchResults () {
+      const res = await api.search(this.search.name, this.search.hospital, this.search.disease, this.search.major)
+      console.log("data from Search")
+      console.log(res.data)
     },
-    // async getByHospital (hospital) {
-    //   const res = await api.getByHospital(this.search.hospital)
-    //   console.log(res.data)
-    //   this.data.doctor_info = res.data.doctor_info
-    //   this.data.participate = res.data.participate
-    //   this.data.writes = res.data.writes
-    // },
+    async submit () {
+      const res = await api.search(this.search.name, this.search.hospital, this.search.disease, this.search.major)
+      console.log("data from Search")
+      console.log(res.data)
+      const results = res.data.person
+      this.dispatchResults(results)
+    },
     dispatchResults (data) {
       // const results = this.getResults()
       // this.splitThesis(results)
-      this.$store.dispatch('callMutation', {inputData: data})
+      this.$store.dispatch('commitSearchResults', {data: data})
       // 현재 search-results경로가 아니면 실행
       if (this.currentRouteName != 'search-results') {
         this.$router.push({name: 'search-results'})

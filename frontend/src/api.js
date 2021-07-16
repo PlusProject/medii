@@ -3,7 +3,7 @@ import axios from 'axios'
 // import AxiosPlugin from 'vue-axios-cors'
 
 Vue.prototype.$http = axios
-axios.defaults.baseURL = '/api/search/'// 'http://ec2-52-79-52-192.ap-northeast-2.compute.amazonaws.com:8000/search/'
+axios.defaults.baseURL = 'http://127.0.0.1:8000/api/search/'// 'http://ec2-52-79-52-192.ap-northeast-2.compute.amazonaws.com:8000/search/'
 
 export default {
   async getByNameAndHospital (name, hospital) {
@@ -19,7 +19,24 @@ export default {
     } catch (error) {
         console.error(error)
     }
+  },
+  async search (name, hospital, disease, major) {
+    try {
+        const response = await axios.get('', {
+          params: {
+            'doctor_name': name,
+            'hospital': hospital,
+            'disease': disease,
+            'major': major
+          }
+        })
+        console.log(response)
+        return response
+    } catch (error) {
+        console.error(error)
+    }
   }
+
   // async getByHospital (hospital) {
   //   try {
   //       const response = await axios.get('hospital', {

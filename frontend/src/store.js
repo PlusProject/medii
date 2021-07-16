@@ -55,16 +55,8 @@ const getters = {
 }
 
 const mutations = {
-  changeName (state, inputData) {
-    // state.searchResults = inputData.data
-    state.person = inputData.person
-    state.doctor_info = inputData.doctor_info
-    state.participate = inputData.participate
-    state.writes = inputData.writes
-
-    // for(var i=0; i<inputData.length; i++){
-    //   state.searchResults.push(inputData[i])
-    // }
+  savePersonInfo (state, data) {
+    state.person = data
   },
   clearState (state) {
     state.searchResults = [],
@@ -76,8 +68,8 @@ const mutations = {
 }
 
 const actions = {
-  callMutation ({ commit }, {inputData}) {
-      commit('changeName', inputData)
+  commitSearchResults ({ commit }, { data }) {
+      commit('savePersonInfo', data)
   },
   clearState ({ commit }) {
     commit('clearState')
