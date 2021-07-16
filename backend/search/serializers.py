@@ -10,7 +10,7 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 
 class PersonSerializer(serializers.ModelSerializer):
-    # doctor_info = DoctorSerializer(source='pid', read_only=True)
+    doctor_info = DoctorSerializer(source='doctor', read_only=True)
 
     class Meta:
         model = Person
@@ -37,7 +37,7 @@ class ParticipateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Participate
-        fields = ['pid', 'clinical_trials', 'position', 'source_name']
+        fields = '__all__'
 
 
 class WritesSerializer(serializers.ModelSerializer):

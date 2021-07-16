@@ -38,7 +38,7 @@
           </b-col>
 
           <b-col md="2">
-            <label for="disease">연관 질병</label>
+            <label for="disease">질병</label>
           </b-col>
           <b-col md="4">
             <b-form-input id="disease"
@@ -97,53 +97,29 @@ export default {
         name: '',
         hospital: '',
         major: '',
-        // researchTitle_ko_field: '',
         disease: ''
       },
-      data: {
-        person: '',
-        doctor_info: '',
-        participate: '',
-        writes: ''
-      }
     }
   },
-  // created() {
-  //   //api call, save data
-  //   this.getData()
-  // },
   methods: {
     clearAll () {
       this.search.name = '',
       this.search.hospital = ''
-      // this.search.researchTitle_ko_field = '',
       this.search.major = ''
       this.search.disease = ''
       this.$store.dispatch('clearState')
     },
-    async getByNameAndHospital () {
-      const res = await api.getByNameAndHospital(this.search.name, this.search.hospital)
-      console.log("data from Original")
-      console.log(res.data)
-      await this.getSearchResults()
-      const data = {}
-      data.person = res.data.person
-      data.doctor_info = res.data.doctor_info
-      data.participate = res.data.participate
-      data.writes = res.data.writes
-      this.dispatchResults(data)
-    },
-    async getSearchResults () {
-      const res = await api.search(this.search.name, this.search.hospital, this.search.disease, this.search.major)
-      console.log("data from Search")
-      console.log(res.data)
-    },
     async submit () {
-      const res = await api.search(this.search.name, this.search.hospital, this.search.disease, this.search.major)
-      console.log("data from Search")
-      console.log(res.data)
-      const results = res.data.person
-      this.dispatchResults(results)
+      try {
+        const res = await api.search(this.search.name, this.search.hospital, this.search.disease, this.search.major)
+        console.log("data from Search")
+        console.log(res.data)
+        const results = res.data.person
+        this.dispatchResults(results)
+      } catch (err) {
+        console.log(err)
+      }
+      
     },
     dispatchResults (data) {
       // const results = this.getResults()
@@ -153,42 +129,7 @@ export default {
       if (this.currentRouteName != 'search-results') {
         this.$router.push({name: 'search-results'})
       }
-    },
-
-    // splitThesis (results) {
-    //   for(var i=0; i<results.length; i++){
-    //     results[i].researchTitle_ko_field = results[i].researchTitle_ko_field.replace(/,/gi,"\n\n")
-    //   }
-    // },
-    // isSearchEmpty () {
-    //   for(var key in this.search){
-    //     if(this.search[key] !== ''){
-    //       return false
-    //     }
-    //   }
-    //   return true
-    // },
-    // getResults () {
-    //   var results = []
-    //   var isEmpty = this.isSearchEmpty()
-    //   for(var i=0; i<this.wholeData.length; i++){
-    //     let flag = 0
-    //     if(!isEmpty){
-    //       for(let key in this.search){
-    //         if(this.search[key] === '' || this.wholeData[i][key].indexOf(this.search[key]) !== -1){
-    //           continue;
-    //         }
-    //         flag = 1
-    //         break;
-    //       }
-    //     }
-    //     this.wholeData[i].major = this.wholeData[i].major.replace("진료분야: ","")
-    //     if(flag !== 1){
-    //       results.push(this.wholeData[i])
-    //     }
-    //   }
-    //   return results
-    // }
+    }
   },
   computed: {
     currentRouteName() {

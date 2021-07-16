@@ -27,8 +27,7 @@ class Person(models.Model):
         managed = False
         db_table = 'person'
 class Doctor(models.Model):
-    pid = models.OneToOneField(Person, models.DO_NOTHING, db_column='pid', primary_key=True)
-    major = models.TextField(blank=True, null=True)
+    pid = models.OneToOneField(Person, models.DO_NOTHING, db_column='pid', primary_key=True, related_name='doctor')
     education = models.TextField(blank=True, null=True)
     career = models.TextField(blank=True, null=True)
     url = models.TextField(blank=True, null=True)

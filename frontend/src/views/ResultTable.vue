@@ -54,7 +54,7 @@
       v-model="personCurrentPage"
       :total-rows="getPersonLength"
       :per-page="personPerPage"
-      align="right"
+      align="center"
     >
     </b-pagination>
 
@@ -97,13 +97,15 @@
         :fields="thesisFields"
         :current-page="thesisCurrentPage"
         :per-page="thesisPerPage"
+        busy.sync="isBusy"
       >
       </b-table>
+      <b-spinner v-if="isBusy" variant="primary" label="Spinning" class="table-spinner"></b-spinner>
       <b-pagination
         v-model="thesisCurrentPage"
         :total-rows="thesisLength"
         :per-page="thesisPerPage"
-        align="center"
+        align="right"
       >
       </b-pagination>
     </b-modal>
@@ -112,6 +114,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
+import api from '../api'
 
 export default {
   name: 'ResultTable',
@@ -126,11 +129,11 @@ export default {
         { key: 'thesis', label: '논문', thClass: 'thclass' },
       ],
       clinicalTrialsFields: [
-        { key: 'title_kor', label: 'Title', sortable: true },
+        { key: 'title_kor', label: 'Title', sortable: true, thClass: 'clinicalTitle' },
         { key: 'title_eng', label: '', sortable: true }
       ],
       thesisFields: [
-        { key: 'title', label: 'Title', sortable: true },
+        { key: 'title', label: 'Title', sortable: true, thClass: 'thesisTitle' },
         { key: 'year', label: 'Year', sortable: true },
         { key: 'journal', label: 'Journal', sortable: true },
         { key: 'citation', label: 'Citation', sortable: true }
@@ -144,10 +147,10 @@ export default {
       thesisCurrentPage: 1,
       showClinicalTrials: false,
       showThesis: false,
-      participateData: '',
       participateItems: [],
       thesisData: '',
-      thesisItems: []
+      thesisItems: [],
+      isBusy: false
     } 
   },
   computed: {
@@ -160,28 +163,37 @@ export default {
     }
   },
   methods: {
-    renderClinicalTrialsTable (pid) {
+    async renderClinicalTrialsTable (pid) {
       // pid로 임상 데이터 가져오기, api 추가
-      let participateItems = []
-      this.participateData = JSON.parse(JSON.stringify(this.getParticipate))
-      console.log(this.participateData)
-      for (let i=0; i<this.participateData.length; i++) {
-        if (this.participateData[i].pid == pid) {
-          participateItems.push(this.participateData[i].clinical_trials)
+      this.participateItems = []
+      try {
+        const res = await api.getClinicalTrials(pid)
+        const participateData = res.data
+        const participateItems = []
+        for (let data of participateData) {
+          participateItems.push(data.clinical_trials)
         }
+        this.participateItems = participateItems
+      } catch (err) {
+        console.log(err)
       }
-      this.participateItems = participateItems
     },
-    renderthesisTable (pid) {
+    async renderthesisTable (pid) {
       // api 추가
-      let thesisItems = []
-      this.thesisData = JSON.parse(JSON.stringify(this.getWrites))
-      for (let i=0; i<this.thesisData.length; i++) {
-        if (this.thesisData[i].pid == pid) {
-          thesisItems.push(this.thesisData[i].thesis)
+      // this.isBusy = true
+      this.thesisItems = []
+      try {
+        const res = await api.getThesis(pid)
+        const thesisData = res.data
+        const thesisItems = []
+        for (let data of thesisData) {
+          thesisItems.push(data.thesis)
         }
+        this.thesisItems = thesisItems
+        // this.isBusy = false
+      } catch (err) {
+        console.log(err)
       }
-      this.thesisItems = thesisItems
     }
     // limitCheck (item) {
     //   if(item.length > 20){
@@ -202,5 +214,23 @@ export default {
   }
   .table th, .table td {
     min-width: 150px;
+  }
+  .clinicalTitle {
+    width: 50%;
+  }
+  .thesisTitle {
+    width: 70%;
+  }
+  .table-container {
+    position: relative;
+    width: 100%;
+  }
+  .b-table[aria-busy="true"] + .table-spinner {
+    /* this assumes that the spinner component has a width and height */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10; /* make sure spinner is over table */
   }
 </style>

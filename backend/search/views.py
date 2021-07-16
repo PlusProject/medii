@@ -53,7 +53,7 @@ class SearchName(APIView):
 
 
 
-class Search(APIView):
+class SearchAPI(APIView):
     def get(self, request):
         name = request.GET.get('doctor_name')
         hospital = request.GET.get('hospital')
@@ -116,3 +116,19 @@ class Search(APIView):
         return Response({
             'person': person.data
         })
+
+
+class ClinicalTrialsAPI(APIView):
+    def get(self, request):
+        pid = request.GET.get('pid')
+        participateQuery = Participate.objects.filter(pid=pid)
+        participate = ParticipateSerializer(participateQuery, many=True)
+        return Response(participate.data)
+
+
+class ThesisAPI(APIView):
+    def get(self, request):
+        pid = request.GET.get('pid')
+        writesQuery = Writes.objects.filter(pid=pid)
+        writes = WritesSerializer(writesQuery, many=True)
+        return Response(writes.data)
