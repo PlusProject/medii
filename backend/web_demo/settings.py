@@ -92,9 +92,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'medii',
-        'USER': 'root',
-        'PASSWORD': 'rootroot',
-        'HOST': 'medii.cyslspudzg4r.ap-northeast-2.rds.amazonaws.com',
+        'USER': 'admin',
+        'PASSWORD': 'tjdrbsrhkseo123',
+        'HOST': 'database-skku.c6dzc5dnqf69.ap-northeast-2.rds.amazonaws.com',
         'PORT': '3306',
     }
 }
