@@ -6,19 +6,21 @@
       :fields="personFields"
       :current-page="personCurrentPage"
       :per-page="personPerPage"
+      :sort-by.sync="sortBy"
+      sort-desc.sync=true
     >
       <template #cell(name_kor)="row">
         <b-link :href="row.item.doctor_info.url" target="_blank">
           {{ row.item.name_kor }}
         </b-link>
       </template>
-      <template #cell(clinical_trials)="row">
+      <template #cell(participate_num)="row">
         <b-button v-b-modal.clinical-trials-modal size="md" @click="renderClinicalTrialsTable(row.item.pid)" class="mr-1">
           show <b-badge variant="light">{{ row.item.participate_num }}</b-badge>
         </b-button>
       </template>
 
-      <template #cell(thesis)="row">
+      <template #cell(thesis_num)="row">
         <b-button v-b-modal.thesis-modal size="md" @click="renderthesisTable(row.item.pid)" class="mr-1">
           show <b-badge variant="light">{{ row.item.thesis_num }}</b-badge>
         </b-button>
@@ -111,12 +113,13 @@ export default {
   name: 'ResultTable',
   data () {
     return {
+      sortBy: 'participate_num',
       personFields: [
         { key: 'name_kor', label: '이름', thClass: 'name', tdClass: 'name', sortable: true },
         { key: 'belong', label: '병원', thClass: 'belong', tdClass: 'belong', sortable: true },
         { key: 'major', label: '진료 분야', thClass: 'major', tdClass: 'major' },
-        { key: 'clinical_trials', label: '임상 시험', tdClass: 'button', thClass: 'button' },
-        { key: 'thesis', label: '논문', tdClass: 'button', thClass: 'button' },
+        { key: 'participate_num', label: '임상 시험', tdClass: 'button', thClass: 'button', sortable: true },
+        { key: 'thesis_num', label: '논문', tdClass: 'button', thClass: 'button', sortable: true },
       ],
       clinicalTrialsFields: [
         { key: 'index', label: 'Index', tdClass: 'index', thClass: 'index' },
