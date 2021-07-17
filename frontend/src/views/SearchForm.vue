@@ -108,6 +108,7 @@ export default {
       this.search.major = ''
       this.search.disease = ''
       this.$store.dispatch('clearState')
+      this.$router.push({name: 'home'})
     },
     async submit () {
       try {
@@ -124,6 +125,7 @@ export default {
     dispatchResults (data) {
       // const results = this.getResults()
       // this.splitThesis(results)
+      
       this.$store.dispatch('commitSearchResults', {data: data})
       // 현재 search-results경로가 아니면 실행
       if (this.currentRouteName != 'search-results') {

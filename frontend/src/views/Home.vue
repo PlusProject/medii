@@ -30,4 +30,17 @@ export default {
   .content-app {
     margin:0;
   }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translate(0, 30px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .fadeInUp-enter-active {
+    animation: fadeInUp .8s;
+  }
 </style>
