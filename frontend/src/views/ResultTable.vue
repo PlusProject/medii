@@ -192,13 +192,13 @@ export default {
           thesisItems.push(data.thesis)
         }
         thesisItems.sort(function (a, b) {
-          if (a.publication_date === '') {
+          if (a.citation === '') {
             return 1;
           }
-          else if (b.publication_date === '') {
+          else if (b.citation === '') {
             return -1;
           }
-          return b.publication_date - a.publication_date
+          return b.citation - a.citation
         })
         this.thesisItems = thesisItems
         // this.isBusy = false
