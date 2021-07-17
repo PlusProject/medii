@@ -54,7 +54,7 @@ class Thesis(models.Model):
     belong = models.CharField(max_length=255, blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     journal = models.TextField(blank=True, null=True)
-    year = models.CharField(max_length=255, blank=True, null=True)
+    publication_date = models.CharField(max_length=255, blank=True, null=True)
     citation = models.CharField(max_length=255, blank=True, null=True)
     coworker = models.TextField(blank=True, null=True)
     journal_index = models.CharField(max_length=45, null=True)

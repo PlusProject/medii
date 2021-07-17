@@ -28,7 +28,7 @@ class ThesisSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Thesis
-        fields = ['tid', 'title', 'journal', 'year', 'citation', 'coworker']
+        fields = ['tid', 'title', 'journal', 'publication_date', 'citation', 'coworker']
 
 
 class ParticipateSerializer(serializers.ModelSerializer):
