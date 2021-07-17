@@ -7,7 +7,7 @@
       :current-page="personCurrentPage"
       :per-page="personPerPage"
       :sort-by.sync="sortBy"
-      sort-desc.sync=true
+      :sort-desc.sync="sortDesc"
     >
       <template #cell(name_kor)="row">
         <b-link :href="row.item.doctor_info.url" target="_blank">
@@ -114,6 +114,7 @@ export default {
   data () {
     return {
       sortBy: 'participate_num',
+      sortDesc: true,
       personFields: [
         { key: 'name_kor', label: '이름', thClass: 'name', tdClass: 'name', sortable: true },
         { key: 'belong', label: '병원', thClass: 'belong', tdClass: 'belong', sortable: true },
