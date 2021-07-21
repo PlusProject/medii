@@ -37,21 +37,6 @@ const getters = {
   getDoctorInfoLength (state) {
     return state.doctor_info.length
   }
-  // getParticipateLength (state) {
-  //   return state.participate.length
-  // },
-  // getWritesLength (state) {
-  //   return state.writes.length
-  // }
-  // getDoctorInfoLength (state) {
-  //   return state.searchResults['doctor_info'].length
-  // },
-  // getParticipateLength (state) {
-  //   return state.searchResults.participate.length
-  // },
-  // getWritesLength (state) {
-  //   return state.searchResults.writes.length
-  // }
 }
 
 const mutations = {
