@@ -17,6 +17,7 @@ class ClinicalTrials(models.Model):
         managed = False
         db_table = 'clinical_trials'
 
+
 class Person(models.Model):
     pid = models.AutoField(primary_key=True)
     name_kor = models.CharField(max_length=255, blank=True, null=True)
@@ -26,6 +27,8 @@ class Person(models.Model):
     class Meta:
         managed = False
         db_table = 'person'
+
+
 class Doctor(models.Model):
     pid = models.OneToOneField(Person, models.DO_NOTHING, db_column='pid', primary_key=True, related_name='doctor')
     education = models.TextField(blank=True, null=True)
@@ -47,6 +50,7 @@ class Participate(models.Model):
     class Meta:
         managed = False
         db_table = 'participate'
+
 
 class Thesis(models.Model):
     tid = models.AutoField(primary_key=True)
