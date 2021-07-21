@@ -1,8 +1,9 @@
 <template>
-  <span>test page</span>
+  <span>page #2</span>
 </template>
+
 <script>
 export default {
-  name: 'Home'
+  name: 'Page2'
 }
 </script>
