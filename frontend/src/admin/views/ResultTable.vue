@@ -1,5 +1,32 @@
 <template>
   <div class="container">
+    <b-row>
+      <b-col>
+        <b-form-group label="정렬 기준" label-cols-lg="2" v-slot="{ ariaDescribedby }">
+          <b-form-radio-group
+            v-model="sortBy"
+            :aria-describedby="ariaDescribedby"
+            class="mt-lg-2"
+          >
+            <b-form-radio value="name_kor" inline>이름</b-form-radio>
+            <b-form-radio value="belong" inline>병원</b-form-radio>
+            <b-form-radio value="participate_num" inline>임상</b-form-radio>
+            <b-form-radio value="thesis_num" inline>논문</b-form-radio>
+          </b-form-radio-group>
+          <b-form-radio-group
+            v-model="sortDesc"
+            :aria-describedby="ariaDescribedby"
+            class="mt-lg-2"
+          >
+            <b-form-radio :value="false" inline>Asc</b-form-radio>
+            <b-form-radio :value="true" inline>Desc</b-form-radio>
+          </b-form-radio-group>
+        </b-form-group>
+      </b-col>
+      <b-col span="6">
+      </b-col>
+    </b-row>
+    
     <b-table
       id="result-table"
       :items="getPerson"
