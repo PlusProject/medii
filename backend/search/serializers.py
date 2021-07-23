@@ -17,6 +17,20 @@ class PersonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class NameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Person
+        fields = ['name_kor']
+
+
+class HospitalSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Person
+        fields = ['belong']
+
+
 class ClinicalTrialsSerializer(serializers.ModelSerializer):
 
     class Meta:

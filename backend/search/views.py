@@ -2,8 +2,9 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from .models import ClinicalTrials, Doctor, Person, Participate, Writes
-from .serializers import ClinicalTrialsSerializer, DoctorSerializer, PersonSerializer, ParticipateSerializer, WritesSerializer
+from .serializers import HospitalSerializer, DoctorSerializer, NameSerializer, PersonSerializer, ParticipateSerializer, WritesSerializer
 from itertools import chain
 from django.db.models import Q
 # Create your views here.
@@ -132,3 +133,17 @@ class ThesisAPI(APIView):
         writesQuery = Writes.objects.filter(pid=pid)
         writes = WritesSerializer(writesQuery, many=True)
         return Response(writes.data)
+
+
+@api_view(['GET'])
+def name_list(request):
+    nameQuery = Person.objects.all().values('name_kor')
+    name = NameSerializer(nameQuery, many=True)
+    return Response(name.data)
+    
+
+@api_view(['GET'])
+def hospital_list(request):
+    hospitalQuery = Person.objects.all().values('belong').distinct()
+    hospital = HospitalSerializer(hospitalQuery, many=True)
+    return Response(hospital.data)
