@@ -12,12 +12,14 @@ const router = new VueRouter({
     {
       name: 'home',
       path: '/',
-      component: Home
-    },
-    {
-      name: 'page2',
-      path: '/page2',
-      component: Page2
+      component: Home,
+      children: [
+        {
+          name: 'page2',
+          path: '/page2',
+          component: Page2
+        }
+      ]
     },
     {
       name: 'page3',
