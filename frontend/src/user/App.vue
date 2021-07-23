@@ -7,18 +7,21 @@
       color="#F3F5FF"
       fixed
       >
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon/>
+      <v-toolbar-title>
+        <a class="route-style" href="/">MEDIAI +</a>
+      </v-toolbar-title>
     </v-app-bar>
 
     <!-- Sizes your content based upon application components -->
     <v-main>
-
+      <router-view></router-view>
       <!-- Provides the application the proper gutter -->
-      <v-container fluid>
+      <!-- <v-container fluid> -->
 
         <!-- If using vue-router -->
-        <router-view></router-view>
-      </v-container>
+        
+      <!-- </v-container> -->
     </v-main>
 
     <!-- <v-footer app>
@@ -34,7 +37,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -42,6 +45,11 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: #F3F5FF;
+}
+.route-style {
+  &:link { color: #2c3e50; text-decoration: none;}
+  &:visited { color: #2c3e50; text-decoration: none;}
+  &:hover { color: #2c3e50; text-decoration: none;}
 }
 /* div > .v-application--wrap {
   min-height: 908px;
