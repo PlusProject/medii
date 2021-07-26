@@ -177,13 +177,21 @@ export default {
 }
 </script>
 <style>
-label {
-  margin: 0
-}
-.input-row {
-  margin: 32px 8px
-}
-.card {
-  margin: 32px
-}
+  label {
+    margin: 0
+  }
+  .input-row {
+    margin: 32px 8px
+  }
+  .card {
+    margin: 32px
+  }
+  datalist {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  .dropdown-menu {
+    max-height: 150px;
+    overflow-y: auto;
+  }
 </style>

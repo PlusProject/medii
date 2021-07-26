@@ -24,7 +24,8 @@ const router = new VueRouter({
     {
       name: 'page3',
       path: '/page3',
-      component: Page3
+      component: Page3,
+      props: true
     },
     {
       name: 'page4',
