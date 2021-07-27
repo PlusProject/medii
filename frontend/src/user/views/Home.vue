@@ -3,15 +3,14 @@
     <v-container
       fluid
       :class="showInfoPage ? 'search-container' + ' transition-move' : 'search-container'" 
-      :style="toolbarPos"
     >
       <p :class="showInfoPage ? 'logo' + ' fade-out' : 'logo'">
         MEDIAI +
       </p>
       <v-toolbar
+        class="toolbar-sheet rounded-pill"
         dense
         floating
-        class="toolbar-sheet rounded-pill"
         color="white"
         elevation="12"
         height="50"
@@ -20,6 +19,7 @@
         :width="styles.toobarWidth"
       >
         <v-text-field
+          class="toobar-textfield"
           solo
           flat
           hide-details
@@ -28,6 +28,7 @@
           :style="{ width: styles.toobarWidth - 80 + 'px' }"
           :disabled="showSearchDetails"
           v-model="elasticSearch"
+          autocomplete="off"
           @keydown.enter="showSearchResults()"
         ></v-text-field>
         <!-- <v-btn
@@ -50,61 +51,13 @@
           v-if="showInfoPage"
           @click="showSearchDetails = !showSearchDetails"
         >
-          <v-icon>mdi-dots-vertical</v-icon>
+          <v-icon> mdi-dots-vertical </v-icon>
         </v-btn>
       </v-toolbar>
         <v-expand-transition>
-          <v-sheet
-            fluid
+          <SearchDetail
             v-show="showSearchDetails && showInfoPage"
-            max-width="800px"
-            overflow-y="auto"
-            class="mx-auto rounded-xl"
-            style="margin-top: 20px; background-color: #fff"
-            elevation="12"
-          >
-            <v-form>
-              <v-container>
-                <v-row>
-                  <v-col cols="6">
-                    <v-col cols="12">
-                      <v-text-field
-                        label="이름"
-                        v-model="detailSearch.name_kor"
-                        @keydown.enter="showSearchResults()"
-                      ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="12">
-                      <v-text-field
-                        label="병원"
-                        v-model="detailSearch.belong"
-                        @keydown.enter="showSearchResults()"
-                      ></v-text-field>
-                    </v-col>
-                  </v-col>
-
-                  <v-col cols="6">
-                    <v-col cols="12">
-                      <v-text-field
-                        label="진료분야"
-                        v-model="detailSearch.major"
-                        @keydown.enter="showSearchResults()"
-                      ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="12">
-                      <v-text-field
-                        label="질병"
-                        v-model="detailSearch.disease"
-                        @keydown.enter="showSearchResults()"
-                      ></v-text-field>
-                    </v-col>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-sheet>
+          />
         </v-expand-transition>
       
 
@@ -118,61 +71,12 @@
           :style="{ 'color': '#F3F5FF' }"
         >
           상세검색
-          <v-icon right>
-            mdi-filter-variant
-          </v-icon>
+          <v-icon right> mdi-filter-variant </v-icon>
         </v-btn>
         <v-expand-transition>
-          <v-sheet fluid
+          <SearchDetail
             v-show="showSearchDetails"
-            max-width="800px"
-            overflow-y="auto"
-            class="mx-auto rounded-xl"
-            style="margin-top: 20px; background-color: #fff"
-            elevation="12"
-          >
-            <v-form>
-              <v-container>
-                <v-row>
-                  <v-col cols="6">
-                    <v-col cols="12">
-                      <v-text-field
-                        label="이름"
-                        v-model="detailSearch.name_kor"
-                        @keydown.enter="showSearchResults()"
-                      ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="12">
-                      <v-text-field
-                        label="병원"
-                        v-model="detailSearch.belong"
-                        @keydown.enter="showSearchResults()"
-                      ></v-text-field>
-                    </v-col>
-                  </v-col>
-
-                  <v-col cols="6">
-                    <v-col cols="12">
-                      <v-text-field
-                        label="진료분야"
-                        v-model="detailSearch.major"
-                        @keydown.enter="showSearchResults()"
-                      ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="12">
-                      <v-text-field
-                        label="질병"
-                        v-model="detailSearch.disease"
-                        @keydown.enter="showSearchResults()"
-                      ></v-text-field>
-                    </v-col>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-sheet>
+          />
         </v-expand-transition>
       </div>
 
@@ -184,9 +88,7 @@
           large
           @click="showInfoPageTrigger()"
         >
-          <v-icon>
-            mdi-vuetify
-          </v-icon>
+          <v-icon>mdi-chevron-double-down</v-icon>
         </v-btn>
       </div>
     </v-container>
@@ -203,35 +105,37 @@
 
 <script>
 import Page2 from './Page2.vue';
+import SearchDetail from '../components/SearchDetail.vue'
 
 export default {
   name: 'Home',
   components: {
-    Page2
+    Page2,
+    SearchDetail
   },
   data () {
     return {
-      elasticSearch: '',
       detailSearch: {
         name_kor: '',
         belong: '',
         major: '',
         disease: ''
       },
+      elasticSearch: '',
       showSearchDetails: false,
       showInfoPage: false,
       loadInfoPage: false,
       styles: {
-        toobarWidth: 600,
-        toolbarTop: 20
+        toobarWidth: 600
       }
     }
   },
   methods: {
     showInfoPageTrigger () {
-      this.showInfoPage = true;
+      this.showSearchDetails = false
+      this.showInfoPage = true
       setTimeout(() => {
-        this.loadInfoPage = true;
+        this.loadInfoPage = true
       }, 1800)
     },
     showSearchResults () {
@@ -247,7 +151,7 @@ export default {
       return {
         top: this.styles.toolbarTop + 'vh',
         'justify-content': 'center',
-        'z-index': 2
+        'z-index': 1
         // left: '-webkit-calc(50% - ' + this.styles.sheetWidth/2 + 'px)' 
       }
     }
@@ -256,8 +160,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  $toolbar-top-pos: 20vh;
+
   .search-container {
     position: relative;
+    top: $toolbar-top-pos;
+    justify-content: center;
+    z-index: 2;
   }
   .btn-search-detail {
     margin-top: 32px;

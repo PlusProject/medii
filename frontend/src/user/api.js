@@ -46,5 +46,21 @@ export default {
     } catch (error) {
         console.error(error)
     }
+  },
+  async getDoctorList () {
+    try {
+      const response = await axios.get('name')
+      return response
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  async getHospitalList () {
+    try {
+      const response = await axios.get('hospital')
+      return response
+    } catch (error) {
+      console.error(error)
+    }
   }
 }

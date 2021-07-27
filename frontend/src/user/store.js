@@ -1,14 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import api from './api'
 
 Vue.use(Vuex)
 const state = {
-  searchResults: {
-    person: [],
-    doctor_info: [],
-    participate: [],
-    writes: []
-  },
+  doctor_list: [],
+  hospital_list: [],
   person: [],
   doctor_info: [],
   participate: [],
@@ -16,8 +13,11 @@ const state = {
 }
 
 const getters = {
-  getInfo (state) {
-    return state.searchResults
+  doctorList (state) {
+    return state.doctor_list
+  },
+  hospitalList (state) {
+    return state.hospital_list
   },
   getPerson (state) {
     return state.person
@@ -40,11 +40,14 @@ const getters = {
 }
 
 const mutations = {
+  initAutocomplete (state, data) {
+    state.doctor_list = data.doctor_list
+    state.hospital_list = data.hospital_list
+  },
   savePersonInfo (state, data) {
     state.person = data
   },
   clearState (state) {
-    state.searchResults = [],
     state.person = [],
     state.doctor_info = [],
     state.participate = [],
@@ -53,6 +56,23 @@ const mutations = {
 }
 
 const actions = {
+  async initAutocomplete ({ commit }) {
+    const doctor = await api.getDoctorList()
+    const hospital = await api.getHospitalList()
+    const doctor_list = []
+    const hospital_list = []
+    for (let name of doctor.data) {
+      doctor_list.push(name.name_kor)
+    }
+    for (let name of hospital.data) {
+      hospital_list.push(name.belong)
+    }
+    const data = {
+      doctor_list,
+      hospital_list
+    }
+    commit('initAutocomplete', data)
+  },
   commitSearchResults ({ commit }, { data }) {
       commit('savePersonInfo', data)
   },

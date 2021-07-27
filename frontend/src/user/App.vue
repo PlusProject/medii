@@ -33,7 +33,10 @@
 <script>
 export default {
   name: 'App',
-  components: {}
+  components: {},
+  created () {
+    this.$store.dispatch('initAutocomplete')
+  }
 }
 </script>
 
