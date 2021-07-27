@@ -133,7 +133,7 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from 'vuex'
 import api from '../api'
 
 export default {
@@ -179,7 +179,7 @@ export default {
     } 
   },
   computed: {
-    ...mapGetters([ 'getInfo', 'getPerson', 'getParticipate', 'getWrites', 'getDoctorInfo', 'getPersonLength' ]),
+    ...mapGetters([ 'getPerson', 'getParticipate', 'getWrites', 'getDoctorInfo', 'getPersonLength' ]),
     participateLength () {
       return this.participateItems.length
     },

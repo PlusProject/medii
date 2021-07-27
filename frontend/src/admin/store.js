@@ -3,12 +3,6 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 const state = {
-  searchResults: {
-    person: [],
-    doctor_info: [],
-    participate: [],
-    writes: []
-  },
   person: [],
   doctor_info: [],
   participate: [],
@@ -16,9 +10,6 @@ const state = {
 }
 
 const getters = {
-  getInfo (state) {
-    return state.searchResults
-  },
   getPerson (state) {
     return state.person
   },
@@ -44,7 +35,6 @@ const mutations = {
     state.person = data
   },
   clearState (state) {
-    state.searchResults = [],
     state.person = [],
     state.doctor_info = [],
     state.participate = [],

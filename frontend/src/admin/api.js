@@ -48,7 +48,7 @@ export default {
         console.error(error)
     }
   },
-  async getNameList () {
+  async getDoctorList () {
     try {
       const response = await axios.get('name')
       return response

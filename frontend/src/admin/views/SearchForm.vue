@@ -126,7 +126,7 @@ export default {
   methods: {
     async init () {
       try {
-        const res_name = await api.getNameList()
+        const res_name = await api.getDoctorList()
         const res_hospital = await api.getHospitalList()
         for(let n of res_name.data){
           this.autoComplete.name_kor.push(n.name_kor)
