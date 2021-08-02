@@ -47,9 +47,9 @@
         </b-button>
       </template>
 
-      <template #cell(thesis_num)="row">
+      <template #cell(writes_num)="row">
         <b-button v-b-modal.thesis-modal size="md" @click="renderthesisTable(row.item.pid)" class="mr-1">
-          show <b-badge variant="light">{{ row.item.thesis_num }}</b-badge>
+          show <b-badge variant="light">{{ row.item.writes_num }}</b-badge>
         </b-button>
       </template>
       
@@ -147,7 +147,7 @@ export default {
         { key: 'belong', label: '병원', thClass: 'belong', tdClass: 'belong', sortable: true },
         { key: 'major', label: '진료 분야', thClass: 'major', tdClass: 'major' },
         { key: 'participate_num', label: '임상 시험', tdClass: 'button', thClass: 'button', sortable: true },
-        { key: 'thesis_num', label: '논문', tdClass: 'button', thClass: 'button', sortable: true },
+        { key: 'writes_num', label: '논문', tdClass: 'button', thClass: 'button', sortable: true },
       ],
       clinicalTrialsFields: [
         { key: 'index', label: 'Index', tdClass: 'index', thClass: 'index' },

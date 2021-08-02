@@ -27,6 +27,9 @@ export default {
 </script>
 
 <style>
+  .container {
+    max-width: 1185px;
+  }
   .content-app {
     margin:0;
   }
