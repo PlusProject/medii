@@ -42,7 +42,7 @@ class Doctor(models.Model):
 
 class Participate(models.Model):
     pcid = models.AutoField(primary_key=True)
-    pid = models.ForeignKey(Person, models.DO_NOTHING, db_column='pid')
+    pid = models.ForeignKey(Person, models.DO_NOTHING, db_column='pid', related_name='participate')
     cid = models.ForeignKey(ClinicalTrials, models.DO_NOTHING, db_column='cid')
     position = models.CharField(max_length=255, blank=True, null=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
@@ -70,7 +70,7 @@ class Thesis(models.Model):
 
 class Writes(models.Model):
     wid = models.AutoField(primary_key=True)
-    pid = models.ForeignKey(Person, models.DO_NOTHING, db_column='pid')
+    pid = models.ForeignKey(Person, models.DO_NOTHING, db_column='pid', related_name='writes')
     tid = models.ForeignKey(Thesis, models.DO_NOTHING, db_column='tid')
 
     class Meta:

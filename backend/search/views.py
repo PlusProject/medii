@@ -90,30 +90,7 @@ class SearchAPI(APIView):
 
             pid_list = sorted((set(pid_list).intersection(pid_in_participate)))
 
-        participateQuery = Participate.objects.none()
-        writesQuery = Writes.objects.none()
-
-        person_index = 0
         person = PersonSerializer(Person.objects.filter(pid__in=pid_list), many=True)
-
-        for pid in pid_list:
-            participateQuery = Participate.objects.filter(pid=pid)
-            writesQuery = Writes.objects.filter(pid=pid)
-            person.data[person_index]['participate_num'] = participateQuery.count()
-            person.data[person_index]['thesis_num'] = writesQuery.count()
-
-            if disease:
-            #     disease_cid = ''
-            #     a = 0
-            #     for key, value in cid_dict.items():
-            #         disease_cid += '|' + str(key)
-            #         # if pid in value:
-            #         #     disease_cid.append(key)
-            #         #     a = pid
-            #     
-                person.data[person_index]['related_cid'] = pid_in_participate
-            person_index += 1
-        
         return Response({
             'person': person.data
         })

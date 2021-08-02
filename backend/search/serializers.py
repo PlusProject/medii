@@ -8,9 +8,18 @@ class DoctorSerializer(serializers.ModelSerializer):
         model = Doctor
         fields = '__all__'
 
-
 class PersonSerializer(serializers.ModelSerializer):
     doctor_info = DoctorSerializer(source='doctor', read_only=True)
+    # participate_test = serializers.StringRelatedField(many=True, read_only=True)
+    # writes_test = serializers.StringRelatedField(many=True, read_only=True)
+    participate_num = serializers.SerializerMethodField(read_only=True)
+    writes_num = serializers.SerializerMethodField(read_only=True)
+    
+    def get_participate_num(self, instance):
+        return instance.participate.count()
+
+    def get_writes_num(self, instance):
+        return instance.writes.count()
 
     class Meta:
         model = Person
