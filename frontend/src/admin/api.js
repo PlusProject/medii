@@ -16,7 +16,7 @@ export default {
             'major': major
           }
         })
-        console.log(response)
+        // console.log(response)
         return response
     } catch (error) {
         console.error(error)
@@ -29,7 +29,7 @@ export default {
             'pid': pid
           }
         })
-        console.log(response)
+        // console.log(response)
         return response
     } catch (error) {
         console.error(error)
@@ -42,7 +42,7 @@ export default {
             'pid': pid
           }
         })
-        console.log(response)
+        // console.log(response)
         return response
     } catch (error) {
         console.error(error)
