@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import {
-  Home, Page2, Page3, Page4
+  Home, DoctorList, Page4
 } from './views'
 Vue.use(VueRouter)
 
@@ -12,19 +12,12 @@ const router = new VueRouter({
     {
       name: 'home',
       path: '/',
-      component: Home,
-      children: [
-        {
-          name: 'page2',
-          path: '/page2',
-          component: Page2
-        }
-      ]
+      component: Home
     },
     {
-      name: 'page3',
-      path: '/page3',
-      component: Page3,
+      name: 'DoctorList',
+      path: '/doctor-list',
+      component: DoctorList,
       props: true
     },
     {
