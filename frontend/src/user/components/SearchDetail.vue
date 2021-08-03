@@ -1,7 +1,7 @@
 <template>
   <v-sheet
     fluid
-    max-width="800px"
+    :max-width="width"
     overflow-y="auto"
     class="mx-auto rounded-xl"
     style="position: relative; margin-top: 20px; background-color: #fff"
@@ -16,6 +16,7 @@
                 v-model="detailSearch.name_kor"
                 :items="doctorItems"
                 label="이름"
+                :menu-props="{ closeOnClick: true, closeOnContentClick: true }"
                 @keyup.enter="showSearchResults()"
               />
             </v-col>
@@ -25,6 +26,7 @@
                 v-model="detailSearch.belong"
                 :items="hospitalItems"
                 label="병원"
+                :menu-props="{ closeOnClick: true, closeOnContentClick: true }"
                 @keyup.enter="showSearchResults()"
               />
             </v-col>
@@ -56,11 +58,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'SearchDetail',
-  props: [ 'visible' ],
+  props: [ 'visible', 'width' ],
   data () {
     return {
       detailSearch: {
@@ -73,16 +75,23 @@ export default {
     }
   },
   methods: {
-    test (e) {
-      this.detailSearch.name_kor = e.target.value
-    },
+    ...mapMutations([ 'setDetailQuery', 'clearSearchQuery' ]),
     onClick (index) {
       let autocomplete = Object.assign([], this.autocomplete);
       autocomplete[index] = !autocomplete[index]
       this.autocomplete = autocomplete
     },
     showSearchResults () {
-      this.$router.push({ name: 'DoctorList', params: { searchByDisease: '', detailSearch: this.detailSearch }})
+      this.$emit('search')
+      this.clearSearchQuery()
+      this.setDetailQuery(this.detailSearch)
+      this.detailSearch.name_kor=''
+      this.detailSearch.belong=''
+      this.detailSearch.major=''
+      this.detailSearch.disease=''
+      if (this.$route.name !== 'DoctorList') {
+        this.$router.push({ name: 'DoctorList' })
+      }
     },
   },
   computed: {
@@ -104,9 +113,6 @@ export default {
 </script>
 
 <style lang="scss">
-  .rotate {
-    transform: rotate(180);
-  }
   .v-menu__content .menuable__content__active .v-autocomplete__content{
     max-height: 150px !important;
   }

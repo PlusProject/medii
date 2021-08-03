@@ -1,7 +1,5 @@
 <template>
   <v-app id="app" style="height: 100%">
-
-
     <v-app-bar
       app
       color="#F3F5FF"
@@ -11,31 +9,94 @@
       <v-toolbar-title>
         <a class="route-style" href="/">MEDIAI +</a>
       </v-toolbar-title>
+      <div
+        v-show="this.$route.name !== 'home'"
+        style="z-index: 2; position: relative; height: 52px; width: 500px;"
+      >
+        <v-toolbar
+          class="toolbar-sheet rounded-pill"
+          dense
+          floating
+          color="white"
+          elevation="0"
+          height="50"
+          outlined
+          rounded
+        >
+          <v-text-field
+            class="toobar-textfield"
+            placeholder="질병명을 입력하세요"
+            solo
+            flat
+            hide-details
+            prepend-icon="mdi-magnify"
+            single-line
+            :style="{ width: '400px' }"
+            :disabled="showSearchDetails"
+            v-model="searchByDisease"
+            autocomplete="off"
+            @keydown.enter="showSearchResults()"
+          ></v-text-field>
+          <v-btn
+            icon
+            ref='showDetails'
+            @click="showSearchDetails = !showSearchDetails"
+          >
+            <v-icon> mdi-dots-vertical </v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-expand-transition>
+          <SearchDetail
+            v-show="showSearchDetails"
+            z-index='3'
+            width='600px'
+            v-on:search='showSearchDetailsTrigger()'
+          />
+        </v-expand-transition>
+        <v-spacer></v-spacer>
+      </div>
     </v-app-bar>
-
-    <!-- Sizes your content based upon application components -->
     <v-main>
       <router-view></router-view>
-      <!-- Provides the application the proper gutter -->
-      <!-- <v-container fluid> -->
-
-        <!-- If using vue-router -->
-        
-      <!-- </v-container> -->
     </v-main>
-
-    <!-- <v-footer app>
-
-    </v-footer> -->
   </v-app>
 </template>
 
 <script>
+import SearchDetail from './components/SearchDetail.vue'
+import { mapMutations } from 'vuex'
+
 export default {
   name: 'App',
-  components: {},
+  components: {
+    SearchDetail
+  },
   created () {
     this.$store.dispatch('initAutocomplete')
+  },
+  data () {
+    return {
+      searchByDisease: '',
+      showSearchDetails: false,
+      showInfoPage: false,
+      loadInfoPage: false,
+    }
+  },
+  methods: {
+    ...mapMutations([ 'setDiseaseQuery', 'clearSearchQuery' ]),
+    showSearchResults () {
+      // this.showSearchDetails = !this.showSearchDetails
+      this.clearSearchQuery()
+      this.setDiseaseQuery(this.searchByDisease)
+      this.searchByDisease = ''
+      if (this.$route.name !== 'DoctorList') {
+        this.$router.push({ name: 'DoctorList' })
+      }
+    },
+    showSearchDetailsTrigger () {
+      this.searchByDisease = ''
+      this.$refs.showDetails.$el.click()
+    }
   }
 }
 </script>
@@ -54,7 +115,4 @@ export default {
   &:visited { color: #2c3e50; text-decoration: none;}
   &:hover { color: #2c3e50; text-decoration: none;}
 }
-/* div > .v-application--wrap {
-  min-height: 908px;
-} */
 </style>

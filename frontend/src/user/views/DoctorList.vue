@@ -182,19 +182,11 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import api from '../api'
 
 export default {
   name: 'DoctorList',
-  props: {
-    searchByDisease: {
-      type: String,
-      default: null
-    },
-    detailSearch: {
-      type: Object
-    }
-  },
   data () {
     return {
       tableHeaders: [
@@ -261,6 +253,7 @@ export default {
     this.init()
   },
   computed: {
+    ...mapGetters([ 'getQuery' ]),
     tableLoading () {
       return this.tableData.length === 0
     },
@@ -268,18 +261,24 @@ export default {
       return this.sortDesc ? '내림차순' : '오름차순'
     }
   },
+  watch: {
+    'getQuery' () {
+      this.init()
+    }
+  },
   methods: {
     async init () {
+      this.tableData = []
       this.getSearchResults()
       // this.getCoworker()
     },
     async getSearchResults () {
       try {
         const params = {
-          name_kor: this.detailSearch.name_kor || '',
-          belong: this.detailSearch.belong || '',
-          major: this.detailSearch.major || '',
-          disease: this.searchByDisease || this.detailSearch.disease || ''
+          name_kor: this.getQuery.name_kor || '',
+          belong: this.getQuery.belong || '',
+          major: this.getQuery.major || '',
+          disease: this.getQuery.disease || ''
         }
         // console.log(params)
         const res = await api.search(params)

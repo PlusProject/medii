@@ -43,6 +43,7 @@
       <v-expand-transition>
         <SearchDetail
           v-show="showSearchDetails && showInfoPage"
+          width="800px"
         />
       </v-expand-transition>
       <div class="btn-search-detail" v-if="!showInfoPage">
@@ -60,6 +61,7 @@
         <v-expand-transition>
           <SearchDetail
             v-show="showSearchDetails"
+            width="800px"
           />
         </v-expand-transition>
       </div>
@@ -88,8 +90,9 @@
 </template>
 
 <script>
-import DatabaseInfo from '../components/DatabaseInfo.vue';
+import DatabaseInfo from '../components/DatabaseInfo.vue'
 import SearchDetail from '../components/SearchDetail.vue'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'Home',
@@ -99,12 +102,6 @@ export default {
   },
   data () {
     return {
-      detailSearch: {
-        name_kor: '',
-        belong: '',
-        major: '',
-        disease: ''
-      },
       searchByDisease: '',
       showSearchDetails: false,
       showInfoPage: false,
@@ -115,6 +112,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations([ 'setDiseaseQuery', 'clearSearchQuery' ]),
     showInfoPageTrigger () {
       this.showSearchDetails = false
       this.showInfoPage = true
@@ -123,21 +121,16 @@ export default {
       }, 1800)
     },
     showSearchResults () {
-      this.$router.push({ name: 'DoctorList', params: { searchByDisease: this.searchByDisease, detailSearch: this.detailSearch }})
+      // this.showSearchDetails = !this.showSearchDetails
+      this.clearSearchQuery()
+      this.setDiseaseQuery(this.searchByDisease)
+      if (this.$route.name !== 'DoctorList') {
+        this.$router.push({ name: 'DoctorList' })
+      }
     },
     showSearchDetailsTrigger () {
       this.searchByDisease = ''
       this.showSearchDetails = !this.showSearchDetails
-    }
-  },
-  computed: {
-    toolbarPos () {
-      return {
-        top: this.styles.toolbarTop + 'vh',
-        'justify-content': 'center',
-        'z-index': 1
-        // left: '-webkit-calc(50% - ' + this.styles.sheetWidth/2 + 'px)' 
-      }
     }
   }
 }

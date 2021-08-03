@@ -4,6 +4,12 @@ import api from './api'
 
 Vue.use(Vuex)
 const state = {
+  search: {
+    name_kor: '',
+    belong: '',
+    major: '',
+    disease: ''
+  },
   doctor_list: [],
   hospital_list: [],
   person: [],
@@ -13,6 +19,9 @@ const state = {
 }
 
 const getters = {
+  getQuery (state) {
+    return state.search
+  },
   doctorList (state) {
     return state.doctor_list
   },
@@ -40,6 +49,15 @@ const getters = {
 }
 
 const mutations = {
+  setDetailQuery (state, data) {
+    state.search.name_kor = data.name_kor || '',
+    state.search.belong = data.belong || '',
+    state.search.major = data.major || '',
+    state.search.disease = data.disease || ''
+  },
+  setDiseaseQuery (state, data) {
+    state.search.disease = data
+  },
   initAutocomplete (state, data) {
     state.doctor_list = data.doctor_list
     state.hospital_list = data.hospital_list
@@ -52,6 +70,15 @@ const mutations = {
     state.doctor_info = [],
     state.participate = [],
     state.writes = []
+  },
+  clearSearchQuery (state) {
+    const data = {
+      name_kor: '',
+      belong: '',
+      major: '',
+      disease: ''
+    }
+    state.search = data
   }
 }
 
