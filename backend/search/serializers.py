@@ -70,3 +70,11 @@ class WritesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Writes
         fields = ['pid', 'thesis']
+
+
+class WritesTestSerializer(serializers.ModelSerializer):
+    thesis = ThesisSerializer(source='tid', read_only=True)
+
+    class Meta:
+        model = Writes
+        fields = ['pid', 'thesis']

@@ -8,5 +8,6 @@ urlpatterns = [
     path('thesis', views.ThesisAPI.as_view(), name='Thesis'),
     path('name', views.name_list, name="Name"),
     path('hospital', views.hospital_list, name="Hospital"),
+    path('coworker', views.get_coworker, name="Coworker"),
     # path('hospital', views.SearchHospital.as_view(), name='SearchHospital'),
 ]
