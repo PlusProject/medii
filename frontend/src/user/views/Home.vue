@@ -20,6 +20,7 @@
       >
         <v-text-field
           class="toobar-textfield"
+          placeholder="질병명을 입력하세요"
           solo
           flat
           hide-details
@@ -27,25 +28,10 @@
           single-line
           :style="{ width: styles.toobarWidth - 80 + 'px' }"
           :disabled="showSearchDetails"
-          v-model="elasticSearch"
+          v-model="searchByDisease"
           autocomplete="off"
           @keydown.enter="showSearchResults()"
         ></v-text-field>
-        <!-- <v-btn
-          elevation="8"
-          large
-          rounded
-          @click="showSearchDetails = !showSearchDetails"
-          color="#93A2FF"
-          :disabled="!showInfoPage"
-          :style="{ 'color': '#F3F5FF', 'margin-left': '80px', 'height': '50px'}"
-          :class="showInfoPage ? 'side-btn' + ' fade-in' : 'side-btn'"
-        >
-          상세검색
-          <v-icon right>
-            mdi-filter-variant
-          </v-icon>
-        </v-btn> -->
         <v-btn
           icon 
           v-if="showInfoPage"
@@ -54,13 +40,11 @@
           <v-icon> mdi-dots-vertical </v-icon>
         </v-btn>
       </v-toolbar>
-        <v-expand-transition>
-          <SearchDetail
-            v-show="showSearchDetails && showInfoPage"
-          />
-        </v-expand-transition>
-      
-
+      <v-expand-transition>
+        <SearchDetail
+          v-show="showSearchDetails && showInfoPage"
+        />
+      </v-expand-transition>
       <div class="btn-search-detail" v-if="!showInfoPage">
         <v-btn
           elevation="8"
@@ -80,7 +64,7 @@
         </v-expand-transition>
       </div>
 
-      <div class="btn-show-info" v-if="!showInfoPage">
+      <div class="btn-show-info" v-if="false">
         <v-btn
           color="primary"
           elevation="8"
@@ -97,21 +81,21 @@
         name="fadeInUp"
         mode="out-in"
       >
-        <page-2 v-if="loadInfoPage" class="infopage"/>
+        <database-info v-if="loadInfoPage" class="infopage"/>
       </transition>
     </div>
   </div>
 </template>
 
 <script>
-import Page2 from './Page2.vue';
+import DatabaseInfo from '../components/DatabaseInfo.vue';
 import SearchDetail from '../components/SearchDetail.vue'
 
 export default {
   name: 'Home',
   components: {
-    Page2,
-    SearchDetail
+    SearchDetail,
+    DatabaseInfo
   },
   data () {
     return {
@@ -121,7 +105,7 @@ export default {
         major: '',
         disease: ''
       },
-      elasticSearch: '',
+      searchByDisease: '',
       showSearchDetails: false,
       showInfoPage: false,
       loadInfoPage: false,
@@ -139,10 +123,10 @@ export default {
       }, 1800)
     },
     showSearchResults () {
-      this.$router.push({ name: 'page3', params: { elasticSearch: this.elasticSearch, detailSearch: this.detailSearch }})
+      this.$router.push({ name: 'DoctorList', params: { searchByDisease: this.searchByDisease, detailSearch: this.detailSearch }})
     },
     showSearchDetailsTrigger () {
-      this.elasticSearch = ''
+      this.searchByDisease = ''
       this.showSearchDetails = !this.showSearchDetails
     }
   },

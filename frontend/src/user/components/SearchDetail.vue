@@ -34,6 +34,7 @@
             <v-col cols="12">
               <v-text-field
                 label="진료분야"
+                placeholder="심장, 폐, 동맥..."
                 v-model="detailSearch.major"
                 @keydown.enter="showSearchResults()"
               ></v-text-field>
@@ -42,6 +43,7 @@
             <v-col cols="12">
               <v-text-field
                 label="질병"
+                placeholder="I00, K00 / 동맥질환, 순환계통..."
                 v-model="detailSearch.disease"
                 @keydown.enter="showSearchResults()"
               ></v-text-field>
@@ -80,7 +82,7 @@ export default {
       this.autocomplete = autocomplete
     },
     showSearchResults () {
-      this.$router.push({ name: 'page3', params: { elasticSearch: '', detailSearch: this.detailSearch }})
+      this.$router.push({ name: 'DoctorList', params: { searchByDisease: '', detailSearch: this.detailSearch }})
     },
   },
   computed: {
