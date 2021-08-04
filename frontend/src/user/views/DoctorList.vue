@@ -107,8 +107,8 @@
         </template>
         <template v-if="noData" v-slot:no-data>
           <p style="font-size: 30px; margin: 60px 0px;">
-            <span v-if="getQuery.disease !== ''" style="color: #f06060">'{{ getQuery.disease }}'</span>
-            <span v-if="getQuery.disease !== ''">에 대한 </span>
+            <span v-if="checkQueryIsOne()" style="color: #f06060">'{{ noDataKeyword }}'</span>
+            <span v-if="checkQueryIsOne()">에 대한 </span>
             검색 결과가 없습니다.
           </p>
         </template>
@@ -292,7 +292,8 @@ export default {
         major: '',
         disease: ''
       },
-      noData: false
+      noData: false,
+      noDataKeyword: ''
     }
   },
   mounted () {
@@ -402,6 +403,20 @@ export default {
       } catch (err) {
         console.log(err)
       }
+    },
+    checkQueryIsOne () {
+      let query = JSON.parse(JSON.stringify(this.getQuery))
+      let flag = 0
+      for (let keyword in query) {
+        if (query[keyword] && flag === 1) {
+          return false
+        }
+        if (query[keyword]) {
+          this.noDataKeyword = query[keyword]
+          flag = 1
+        }
+      }
+      return true
     },
     expandParticipateInfo (item) {
       const currentRowExpanded = this.expanded[0] === item;
