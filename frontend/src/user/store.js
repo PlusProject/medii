@@ -23,10 +23,10 @@ const getters = {
     return state.search
   },
   doctorList (state) {
-    return state.doctor_list
+    return state.doctor_list.sort()
   },
   hospitalList (state) {
-    return state.hospital_list
+    return state.hospital_list.sort()
   },
   getPerson (state) {
     return state.person

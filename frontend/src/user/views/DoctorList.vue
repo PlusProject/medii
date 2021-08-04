@@ -26,6 +26,34 @@
       >
         <template v-slot:top>
           <v-toolbar flat>
+            <v-chip
+              class="ma-2"
+              color='primary'
+              v-if="getQuery.name_kor !== ''"
+            >
+              {{ getQuery.name_kor }}
+            </v-chip>
+            <v-chip
+              class="ma-2"
+              color='primary'
+              v-if="getQuery.belong !== ''"
+            >
+              {{ getQuery.belong }}
+            </v-chip>
+            <v-chip
+              class="ma-2"
+              color='primary'
+              v-if="getQuery.major !== ''"
+            >
+              {{ getQuery.major }}
+            </v-chip>
+            <v-chip
+              class="ma-2"
+              color='primary'
+              v-if="getQuery.disease !== ''"
+            >
+              {{ getQuery.disease }}
+            </v-chip>
             <v-spacer></v-spacer>
             <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
@@ -57,6 +85,9 @@
               {{ sortOrder }}
             </v-btn>
           </v-toolbar>
+        </template>
+        <template v-slot:item.name_kor="{ item }">
+          <a :href="item.doctor_info.url" target="_blank">{{ item.name_kor }}</a>
         </template>
         <template v-slot:item.participate_num="{ item }">
           <v-btn
@@ -246,7 +277,14 @@ export default {
       writesDialog: false,
       participateExpand: false,
       writesExpand: false,
-      loadingDialog: false
+      loadingDialog: false,
+      tableLoading: true,
+      resultRender: {
+        name_kor: '',
+        belong: '',
+        major: '',
+        disease: ''
+      }
     }
   },
   mounted () {
@@ -254,15 +292,16 @@ export default {
   },
   computed: {
     ...mapGetters([ 'getQuery' ]),
-    tableLoading () {
-      return this.tableData.length === 0
-    },
+    // tableLoading () {
+    //   return this.tableData.length === 0
+    // },
     sortOrder () {
       return this.sortDesc ? '내림차순' : '오름차순'
     }
   },
   watch: {
     'getQuery' () {
+      this.resultRender = JSON.parse(JSON.stringify(this.getQuery))
       this.init()
     }
   },
@@ -273,6 +312,7 @@ export default {
       // this.getCoworker()
     },
     async getSearchResults () {
+      this.tableLoading = true
       try {
         const params = {
           name_kor: this.getQuery.name_kor || '',
@@ -286,6 +326,7 @@ export default {
       } catch (err) {
         console.log(err)
       }
+      this.tableLoading = false
     },
     // async getCoworker () {
     //   try {
@@ -374,3 +415,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  a:link { text-decoration: none;}
+  a:visited { text-decoration: none;}
+  a:hover { text-decoration: underline;}
+</style>

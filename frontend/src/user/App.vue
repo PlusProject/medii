@@ -11,7 +11,7 @@
       </v-toolbar-title>
       <div
         v-show="this.$route.name !== 'home'"
-        style="z-index: 2; position: relative; height: 52px; width: 500px;"
+        style="z-index: 2; position: relative; height: 52px; width: 570px;"
       >
         <v-toolbar
           class="toolbar-sheet rounded-pill"
@@ -25,13 +25,13 @@
         >
           <v-text-field
             class="toobar-textfield"
-            placeholder="질병명을 입력하세요"
+            placeholder="질병명을 입력하세요(순환계통, 신경계통... / I00, C00...)"
             solo
             flat
             hide-details
             prepend-icon="mdi-magnify"
             single-line
-            :style="{ width: '400px' }"
+            :style="{ width: '470px' }"
             :disabled="showSearchDetails"
             v-model="searchByDisease"
             autocomplete="off"

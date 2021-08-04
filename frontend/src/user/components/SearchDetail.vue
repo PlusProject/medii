@@ -7,6 +7,10 @@
     style="position: relative; margin-top: 20px; background-color: #fff"
     elevation="12"
   >
+    <!-- <p :style="{ 'position': 'absolute', 'left': leftPos, 'top': topPos }">
+      <i :style="{ 'font-size': fontSize }">press Enter to search</i>
+    </p> -->
+    
     <v-form>
       <v-container>
         <v-row>
@@ -14,9 +18,9 @@
             <v-col cols="12">
               <v-combobox
                 v-model="detailSearch.name_kor"
-                :items="doctorItems"
+                :items="doctorList"
                 label="이름"
-                :menu-props="{ closeOnClick: true, closeOnContentClick: true }"
+                autocomplete="off"
                 @keyup.enter="showSearchResults()"
               />
             </v-col>
@@ -24,9 +28,9 @@
             <v-col cols="12">
               <v-combobox
                 v-model="detailSearch.belong"
-                :items="hospitalItems"
+                :items="hospitalList"
                 label="병원"
-                :menu-props="{ closeOnClick: true, closeOnContentClick: true }"
+                autocomplete="off"
                 @keyup.enter="showSearchResults()"
               />
             </v-col>
@@ -37,6 +41,7 @@
               <v-text-field
                 label="진료분야"
                 placeholder="심장, 폐, 동맥..."
+                autocomplete="off"
                 v-model="detailSearch.major"
                 @keydown.enter="showSearchResults()"
               ></v-text-field>
@@ -45,12 +50,36 @@
             <v-col cols="12">
               <v-text-field
                 label="질병"
-                placeholder="I00, K00 / 동맥질환, 순환계통..."
+                placeholder="순환계통, 신경계통... / I00, C00..."
+                autocomplete="off"
                 v-model="detailSearch.disease"
                 @keydown.enter="showSearchResults()"
               ></v-text-field>
             </v-col>
           </v-col>
+        </v-row>
+        <v-row class="ma-0 pb-3">
+          <v-spacer/>
+          <v-col cols="3" class="pa-0">
+            <v-btn
+              class="mx-auto rounded"
+              :small="width < '800'"
+              plane
+              @click="showSearchResults()"
+            >
+              search
+            </v-btn>
+          </v-col>
+          
+          <!-- <v-col cols="2">
+            <v-btn
+              class="mx-auto rounded"
+              :small="width < '800'"
+            >
+              clear
+            </v-btn>
+          </v-col> -->
+          <v-spacer/>
         </v-row>
       </v-container>
     </v-form>
@@ -65,13 +94,14 @@ export default {
   props: [ 'visible', 'width' ],
   data () {
     return {
+      name_kor: '',
       detailSearch: {
         name_kor: '',
         belong: '',
         major: '',
         disease: ''
       },
-      autocomplete: [ false, false, false, false ]
+      height: ''
     }
   },
   methods: {
@@ -93,6 +123,22 @@ export default {
         this.$router.push({ name: 'DoctorList' })
       }
     },
+    resetField (field) {
+      switch (field) {
+        case 0:
+          this.detailSearch.name_kor=''
+          break
+        case 1:
+          this.detailSearch.belong=''
+          break
+        case 2:
+          this.detailSearch.major=''
+          break
+        case 3:
+          this.detailSearch.disease=''
+          break
+      }
+    }
   },
   computed: {
     ...mapGetters([ 'doctorList', 'hospitalList' ]),
@@ -107,6 +153,15 @@ export default {
       return this.hospitalList.filter((cur) => {
         return cur.indexOf(name) > -1
       }).sort()
+    },
+    topPos () {
+      return this.width.substring(0, 3) < 800 ? '150px' : '182px'
+    },
+    leftPos () {
+      return this.width.substring(0, 3) / 2 + 'px'
+    },
+    fontSize () {
+      return this.width.substring(0, 3) < 800 ? '14px' : 'medium'
     }
   }
 }

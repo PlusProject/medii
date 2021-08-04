@@ -20,7 +20,7 @@
       >
         <v-text-field
           class="toobar-textfield"
-          placeholder="질병명을 입력하세요"
+          placeholder="질병명을 입력하세요(순환계통, 신경계통... / I00, C00...)"
           solo
           flat
           hide-details
