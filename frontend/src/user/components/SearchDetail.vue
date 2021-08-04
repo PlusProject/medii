@@ -52,7 +52,7 @@
             <v-col cols="12">
               <v-text-field
                 label="질병"
-                placeholder="순환계통, 신경계통... / I00, C00..."
+                placeholder="심장판막, 심근경색, 순환계통 / I00, C00, ..."
                 autocomplete="off"
                 v-model="detailSearch.disease"
                 @keydown.enter="showSearchResults()"

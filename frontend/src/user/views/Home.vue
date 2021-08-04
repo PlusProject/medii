@@ -20,7 +20,7 @@
       >
         <v-text-field
           class="toobar-textfield"
-          placeholder="질병명을 입력하세요(순환계통, 신경계통... / I00, C00...)"
+          placeholder="질병명을 입력하세요(심장판막, 심근경색, 순환계통 / I00, C00, ...)"
           solo
           flat
           hide-details
@@ -107,7 +107,7 @@ export default {
       showInfoPage: false,
       loadInfoPage: false,
       styles: {
-        toobarWidth: 600
+        toobarWidth: 601
       }
     }
   },

@@ -105,6 +105,13 @@
             {{ item.writes_num }}
           </v-btn>
         </template>
+        <template v-if="noData" v-slot:no-data>
+          <p style="font-size: 30px; margin: 60px 0px;">
+            <span v-if="getQuery.disease !== ''" style="color: #f06060">'{{ getQuery.disease }}'</span>
+            <span v-if="getQuery.disease !== ''">에 대한 </span>
+            검색 결과가 없습니다.
+          </p>
+        </template>
         <!-- <template v-slot:expanded-item="{ headers }">
           <td :colspan="headers.length" style="margin-top:20px">
           <v-card>
@@ -284,7 +291,8 @@ export default {
         belong: '',
         major: '',
         disease: ''
-      }
+      },
+      noData: false
     }
   },
   mounted () {
@@ -323,6 +331,9 @@ export default {
         // console.log(params)
         const res = await api.search(params)
         this.tableData = res.data.person
+        if (this.tableData.length === 0){
+          this.noData = true
+        }
       } catch (err) {
         console.log(err)
       }
