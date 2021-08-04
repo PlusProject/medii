@@ -22,6 +22,7 @@
                 label="이름"
                 autocomplete="off"
                 @keyup.enter="showSearchResults()"
+                ref="nameCombobox"
               />
             </v-col>
 
@@ -32,6 +33,7 @@
                 label="병원"
                 autocomplete="off"
                 @keyup.enter="showSearchResults()"
+                ref="hospitalCombobox"
               />
             </v-col>
           </v-col>
@@ -65,20 +67,11 @@
               class="mx-auto rounded"
               :small="width < '800'"
               plane
-              @click="showSearchResults()"
+              @click="searchWithClick()"
             >
               search
             </v-btn>
           </v-col>
-          
-          <!-- <v-col cols="2">
-            <v-btn
-              class="mx-auto rounded"
-              :small="width < '800'"
-            >
-              clear
-            </v-btn>
-          </v-col> -->
           <v-spacer/>
         </v-row>
       </v-container>
@@ -110,6 +103,13 @@ export default {
       let autocomplete = Object.assign([], this.autocomplete);
       autocomplete[index] = !autocomplete[index]
       this.autocomplete = autocomplete
+    },
+    searchWithClick () {
+      this.$refs["nameCombobox"].blur()
+      this.$refs["hospitalCombobox"].blur()
+      this.$nextTick(() => {
+          this.showSearchResults()
+      })
     },
     showSearchResults () {
       this.$emit('search')
