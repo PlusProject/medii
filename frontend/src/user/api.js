@@ -12,7 +12,8 @@ export default {
             'doctor_name': params.name_kor,
             'hospital': params.belong,
             'disease': params.disease,
-            'major': params.major
+            'major': params.major,
+            'rare': params.rare
           }
         })
         console.log(response)
@@ -98,6 +99,20 @@ export default {
   async getRareDiseaseList () {
     try {
       const response = await axios.get('rare_disease')
+      return response
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  async searchClinicalTrials (params) {
+    try {
+      const response = await axios.get('searchClinicalTrials', {
+        params: {
+          'disease': params.disease,
+          'rare': params.rare
+        }
+      })
+      console.log(response)
       return response
     } catch (error) {
       console.error(error)

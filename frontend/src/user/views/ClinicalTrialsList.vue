@@ -12,10 +12,10 @@
         ></v-text-field>
       </v-card-title>
       <v-data-table
-        :headers="tableHeaders"
-        :items="tableData"
-        item-key="name_kor+${belong}"
-        :search="tableSearch"
+        :headers="clinicalTrialsHeaders"
+        :items="clinicalTrialsData"
+        item-key="index+${start_date}"
+        :search="clinicalTrialsSearch"
         :sort-by.sync="sortBy"
         :sort-desc.sync="sortDesc"
         :loading="tableLoading"
@@ -23,20 +23,6 @@
         height="560px"
         fixed-header
       >
-      <!-- <v-data-table
-        :headers="tableHeaders"
-        :items="tableData"
-        item-key="name_kor"
-        :search="tableSearch"
-        :sort-by.sync="sortBy"
-        :sort-desc.sync="sortDesc"
-        :single-expand="true"
-        :expanded.sync="expanded"
-        @item-expanded="onExapnd"
-        show-expand
-        :loading="tableLoading"
-        loading-text="Loading... Please wait"
-      > -->
         <template v-slot:top>
           <v-toolbar flat>
             <v-chip
@@ -99,25 +85,14 @@
             </v-btn>
           </v-toolbar>
         </template>
-        <template v-slot:item.name_kor="{ item }">
-          <a v-if="item.doctor_info" :href="item.doctor_info.url" target="_blank">{{ item.name_kor }}</a>
-          <span v-else>{{ item.name_kor }}</span>
-        </template>
-        <template v-slot:item.participate_num="{ item }">
-          <v-btn
-            @click.stop="showParticipateInfo(item)"
-            :disabled="item.participate_num === 0"
+        <template v-slot:item.rare_disease="{ item }">
+          <v-icon
+            small
+            color="red"
+            v-if="item.rare_disease===1"
           >
-            {{ item.participate_num }}
-          </v-btn>
-        </template>
-        <template v-slot:item.writes_num="{ item }">
-          <v-btn
-            @click.stop="showWritesInfo(item)"
-            :disabled="item.writes_num === 0"
-          >
-            {{ item.writes_num }}
-          </v-btn>
+            mdi-circle
+          </v-icon>
         </template>
         <template v-if="noData" v-slot:no-data>
           <p style="font-size: 30px; margin: 180px 0px;">
@@ -126,24 +101,9 @@
             검색 결과가 없습니다.
           </p>
         </template>
-        <template v-slot:expanded-item="{ headers }">
-          <td :colspan="headers.length" style="margin-top:20px">
-            <v-card>
-              <v-card-title>
-                임상 coworker
-              </v-card-title>
-              {{ crisCoworker }}
-            </v-card>
-            <v-card>
-              <v-card-title>
-                논문 coworker
-              </v-card-title>
-              {{ thesisCoworker }}
-            </v-card>
-          </td>
-        </template>
       </v-data-table>
 
+      <!-- 다이얼로그는 연구담당자 정보 -> cid를 받아서 해당 cid의 연구담당자 정보 가져오는 API로 받아오기 간단한 데이터 테이블카드로 구성 -->
       <v-dialog
         v-model="loadingDialog"
         hide-overlay
@@ -191,34 +151,6 @@
           </v-data-table>
         </v-card>
       </v-dialog>
-
-      <v-dialog
-        v-model="writesDialog"
-        max-width="1000"
-      >
-        <v-card>
-          <v-card-title>
-            <v-spacer></v-spacer>
-            <v-text-field
-              v-model="thesisSearch"
-              append-icon="mdi-magnify"
-              label="결과 내 검색"
-              single-line
-              hide-details
-            ></v-text-field>
-          </v-card-title>
-          <v-data-table
-            :headers="thesisHeaders"
-            :items="thesisData"
-            item-key="title"
-            :search="thesisSearch"
-          >
-            <template v-slot:item.index="{ index }">
-              {{ index + 1}}
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-dialog>
     </v-card>
   </div>
 </template>
@@ -234,7 +166,7 @@ export default {
       tableHeaders: [
         {
           text: '이름',
-          align: 'start',
+          align: 'center',
           sortable: true,
           value: 'name_kor',
           width: '80px'
@@ -249,15 +181,18 @@ export default {
       tableSearch: '',
       clinicalTrialsHeaders: [
         { 
-          text: 'Index',
-          align: 'start',
+          text: '희귀질환',
+          align: 'center',
           sortable: true,
-          value: 'index'
+          value: 'rare_disease',
+          width: '8%'
         },
+        //희귀질환 여부 동그라미 추가 필요)
         { text: '연구제목', value: 'title_kor', width: '30%', align: 'center' },
-        { text: 'Scientific Title', value: 'title_eng', width: '40%', align: 'center' },
-        { text: 'Source', value: 'source_name', width: '15%', align: 'center' },
-        { text: 'Start Date', value: 'start_date', width: '15%', align: 'center' }
+        { text: 'Scientific Title', value: 'title_eng', width: '30%', align: 'center' },
+        { text: 'Source', value: 'source_name', width: '10%', align: 'center' },
+        { text: 'Start Date', value: 'start_date', width: '10%', align: 'center' },
+        { text: '연구담당자', value: 'chief_name', width: '10%', align: 'center' },
       ],
       clinicalTrialsData: [],
       clinicalTrialsSearch: '',
@@ -307,9 +242,6 @@ export default {
   },
   computed: {
     ...mapGetters([ 'getQuery' ]),
-    // tableLoading () {
-    //   return this.tableData.length === 0
-    // },
     sortOrder () {
       return this.sortDesc ? '내림차순' : '오름차순'
     }
@@ -328,41 +260,20 @@ export default {
     async getSearchResults () {
       this.tableLoading = true
       try {
-        const condition = this.$store.state.showClinicalTrialsPage ? true : false
         const params = {
-          name_kor: condition ? '' : this.getQuery.name_kor,
-          belong: condition ? '' : this.getQuery.belong,
-          major: condition? '' : this.getQuery.major,
           disease: this.getQuery.disease,
           rare: this.$store.state.showRareDisease
         }
-        // console.log(params)
-        const res = await api.search(params)
-        this.tableData = res.data.person
-        this.rareDisease = res.data.rare
-        if (this.tableData.length === 0){
+        console.log(params)
+        const res = await api.searchClinicalTrials(params)
+        this.clinicalTrialsData = res.data
+        if (this.clinicalTrialsData.length === 0){
           this.noData = true
         }
       } catch (err) {
         console.log(err)
       }
       this.tableLoading = false
-    },
-    async getCoworker (id) {
-      try {
-        const res = await api.getCoworker(id)
-        this.thesisCoworker = res.data
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    async getCrisCoworker (id) {
-      try {
-        const res = await api.getCrisCoworker(id)
-        this.crisCoworker = res.data
-      } catch (err) {
-        console.log(err)
-      }
     },
     setSortBy (index) {
       this.currentSortByTitle = this.sortByItems[index].title
@@ -433,37 +344,6 @@ export default {
         }
       }
       return true
-    },
-    async onExapnd (item) {
-      if (this.expanded.length === 0) {
-        try {
-          const id = item.item.pid
-          this.getCoworker(id)
-          this.getCrisCoworker(id)
-        } catch (err) {
-          console.log(err)
-        }
-      }
-    },
-    expandParticipateInfo (item) {
-      const currentRowExpanded = this.expanded[0] === item;
-      this.expanded = []
-      const rowExpanded = this.expanded[0] === item;
-      if (rowExpanded || currentRowExpanded) {
-        this.expanded.pop()
-      } else {
-        this.expanded.push(item);
-      }
-    },
-    expandWritesInfo (item) {
-      const currentRowExpanded = this.expanded[0] === item;
-      this.expanded = []
-      const rowExpanded = this.expanded[0] === item;
-      if (rowExpanded || currentRowExpanded) {
-        this.expanded.pop()
-      } else {
-        this.expanded.push(item);
-      }
     }
   }
 }

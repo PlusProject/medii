@@ -5,13 +5,15 @@ class ClinicalTrials(models.Model):
     cid = models.AutoField(primary_key=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
     source_id = models.IntegerField(blank=True, null=True)
-    title_kor = models.CharField(max_length=255, blank=True, null=True)
+    chief_name = models.CharField(max_length=255, blank=True, null=True)
+    title_kor = models.CharField(max_length=2000, blank=True, null=True)
     title_eng = models.TextField(blank=True, null=True)
     recruitment_state = models.CharField(max_length=255, blank=True, null=True)
     start_date = models.CharField(max_length=255, blank=True, null=True)
     end_date = models.CharField(max_length=255, blank=True, null=True)
-    disease = models.TextField(blank=True, null=True)
-    disease_detail = models.CharField(max_length=1000, blank=True, null=True)
+    disease_code = models.TextField(blank=True, null=True)
+    disease_detail = models.CharField(max_length=2000, blank=True, null=True)
+    rare_disease = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -43,7 +45,7 @@ class Doctor(models.Model):
 class Participate(models.Model):
     pcid = models.AutoField(primary_key=True)
     pid = models.ForeignKey(Person, models.DO_NOTHING, db_column='pid', related_name='participate')
-    cid = models.ForeignKey(ClinicalTrials, models.DO_NOTHING, db_column='cid')
+    cid = models.ForeignKey(ClinicalTrials, models.DO_NOTHING, db_column='cid', related_name='clinical_trials')
     position = models.CharField(max_length=255, blank=True, null=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
 

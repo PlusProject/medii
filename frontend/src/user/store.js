@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from 'vuex-persistedstate'
 import api from './api'
 
 Vue.use(Vuex)
@@ -17,7 +18,9 @@ const state = {
   person: [],
   doctor_info: [],
   participate: [],
-  writes: []
+  writes: [],
+  showRareDisease: false,
+  showClinicalTrialsPage: false
 }
 
 const getters = {
@@ -53,6 +56,12 @@ const getters = {
   },
   getDoctorInfoLength (state) {
     return state.doctor_info.length
+  },
+  showRareDisease (state) {
+    return state.showRareDisease
+  },
+  showClinicalTrialsPage (state) {
+    return state.showClinicalTrialsPage
   }
 }
 
@@ -89,6 +98,12 @@ const mutations = {
       disease: ''
     }
     state.search = data
+  },
+  setShowRareDisease (state, data) {
+    state.showRareDisease = data
+  },
+  setShowClinicalTrialsPage (state, data) {
+    state.showClinicalTrialsPage = data
   }
 }
 
@@ -131,6 +146,7 @@ const actions = {
 }
 
 export default new Vuex.Store({
+    plugins: [createPersistedState()],
     state: state,
     getters: getters,
     mutations: mutations,

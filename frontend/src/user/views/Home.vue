@@ -7,14 +7,6 @@
       <p :class="showInfoPage ? 'logo' + ' fade-out' : 'logo'">
         MEDIAI +
       </p>
-      <div>
-      <v-switch
-        v-model="showRareDisease"
-        label="희귀질환만 보기"
-        color="indigo"
-        style="margin-left: 860px"
-      ></v-switch>
-      </div>
       <v-toolbar
         class="toolbar-sheet rounded-pill"
         dense
@@ -26,7 +18,7 @@
         rounded
         :width="styles.toobarWidth"
       >
-        <!-- <v-text-field
+        <v-text-field
           class="toobar-textfield"
           placeholder="질병명을 입력하세요(심장판막, 심근경색, 순환계통 / I00, C00, ...)"
           solo
@@ -39,8 +31,8 @@
           v-model="searchByDisease"
           autocomplete="off"
           @keydown.enter="showSearchResults()"
-        ></v-text-field> -->
-        <v-combobox
+        ></v-text-field>
+        <!-- <v-combobox
             class="toobar-textfield"
             placeholder="질병명을 입력하세요(심장판막, 심근경색, 순환계통 / I00, C00, ...)"
             solo
@@ -56,7 +48,7 @@
             :items="showRareDisease ? $store.getters.rareDiseaseList : $store.getters.diseaseList"
             :menu-props="{ 'max-width': styles.toobarWidth - 80 + 'px' }"
             ref="diseaseCombobox"
-          />
+          /> -->
         <v-btn
           icon 
           v-if="showInfoPage"
@@ -134,7 +126,8 @@ export default {
       styles: {
         toobarWidth: 601
       },
-      showRareDisease: false
+      showRareDisease: false,
+      showClinicalTrialsPage: false
     }
   },
   methods: {
@@ -227,5 +220,9 @@ export default {
 
   .fadeInUp-enter-active {
     animation: fadeInUp .8s;
+  }
+  .switch-center {
+    display: flex;
+    justify-content: center;
   }
 </style>

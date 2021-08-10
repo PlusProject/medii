@@ -3,9 +3,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis
-from .serializers import (HospitalSerializer, ThesisSerializer, NameSerializer, 
+from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer, 
                             PersonSerializer, ParticipateSerializer, WritesSerializer, 
                             CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer)
+from django.db.models import Q
 import re
 
 class SearchAPI(APIView):
@@ -14,11 +15,29 @@ class SearchAPI(APIView):
         hospital = request.GET.get('hospital')
         major = request.GET.get('major')
         disease = request.GET.get('disease')
-        personQuery = Person.objects.filter(name_kor__contains=name, belong__contains=hospital, major__contains=major)
+        rare = request.GET.get('rare')
+
+        personQuery = Person.objects.all()
+
+        if name:
+            personQuery = personQuery.filter(name_kor__icontains=name)
+        
+        if hospital:
+            personQuery = personQuery.filter(belong__contains=hospital)
+
+        if major:
+            personQuery = personQuery.filter(major__contains=major)
+
         pid_list = [person.pid for person in personQuery]
 
         if disease:
-            clinicalTrialsQuery = ClinicalTrials.objects.filter(disease_detail__contains=disease)
+            if re.compile('[a-zA-Z]\d{2}').search(disease):
+                clinicalTrialsQuery = ClinicalTrials.objects.filter(disease_code__icontains=disease)
+            else:
+                clinicalTrialsQuery = ClinicalTrials.objects.filter(disease_detail__contains=disease)
+
+            if rare=='true':
+                clinicalTrialsQuery = clinicalTrialsQuery.filter(rare_disease=True)
             cid_list = [trial.cid for trial in clinicalTrialsQuery]
             pid_in_participate = []
 
@@ -41,6 +60,21 @@ class SearchAPI(APIView):
             'person': person.data,
             'rare': True if rare_disease else False
         })
+
+
+class SearchClinicalTrialsAPI(APIView):
+    def get(self, request):
+        disease = request.GET.get('disease')
+        rare = request.GET.get('rare')
+
+        if re.compile('[a-zA-Z]\d{2}').search(disease):
+            clinicalTrialsQuery = ClinicalTrials.objects.filter(disease_code__icontains=disease)
+        else:
+            clinicalTrialsQuery = ClinicalTrials.objects.filter(disease_detail__contains=disease)
+
+        if rare=='true':
+            clinicalTrialsQuery = clinicalTrialsQuery.filter(rare_disease=True)
+        return Response(ClinicalTrialsSerializer(clinicalTrialsQuery, many=True).data)
 
 
 class ClinicalTrialsAPI(APIView):

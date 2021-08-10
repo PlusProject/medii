@@ -19,6 +19,7 @@
               <v-combobox
                 v-model="detailSearch.name_kor"
                 :items="doctorList"
+                :disabled="showClinicalTrialsPage"
                 label="이름"
                 autocomplete="off"
                 @keyup.enter="showSearchResults()"
@@ -30,7 +31,8 @@
               <v-combobox
                 v-model="detailSearch.belong"
                 :items="hospitalList"
-                label="병원"
+                :disabled="showClinicalTrialsPage"
+                label="소속기관"
                 autocomplete="off"
                 @keyup.enter="showSearchResults()"
                 ref="hospitalCombobox"
@@ -43,6 +45,7 @@
               <v-text-field
                 label="진료분야"
                 placeholder="심장, 폐, 동맥..."
+                :disabled="showClinicalTrialsPage"
                 autocomplete="off"
                 v-model="detailSearch.major"
                 @keydown.enter="showSearchResults()"
@@ -67,6 +70,20 @@
                 ref="diseaseCombobox"
               /> -->
             </v-col>
+            <v-row>
+              <v-switch
+                v-model="showRareDisease"
+                label="희귀질환만 보기"
+                color="indigo"
+                style="margin: auto"
+              ></v-switch>
+              <v-switch
+                v-model="showClinicalTrialsPage"
+                label="임상시험 기준으로 검색"
+                color="indigo"
+                style="margin: auto"
+              ></v-switch>
+            </v-row>
           </v-col>
         </v-row>
         <v-row class="ma-0 pb-3">
@@ -103,7 +120,7 @@ export default {
         major: '',
         disease: ''
       },
-      height: ''
+      height: '',
     }
   },
   methods: {
@@ -124,13 +141,21 @@ export default {
       this.detailSearch.belong=''
       this.detailSearch.major=''
       this.detailSearch.disease=''
-      if (this.$route.name !== 'DoctorList') {
+      if (this.$store.state.showClinicalTrialsPage) {
+        this.$router.push({ name: 'ClinicalTrialsList' })
+      }
+      else if (this.$route.name !== 'DoctorList') {
         this.$router.push({ name: 'DoctorList' })
       }
+    },
+    removeQuery () {
+      this.detailSearch.name_kor=''
+      this.detailSearch.belong=''
+      this.detailSearch.major=''
     }
   },
   computed: {
-    ...mapGetters([ 'doctorList', 'hospitalList', 'rareDiseaseList' ]),
+    ...mapGetters([ 'doctorList', 'hospitalList', 'rareDiseaseList', 'showClinicalTrialsPage' ]),
     topPos () {
       return this.width.substring(0, 3) < 800 ? '150px' : '182px'
     },
@@ -139,6 +164,30 @@ export default {
     },
     fontSize () {
       return this.width.substring(0, 3) < 800 ? '14px' : 'medium'
+    },
+    showRareDisease: {
+      get () {
+        return this.$store.state.showRareDisease
+      },
+      set (value) {
+        this.$store.commit('setShowRareDisease', value)
+      }
+    },
+    showClinicalTrialsPage: {
+      get () {
+        return this.$store.state.showClinicalTrialsPage
+      },
+      set (value) {
+        this.$store.commit('setShowClinicalTrialsPage', value)
+      }
+    }
+  },
+  watch: {
+    '$store.state.showClinicalTrialsPage' () {
+      console.log("changed")
+      this.detailSearch.name_kor=''
+      this.detailSearch.belong=''
+      this.detailSearch.major=''
     }
   }
 }

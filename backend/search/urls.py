@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.SearchAPI.as_view(), name='Search'),
+    path('searchClinicalTrials', views.SearchClinicalTrialsAPI.as_view(), name='SearchClinical'),
     path('clinicaltrials', views.ClinicalTrialsAPI.as_view(), name='ClinicalTrials'),
     path('thesis', views.ThesisAPI.as_view(), name='Thesis'),
     path('name', views.name_list, name="Name"),
