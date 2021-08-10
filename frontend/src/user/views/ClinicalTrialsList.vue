@@ -54,7 +54,7 @@
               {{ getQuery.disease }}
             </v-chip>
             <v-spacer></v-spacer>
-            <v-menu offset-y>
+            <!-- <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   color="primary"
@@ -82,7 +82,7 @@
               @click="sortDesc = !sortDesc"
             >
               {{ sortOrder }}
-            </v-btn>
+            </v-btn> -->
           </v-toolbar>
         </template>
         <template v-slot:item.rare_disease="{ item }">
