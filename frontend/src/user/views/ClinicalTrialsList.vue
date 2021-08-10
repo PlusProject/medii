@@ -20,7 +20,7 @@
         :sort-desc.sync="sortDesc"
         :loading="tableLoading"
         loading-text="Loading... Please wait"
-        height="560px"
+        height="530px"
         fixed-header
       >
         <template v-slot:top>
