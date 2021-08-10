@@ -23,7 +23,7 @@
           outlined
           rounded
         >
-          <v-text-field
+          <!-- <v-text-field
             class="toobar-textfield"
             placeholder="질병명을 입력하세요(심장판막, 심근경색, 순환계통 / I00, C00, ...)"
             solo
@@ -36,7 +36,33 @@
             v-model="searchByDisease"
             autocomplete="off"
             @keydown.enter="showSearchResults()"
-          ></v-text-field>
+          ></v-text-field> -->
+          <v-combobox
+            class="toobar-textfield"
+            placeholder="질병명을 입력하세요(심장판막, 심근경색, 순환계통 / I00, C00, ...)"
+            solo
+            flat
+            hide-details
+            prepend-icon="mdi-magnify"
+            single-line
+            :style="{ width: '525px' }"
+            :menu-props="{ 'max-width': 500 }"
+            :disabled="showSearchDetails"
+            v-model="searchByDisease"
+            :items="$store.getters.rareDiseaseList"
+            autocomplete="off"
+            @keydown.enter="searchWithClick()"
+            ref="diseaseCombobox"
+          />
+          <!-- <v-combobox
+            v-model="detailSearch.disease"
+            :items="rareDiseaseList"
+            label="질병"
+            autocomplete="off"
+            placeholder="심장판막, 심근경색, 순환계통 / I00, C00, ..."
+            @keyup.enter="showSearchResults()"
+            ref="diseaseCombobox"
+          /> -->
           <v-btn
             icon
             ref='showDetails'
@@ -64,7 +90,7 @@
 
 <script>
 import SearchDetail from './components/SearchDetail.vue'
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'App',
@@ -84,6 +110,12 @@ export default {
   },
   methods: {
     ...mapMutations([ 'setDiseaseQuery', 'clearSearchQuery' ]),
+    searchWithClick () {
+      this.$refs["diseaseCombobox"].blur()
+      this.$nextTick(() => {
+          this.showSearchResults()
+      })
+    },
     showSearchResults () {
       // this.showSearchDetails = !this.showSearchDetails
       this.clearSearchQuery()
@@ -97,6 +129,9 @@ export default {
       this.searchByDisease = ''
       this.$refs.showDetails.$el.click()
     }
+  },
+  computed: {
+    ...mapGetters([ 'rareDiseaseList '])
   }
 }
 </script>

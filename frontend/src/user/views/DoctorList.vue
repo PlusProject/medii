@@ -2,7 +2,6 @@
   <div style="width:1185px; margin:auto; margin-top:40px">
     <v-card>
       <v-card-title>
-        <!-- {{ coworker_453 }} -->
         <v-spacer></v-spacer>
         <v-text-field
           v-model="tableSearch"
@@ -21,6 +20,8 @@
         :sort-desc.sync="sortDesc"
         :single-expand="true"
         :expanded.sync="expanded"
+        @item-expanded="onExapnd"
+        show-expand
         :loading="tableLoading"
         loading-text="Loading... Please wait"
       >
@@ -49,7 +50,7 @@
             </v-chip>
             <v-chip
               class="ma-2"
-              color='primary'
+              :color="rareDisease ? 'error' : 'primary'"
               v-if="getQuery.disease !== ''"
             >
               {{ getQuery.disease }}
@@ -112,32 +113,22 @@
             검색 결과가 없습니다.
           </p>
         </template>
-        <!-- <template v-slot:expanded-item="{ headers }">
+        <template v-slot:expanded-item="{ headers }">
           <td :colspan="headers.length" style="margin-top:20px">
-          <v-card>
-            <v-card-title>
-              <v-spacer></v-spacer>
-              <v-text-field
-                v-model="tableSearch"
-                append-icon="mdi-magnify"
-                label="결과 내 검색"
-                single-line
-                hide-details
-              ></v-text-field>
-            </v-card-title>
-            <v-data-table
-              :headers="clinicalTrialsHeaders"
-              :items="clinicalTrialsData"
-              item-key="title"
-              :search="clinicalTrialsSearch"
-            >
-              <template v-slot:item.index="{ index }">
-                {{ index }}
-              </template>
-            </v-data-table>
-          </v-card>
+            <v-card>
+              <v-card-title>
+                임상 coworker
+              </v-card-title>
+              {{ crisCoworker }}
+            </v-card>
+            <v-card>
+              <v-card-title>
+                논문 coworker
+              </v-card-title>
+              {{ thesisCoworker }}
+            </v-card>
           </td>
-        </template> -->
+        </template>
       </v-data-table>
 
       <v-dialog
@@ -241,6 +232,7 @@ export default {
         { text: '논문', value: 'writes_num' },
       ],
       tableData: [],
+      rareDisease: '',
       tableSearch: '',
       clinicalTrialsHeaders: [
         { 
@@ -270,7 +262,8 @@ export default {
       ],
       thesisData: [],
       thesisSearch: '',
-      coworker_453: '',
+      thesisCoworker: '',
+      crisCoworker: '',
       sortByItems: [
         { title: '이름', value: 'name_kor'},
         { title: '임상 시험 수', value: 'participate_num' },
@@ -318,7 +311,6 @@ export default {
     async init () {
       this.tableData = []
       this.getSearchResults()
-      // this.getCoworker()
     },
     async getSearchResults () {
       this.tableLoading = true
@@ -332,6 +324,8 @@ export default {
         // console.log(params)
         const res = await api.search(params)
         this.tableData = res.data.person
+        this.rareDisease = res.data.rare
+        console.log(this.rareDisease)
         if (this.tableData.length === 0){
           this.noData = true
         }
@@ -340,14 +334,22 @@ export default {
       }
       this.tableLoading = false
     },
-    // async getCoworker () {
-    //   try {
-    //     const res = await api.getCoworker(453)
-    //     this.coworker_453 = res.data.thesis.title
-    //   } catch (err) {
-    //     console.log(err)
-    //   }
-    // },
+    async getCoworker (id) {
+      try {
+        const res = await api.getCoworker(id)
+        this.thesisCoworker = res.data
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async getCrisCoworker (id) {
+      try {
+        const res = await api.getCrisCoworker(id)
+        this.crisCoworker = res.data
+      } catch (err) {
+        console.log(err)
+      }
+    },
     setSortBy (index) {
       this.currentSortByTitle = this.sortByItems[index].title
       this.sortBy = this.sortByItems[index].value
@@ -417,6 +419,17 @@ export default {
         }
       }
       return true
+    },
+    async onExapnd (item) {
+      if (this.expanded.length === 0) {
+        try {
+          const id = item.item.pid
+          this.getCoworker(id)
+          this.getCrisCoworker(id)
+        } catch (err) {
+          console.log(err)
+        }
+      }
     },
     expandParticipateInfo (item) {
       const currentRowExpanded = this.expanded[0] === item;

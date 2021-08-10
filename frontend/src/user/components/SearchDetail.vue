@@ -57,6 +57,15 @@
                 v-model="detailSearch.disease"
                 @keydown.enter="showSearchResults()"
               ></v-text-field>
+              <!-- <v-combobox
+                v-model="detailSearch.disease"
+                :items="rareDiseaseList"
+                label="질병"
+                autocomplete="off"
+                placeholder="심장판막, 심근경색, 순환계통 / I00, C00, ..."
+                @keyup.enter="showSearchResults()"
+                ref="diseaseCombobox"
+              /> -->
             </v-col>
           </v-col>
         </v-row>
@@ -99,14 +108,10 @@ export default {
   },
   methods: {
     ...mapMutations([ 'setDetailQuery', 'clearSearchQuery' ]),
-    onClick (index) {
-      let autocomplete = Object.assign([], this.autocomplete);
-      autocomplete[index] = !autocomplete[index]
-      this.autocomplete = autocomplete
-    },
     searchWithClick () {
       this.$refs["nameCombobox"].blur()
       this.$refs["hospitalCombobox"].blur()
+      // this.$refs["diseaseCombobox"].blur()
       this.$nextTick(() => {
           this.showSearchResults()
       })
@@ -122,38 +127,10 @@ export default {
       if (this.$route.name !== 'DoctorList') {
         this.$router.push({ name: 'DoctorList' })
       }
-    },
-    resetField (field) {
-      switch (field) {
-        case 0:
-          this.detailSearch.name_kor=''
-          break
-        case 1:
-          this.detailSearch.belong=''
-          break
-        case 2:
-          this.detailSearch.major=''
-          break
-        case 3:
-          this.detailSearch.disease=''
-          break
-      }
     }
   },
   computed: {
-    ...mapGetters([ 'doctorList', 'hospitalList' ]),
-    doctorItems () {
-      const name = this.detailSearch.name_kor
-      return this.doctorList.filter((cur) => {
-        return cur.indexOf(name) > -1
-      }).sort()
-    },
-    hospitalItems () {
-      const name = this.detailSearch.belong
-      return this.hospitalList.filter((cur) => {
-        return cur.indexOf(name) > -1
-      }).sort()
-    },
+    ...mapGetters([ 'doctorList', 'hospitalList', 'rareDiseaseList' ]),
     topPos () {
       return this.width.substring(0, 3) < 800 ? '150px' : '182px'
     },

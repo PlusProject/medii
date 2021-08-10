@@ -76,3 +76,14 @@ class Writes(models.Model):
     class Meta:
         managed = False
         db_table = 'writes'
+
+
+class Disease(models.Model):
+    code = models.CharField(max_length=255, blank=True, null=True)
+    name_kor = models.CharField(max_length=1000, blank=True, null=True)
+    name_eng = models.CharField(max_length=1000, blank=True, null=True)
+    rare = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'disease'

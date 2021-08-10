@@ -1,17 +1,16 @@
 from django.db import models
 from rest_framework import serializers
-from .models import ClinicalTrials, Doctor, Person, Participate, Thesis, Writes
+from rest_framework.fields import SerializerMethodField
+from .models import ClinicalTrials, Disease, Doctor, Person, Participate, Thesis, Writes
 
 class DoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = '__all__'
+        fields = "__all__"
 
 class PersonSerializer(serializers.ModelSerializer):
-    doctor_info = DoctorSerializer(source='doctor', read_only=True)
-    # participate_test = serializers.StringRelatedField(many=True, read_only=True)
-    # writes_test = serializers.StringRelatedField(many=True, read_only=True)
+    doctor_info = DoctorSerializer(source="doctor", read_only=True)
     participate_num = serializers.SerializerMethodField(read_only=True)
     writes_num = serializers.SerializerMethodField(read_only=True)
     
@@ -23,58 +22,80 @@ class PersonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
-        fields = '__all__'
+        fields = "__all__"
 
 
 class NameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
-        fields = ['name_kor']
+        fields = ("name_kor",)
 
 
 class HospitalSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Person
-        fields = ['belong']
+        fields = ("belong",)
 
 
 class ClinicalTrialsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClinicalTrials
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ThesisSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Thesis
-        fields = ['tid', 'title', 'journal', 'publication_date', 'citation', 'coworker']
+        fields = ("tid", "title", "journal", "publication_date", "citation", "coworker",)
 
 
 class ParticipateSerializer(serializers.ModelSerializer):
-    # person = PersonSerializer(source='pid', read_only=True)
-    clinical_trials = ClinicalTrialsSerializer(source='cid', read_only=True)
+    # person = PersonSerializer(source="pid", read_only=True)
+    clinical_trials = ClinicalTrialsSerializer(source="cid", read_only=True)
+    # filtered_cid = serializers.SerializerMethodField()
+
+    # def get_filtered_cid(self, obj):
+    #     keyword = self.context["keyword"]
+    #     if keyword:
+            
+    #     else:
+    #         return 0
 
     class Meta:
         model = Participate
-        fields = '__all__'
+        fields = "__all__"
 
 
 class WritesSerializer(serializers.ModelSerializer):
-    # person = PersonSerializer(source='pid', read_only=True)
-    thesis = ThesisSerializer(source='tid', read_only=True)
+    # person = PersonSerializer(source="pid", read_only=True)
+    thesis = ThesisSerializer(source="tid", read_only=True)
 
     class Meta:
         model = Writes
-        fields = ['pid', 'thesis']
+        fields = ("pid", "thesis",)
 
 
-class WritesTestSerializer(serializers.ModelSerializer):
-    thesis = ThesisSerializer(source='tid', read_only=True)
+class ThesisCoworkerSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Thesis
+        fields = ("tid", "title",)
+
+
+class CrisCoworkerSerializer(serializers.ModelSerializer):
+    person = PersonSerializer(source="pid", read_only=True)
 
     class Meta:
-        model = Writes
-        fields = ['pid', 'thesis']
+        model = Participate
+        fields = ("person", "cid", "position",)
+
+
+class DiseaseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Disease
+        fields = "__all__"

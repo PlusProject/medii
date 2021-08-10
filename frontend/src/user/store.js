@@ -10,8 +10,10 @@ const state = {
     major: '',
     disease: ''
   },
-  doctor_list: [],
-  hospital_list: [],
+  doctorList: [],
+  hospitalList: [],
+  diseaseList: [],
+  rareDiseaseList: [],
   person: [],
   doctor_info: [],
   participate: [],
@@ -23,10 +25,16 @@ const getters = {
     return state.search
   },
   doctorList (state) {
-    return state.doctor_list.sort()
+    return state.doctorList.sort()
   },
   hospitalList (state) {
-    return state.hospital_list.sort()
+    return state.hospitalList.sort()
+  },
+  diseaseList (state) {
+    return state.diseaseList.sort()
+  },
+  rareDiseaseList (state) {
+    return state.rareDiseaseList.sort()
   },
   getPerson (state) {
     return state.person
@@ -59,8 +67,10 @@ const mutations = {
     state.search.disease = data
   },
   initAutocomplete (state, data) {
-    state.doctor_list = data.doctor_list
-    state.hospital_list = data.hospital_list
+    state.doctorList = data.doctorList
+    state.hospitalList = data.hospitalList
+    state.diseaseList = data.diseaseList
+    state.rareDiseaseList = data.rareDiseaseList
   },
   savePersonInfo (state, data) {
     state.person = data
@@ -86,17 +96,29 @@ const actions = {
   async initAutocomplete ({ commit }) {
     const doctor = await api.getDoctorList()
     const hospital = await api.getHospitalList()
-    const doctor_list = []
-    const hospital_list = []
+    const disease = await api.getDiseaseList()
+    const rareDisease = await api.getRareDiseaseList()
+    const doctorList = []
+    const hospitalList = []
+    const diseaseList = []
+    const rareDiseaseList = []
     for (let name of doctor.data) {
-      doctor_list.push(name.name_kor)
+      doctorList.push(name.name_kor)
     }
     for (let name of hospital.data) {
-      hospital_list.push(name.belong)
+      hospitalList.push(name.belong)
+    }
+    for (let name of disease.data) {
+      diseaseList.push(name.name_kor)
+    }
+    for (let name of rareDisease.data) {
+      rareDiseaseList.push(name.name_kor)
     }
     const data = {
-      doctor_list,
-      hospital_list
+      doctorList,
+      hospitalList,
+      diseaseList,
+      rareDiseaseList
     }
     commit('initAutocomplete', data)
   },

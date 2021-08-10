@@ -74,5 +74,33 @@ export default {
     } catch (error) {
       console.error(error)
     }
+  },
+  async getCrisCoworker (id) {
+    try {
+      const response = await axios.get('coworker_cris', {
+        params: {
+          pid: id
+        }
+      })
+      return response
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  async getDiseaseList () {
+    try {
+      const response = await axios.get('disease')
+      return response
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  async getRareDiseaseList () {
+    try {
+      const response = await axios.get('rare_disease')
+      return response
+    } catch (error) {
+      console.error(error)
+    }
   }
 }

@@ -1,14 +1,12 @@
-from django.shortcuts import render
-from rest_framework import viewsets
 from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Doctor, Person, Participate, Writes, Thesis
-from .serializers import HospitalSerializer, ThesisSerializer, NameSerializer, PersonSerializer, ParticipateSerializer, WritesSerializer
-from itertools import chain
-from django.db.models import Q
-# Create your views here.
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis
+from .serializers import (HospitalSerializer, ThesisSerializer, NameSerializer, 
+                            PersonSerializer, ParticipateSerializer, WritesSerializer, 
+                            CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer)
+import re
 
 class SearchAPI(APIView):
     def get(self, request):
@@ -18,22 +16,7 @@ class SearchAPI(APIView):
         disease = request.GET.get('disease')
         personQuery = Person.objects.filter(name_kor__contains=name, belong__contains=hospital, major__contains=major)
         pid_list = [person.pid for person in personQuery]
-        # 연결된 cid 뽑기...실패.......ㅠ
-        # if disease:
-        #     clinicalTrialsQuery = ClinicalTrials.objects.filter(disease_detail__contains=disease)
-        #     cid_dict = { trial.cid: [] for trial in clinicalTrialsQuery }
-        #     cid_not_in_participate = []
 
-        #     for cid, pid in cid_dict.items():
-        #         participateSet = Participate.objects.filter(cid=cid)
-        #         if participateSet:
-        #             for row in participateSet:
-        #                 pid.append(row.pid)
-        #         else:
-        #             cid_not_in_participate.append(cid)
-
-        #     for cid in cid_not_in_participate:
-        #         del cid_dict[cid]
         if disease:
             clinicalTrialsQuery = ClinicalTrials.objects.filter(disease_detail__contains=disease)
             cid_list = [trial.cid for trial in clinicalTrialsQuery]
@@ -46,18 +29,32 @@ class SearchAPI(APIView):
 
             pid_list = sorted((set(pid_list).intersection(pid_in_participate)))
 
+        if re.compile('[a-zA-Z]\d{2}').search(disease):
+            rare_disease = Disease.objects.filter(code=disease).values('rare')
+        elif re.compile('[가-힣]+').search(disease):
+            rare_disease = Disease.objects.filter(name_kor=disease).values('rare')
+        else:
+            rare_disease = Disease.objects.filter(name_eng=disease).values('rare')
+
         person = PersonSerializer(Person.objects.filter(pid__in=pid_list), many=True)
         return Response({
-            'person': person.data
+            'person': person.data,
+            'rare': True if rare_disease else False
         })
 
 
 class ClinicalTrialsAPI(APIView):
     def get(self, request):
         pid = request.GET.get('pid')
+        keyword = request.GET.get('keyword')
         participateQuery = Participate.objects.filter(pid=pid)
-        participate = ParticipateSerializer(participateQuery, many=True)
+        participate = ParticipateSerializer(participateQuery, context={"keyword": keyword}, many=True)
+        
         return Response(participate.data)
+        # return Response({
+        #     'participate': participate.data,
+        #     # 'filtered_cid': 
+        # })
 
 
 class ThesisAPI(APIView):
@@ -83,19 +80,51 @@ def hospital_list(request):
 
 
 @api_view(['GET'])
+def disease_list(request):
+    diseases = Disease.objects.all()
+    return Response(DiseaseSerializer(diseases, many=True).data)
+
+
+@api_view(['GET'])
+def rare_disease_list(request):
+    diseases = Disease.objects.filter(rare=True)
+    return Response(DiseaseSerializer(diseases, many=True).data)
+
+
+@api_view(['GET'])
 def get_coworker(request):
     pid = request.GET.get('pid')
     writes = Writes.objects.filter(pid=pid)
     tid_list = [thesis.tid.tid for thesis in writes]
 
+    # coworker_list = []
+    # for tid in tid_list:
+    #     thesis_title = Thesis.objects.get(tid=tid).title
+    #     coworker = Thesis.objects.filter(title=thesis_title)
+    #     if len(coworker) > 1:
+    #         coworker_list += coworker[1:]
+    # print(coworker_list)
+    # return Response(ThesisSerializer(coworker_list, many=True).data)
     coworker_list = []
     for tid in tid_list:
-        thesis_title = Thesis.objects.get(tid=tid).title
-        coworker = Thesis.objects.filter(title=thesis_title)
-        if len(coworker) > 1:
-            coworker_list.append(coworker[1])
+        thesis = Thesis.objects.get(tid=tid)
+        thesis_title = thesis.title
+        thesis_tid = thesis.tid
+        coworker = Thesis.objects.filter(title=thesis_title).exclude(tid=thesis_tid)
+        if len(coworker) > 0:
+            coworker_list += coworker
+    return Response(ThesisCoworkerSerializer(coworker_list, many=True).data)
 
-    print(coworker_list)
+# @api_view(['GET'])
+class CrisCoworkerAPI(APIView):
+    def get(self, request):
+        pid = request.GET.get('pid')
+        participate = Participate.objects.filter(pid=pid, source_name="CRIS")
+        cid_list = [[cris.cid.cid, cris.position] for cris in participate]
 
-
-    return Response(ThesisSerializer(coworker_list, many=True).data)
+        coworker_list = []
+        for cid, position in cid_list:
+            participate_list = Participate.objects.filter(cid=cid).exclude(position=position)
+            if len(participate_list) >= 1:
+                coworker_list += participate_list
+        return Response(CrisCoworkerSerializer(coworker_list, many=True).data)

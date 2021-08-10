@@ -9,5 +9,8 @@ urlpatterns = [
     path('name', views.name_list, name="Name"),
     path('hospital', views.hospital_list, name="Hospital"),
     path('coworker', views.get_coworker, name="Coworker"),
-    # path('hospital', views.SearchHospital.as_view(), name='SearchHospital'),
+    path('coworker_cris', views.CrisCoworkerAPI.as_view(), name="CrisCoworker"),
+    path('disease', views.disease_list, name="disease_list"),
+    path('rare_disease', views.rare_disease_list, name="rare_disease_list"),
+    # path('coworker_cris', views.get_cris_coworker, name="CrisCoworker"),
 ]
