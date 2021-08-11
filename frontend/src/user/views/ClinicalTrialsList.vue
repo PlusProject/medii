@@ -54,7 +54,7 @@
               {{ getQuery.disease }}
             </v-chip>
             <v-spacer></v-spacer>
-            <!-- <v-menu offset-y>
+            <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   color="primary"
@@ -82,7 +82,7 @@
               @click="sortDesc = !sortDesc"
             >
               {{ sortOrder }}
-            </v-btn> -->
+            </v-btn>
           </v-toolbar>
         </template>
         <template v-slot:item.rare_disease="{ item }">
@@ -213,12 +213,12 @@ export default {
       thesisCoworker: '',
       crisCoworker: '',
       sortByItems: [
-        { title: '이름', value: 'name_kor', align: 'center' },
-        { title: '임상 시험 수', value: 'participate_num', align: 'center' },
-        { title: '논문 개수', value: 'writes_num', align: 'center' }
+        { title: '희귀질환 여부', value: 'rare_disease', align: 'center' },
+        { title: 'Source', value: 'source_name', align: 'center' },
+        { title: 'Start Date', value: 'start_date', align: 'center' }
       ],
-      currentSortByTitle: '임상 시험 수',
-      sortBy: 'participate_num',
+      currentSortByTitle: '희귀질환 여부',
+      sortBy: 'rare_disease',
       sortDesc: true,
       expanded: [],
       participateDialog: false,
