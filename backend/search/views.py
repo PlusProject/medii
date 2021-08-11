@@ -101,14 +101,14 @@ class ThesisAPI(APIView):
 
 @api_view(['GET'])
 def name_list(request):
-    nameQuery = Person.objects.all().values('name_kor')
+    nameQuery = Person.objects.filter(job='의사').values('name_kor')
     name = NameSerializer(nameQuery, many=True)
     return Response(name.data)
-    
+
 
 @api_view(['GET'])
 def hospital_list(request):
-    hospitalQuery = Person.objects.all().values('belong').distinct()
+    hospitalQuery = Person.objects.filter(job='의사').values('belong').distinct()
     hospital = HospitalSerializer(hospitalQuery, many=True)
     return Response(hospital.data)
 
