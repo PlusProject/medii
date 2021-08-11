@@ -85,6 +85,10 @@
             </v-btn>
           </v-toolbar>
         </template>
+        <template v-slot:item.source_name="{ item }">
+          <a v-if="item.url" :href="item.url" target="_blank">{{ item.source_name }}</a>
+          <span v-else>{{ item.source_name }}</span>
+        </template>
         <template v-slot:item.rare_disease="{ item }">
           <v-icon
             small

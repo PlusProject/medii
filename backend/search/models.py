@@ -14,6 +14,7 @@ class ClinicalTrials(models.Model):
     disease_code = models.TextField(blank=True, null=True)
     disease_detail = models.CharField(max_length=2000, blank=True, null=True)
     rare_disease = models.IntegerField(blank=True, null=True)
+    url = models.CharField(max_length=1000, blank=True, null=True)
 
     class Meta:
         managed = False

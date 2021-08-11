@@ -184,7 +184,6 @@ export default {
   },
   watch: {
     '$store.state.showClinicalTrialsPage' () {
-      console.log("changed")
       this.detailSearch.name_kor=''
       this.detailSearch.belong=''
       this.detailSearch.major=''
