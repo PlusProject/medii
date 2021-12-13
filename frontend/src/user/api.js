@@ -117,5 +117,70 @@ export default {
     } catch (error) {
       console.error(error)
     }
-  }
+  },
+  async getDiseaseMatch(params) {
+    try {
+        const response = await axios.get('diseasematch', {
+          params: {
+            'input': params.input,
+          }
+        })
+        console.log(response)
+        return response
+    } catch (error) {
+        console.error(error)
+    }
+  },
+  async recommend (params) {
+    try {
+        const response = await axios.get('recommend', {
+          params: {
+            'input': params.input,
+          }
+        })
+        console.log(response)
+        return response
+    } catch (error) {
+        console.error(error)
+    }
+  },
+  async recommend2 (params) {
+    try {
+        const response = await axios.get('recommend2', {
+          params: {
+            'input': params.input,
+          }
+        })
+        console.log(response)
+        return response
+    } catch (error) {
+        console.error(error)
+    }
+  },
+  async getCount(params) {
+    try {
+        const response = await axios.get('count', {
+          params: {
+            'input': params.input,
+          }
+        })
+        console.log(response)
+        return response
+    } catch (error) {
+        console.error(error)
+    }
+  },
+  async getExtractDisease(params){
+    try {
+        const response = await axios.get('extractdisease', {
+          params: {
+            'summary': params.input,
+          }
+        })
+        console.log(response)
+        return response
+    } catch (error) {
+        console.error(error)
+    }
+  }, 
 }
