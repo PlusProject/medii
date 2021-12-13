@@ -2,7 +2,7 @@ import Vue from 'vue'
 import axios from 'axios'
 
 Vue.prototype.$http = axios
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api/search/'// 'http://ec2-52-79-52-192.ap-northeast-2.compute.amazonaws.com:8000/search/'
+axios.defaults.baseURL = 'http://ec2-52-79-52-192.ap-northeast-2.compute.amazonaws.com:8000/search/'
 
 export default {
   async search (params) {
