@@ -7,7 +7,7 @@
       >
       <v-app-bar-nav-icon/>
       <v-toolbar-title>
-        <a class="route-style" href="/">MEDIAI+</a>
+        <a class="route-style" href="/">MEDIAI +</a>
       </v-toolbar-title>
       
       <div
@@ -38,23 +38,7 @@
             autocomplete="off"
             @keydown.enter="showSearchResults()"
           ></v-text-field>
-          <!-- <v-combobox
-            class="toobar-textfield"
-            placeholder="질병명을 입력하세요(고혈압, 심근경색, 순환계통 / I00, C00, ...)"
-            solo
-            flat
-            hide-details
-            prepend-icon="mdi-magnify"
-            single-line
-            :style="{ width: '525px' }"
-            :menu-props="{ 'max-width': 500 }"
-            :disabled="showSearchDetails"
-            v-model="searchByDisease"
-            :items="$store.getters.rareDiseaseList"
-            autocomplete="off"
-            @keydown.enter="searchWithClick()"
-            ref="diseaseCombobox"
-          /> -->
+          
           <v-btn
             icon
             ref='showDetails'
@@ -109,7 +93,7 @@ export default {
       })
     },
     showSearchResults () {
-      // this.showSearchDetails = !this.showSearchDetails
+      
       this.clearSearchQuery()
       this.setDiseaseQuery(this.searchByDisease)
       this.searchByDisease = ''
