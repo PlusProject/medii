@@ -7,8 +7,9 @@
       >
       <v-app-bar-nav-icon/>
       <v-toolbar-title>
-        <a class="route-style" href="/">MEDIAI +</a>
+        <a class="route-style" href="/">MEDIAI+</a>
       </v-toolbar-title>
+      
       <div
         v-show="this.$route.name !== 'home'"
         style="z-index: 2; position: relative; height: 52px; width: 625px;"
@@ -128,8 +129,11 @@ export default {
 </script>
 
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@700&display=swap');
+
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Nanum Gothic', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
