@@ -13,5 +13,10 @@ urlpatterns = [
     path('coworker_cris', views.CrisCoworkerAPI.as_view(), name="CrisCoworker"),
     path('disease', views.disease_list, name="disease_list"),
     path('rare_disease', views.rare_disease_list, name="rare_disease_list"),
+    path('recommend', views.RecommendAPI.as_view(), name='Recommend'),
+    path('recommend2', views.Recommend2API.as_view(), name='Recommend2'),
+    path('count', views.CountAPI.as_view(), name='Count'),
+    path('diseasematch', views.DiseaseMatchAPI.as_view(), name='DiseaseMatch'),
+    path('extractdisease', views.ExtractDieaseAPI.as_view(), name='ExtractDisease'),
     # path('coworker_cris', views.get_cris_coworker, name="CrisCoworker"),
 ]
