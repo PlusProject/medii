@@ -2,12 +2,32 @@ from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis,DoctorTotalDisease, Totaldisease
 from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer, 
                             PersonSerializer, ParticipateSerializer, WritesSerializer, 
-                            CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer)
+                            CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer
+                            ,DiseaseSerializer, DoctorTotalDiseaseSerializer)
 from django.db.models import Q
 import re
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import json
+from pathlib import Path
+import os
+from django.core.exceptions import ImproperlyConfigured
+import boto3
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
+    secrets = json.load(secrets_file)
+
+def get_secret(setting, secrets=secrets):
+    """Get secret setting or fail with ImproperlyConfigured"""
+    try:
+        return secrets[setting]
+    except KeyError:
+        raise ImproperlyConfigured("Set the {} setting".format(setting))
 
 class SearchAPI(APIView):
     def get(self, request):
@@ -162,3 +182,570 @@ class CrisCoworkerAPI(APIView):
             if len(participate_list) >= 1:
                 coworker_list += participate_list
         return Response(CrisCoworkerSerializer(coworker_list, many=True).data)
+
+
+class RecommendAPI(APIView):
+  
+    def get(self, request):
+        input = request.GET.get('input', 'I20.9')
+        weight_paper = request.GET.get('weight_paper', 3)
+        weight_trial = request.GET.get('weight_trial', 1)
+
+        doctor_totaldisease = pd.DataFrame(list(DoctorTotalDisease.objects.all().values()))
+        diseasecode_disease = pd.DataFrame(list(Totaldisease.objects.all().values()))
+        doctor_totaldisease = doctor_totaldisease.fillna("")
+
+        def disease_match(text):
+            text = text.split(', ')
+            result = dict()
+
+            for word in text:          
+                disease_indexs = diseasecode_disease[diseasecode_disease['disease_code'] == word].index
+                if(len(disease_indexs)):
+                    result[word] = diseasecode_disease['disease_kor'][disease_indexs[0]]
+
+            return result
+
+
+        def paper_score(input, w1, w2):
+            
+            doctor_paper_data = doctor_totaldisease.copy()
+            std = input.split(', ')
+
+            def preprocess(text):
+                text = text.replace('.', "dot")
+
+                return text
+
+            def overlap_paper(text):
+                paper_overlap = 0
+                papers = text.split('/ ')
+
+                for paper in papers:
+                    paper = paper.split(', ')
+                    if all( temp in paper for temp in std):
+                        paper_overlap += 1
+                
+                return paper_overlap
+
+
+            def overlap_keyword(text):
+                words_count = {}
+
+                text = text.replace('/ ', ', ')
+                words = text.split(', ')
+                word_target = set(words)
+                add_keyword = set(std) & word_target
+
+                
+                for word in words:
+                    if word in words_count:
+                        words_count[word] += 1
+                    else:
+                        words_count[word] = 1
+
+                sorted_words = sorted([(k, v) for k, v in words_count.items()], key=lambda word_count: -word_count[1])
+                keyword = [w for w in sorted_words if w[0] in add_keyword]
+                if(len(keyword) >= 5):
+                    keyword = keyword[0:5]
+
+                return keyword
+
+            def disease_kor_match(text):
+
+                for idx in range(0, len(text)):
+                    name_kor = disease_match(text[idx][0])
+                    if(len(name_kor) != 0): name_kor = name_kor[text[idx][0]]
+                    else: name_kor = 'x'
+                    text[idx] = [text[idx][0], name_kor, text[idx][1]]
+
+
+                return text
+
+            target_input = preprocess(input)
+            target_name = list(doctor_paper_data['name_kor'])
+            target_index = len(target_name)
+            target_name.append('target')
+
+            text = list(doctor_paper_data['paper_disease_all'])
+            target_text = [ preprocess(t) for t in text ]
+            target_text.append(target_input)
+
+            doctors = pd.DataFrame({'name': target_name,
+                                    'text': target_text})
+
+            tfidf_vector = TfidfVectorizer(min_df =3, max_features = 6000)
+            tfidf_matrix = tfidf_vector.fit_transform(doctors['text']).toarray()
+
+            cosine_sim = cosine_similarity(tfidf_matrix)
+            cosine_sim_df = pd.DataFrame(cosine_sim, columns = doctors.name)
+            cosine_sim_df.head()
+
+            temp = cosine_sim_df['target'][0:target_index]
+            doctor_paper_data['cosine_simil_paper'] = temp
+
+
+            doctor_paper_data['keyword_paper'] = doctor_paper_data.apply(lambda x: overlap_keyword(x['paper_disease_all']), axis = 1)
+            doctor_paper_data['keyword_paper'] = doctor_paper_data.apply(lambda x: disease_kor_match(x['keyword_paper']), axis = 1)
+            doctor_paper_data['overlap_paper'] = doctor_paper_data.apply(lambda x: overlap_paper(x['paper_disease_all']), axis = 1)
+            doctor_paper_data['total_paper'] =  doctor_paper_data.apply(lambda x: (x['paper_impact']*w1+x['cosine_simil_paper']*w2)/(w1+w2), axis = 1)
+
+            return doctor_paper_data
+
+        
+        def clinical_score(input):
+            
+            doctor_disease_data =  pd.DataFrame({'chief_name': doctor_totaldisease['name_kor'],
+                                                'belong': doctor_totaldisease['belong'],
+                                                'clinical_count': doctor_totaldisease['clinical_count'],
+                                                'clinical_disease_all': doctor_totaldisease['clinical_disease_all']
+                                                })
+
+            def preprocess(text):
+
+                text = text.replace('.', "dot")
+                return text
+
+                
+            target_input = preprocess(input)
+            target_name = list(doctor_disease_data['chief_name'])
+            target_index = len(target_name)
+            target_name.append('target')
+
+            text = list(doctor_disease_data['clinical_disease_all'])
+            target_text = [ preprocess(t) for t in text ]
+            target_text.append(target_input)
+
+            doctors = pd.DataFrame({'name': target_name,
+                                    'text': target_text})
+
+            tfidf_vector = TfidfVectorizer(min_df =3, max_features = 6000)
+            tfidf_matrix = tfidf_vector.fit_transform(doctors['text']).toarray()
+
+            cosine_sim = cosine_similarity(tfidf_matrix)
+            cosine_sim_df = pd.DataFrame(cosine_sim, columns = doctors.name)
+            cosine_sim_df.head()
+
+            doctor_disease_data['total_clinical'] = cosine_sim_df['target'][:target_index]
+
+
+            std = input.split(', ')
+
+            def overlap_clinical(text):
+                clinical_overlap = 0
+                clinicals = text.split('/ ')
+                for clinical in clinicals:
+                    clinical = clinical.split(', ')
+                    if all( temp in clinical for temp in std):
+                        clinical_overlap += 1
+                
+                return clinical_overlap
+
+            def overlap_keyword(text):
+                text = text.replace('/ ', ', ')
+                words = text.split(', ')
+                word_target = set(words)
+                add_keyword = set(std) & word_target
+
+                words_count = {}
+                for word in words:
+                    if word in words_count:
+                        words_count[word] += 1
+                    else:
+                        words_count[word] = 1
+
+                sorted_words = sorted([(k, v) for k, v in words_count.items()], key=lambda word_count: -word_count[1])
+                keyword = [w for w in sorted_words if w[0] in add_keyword]
+                if(len(keyword) >= 5):
+                    keyword = keyword[0:5]
+
+                return keyword
+
+            def disease_kor_match(text):
+
+                for idx in range(0, len(text)):
+                    name_kor = disease_match(text[idx][0])
+                    if len(name_kor):
+                        name_kor = name_kor[text[idx][0]]
+                        text[idx] = [text[idx][0], name_kor, text[idx][1]]
+
+                return text
+
+            
+            doctor_disease_data['keyword_clinical'] = doctor_disease_data.apply(lambda x: overlap_keyword(x['clinical_disease_all']), axis = 1)
+            doctor_disease_data['keyword_clinical'] = doctor_disease_data.apply(lambda x: disease_kor_match(x['keyword_clinical']), axis = 1)
+            doctor_disease_data['overlap_clinical'] = doctor_disease_data.apply(lambda x: overlap_clinical(x['clinical_disease_all']), axis = 1)
+            doctor_disease_data['index'] = range(target_index)
+
+            result = doctor_disease_data[['total_clinical', 'overlap_clinical', 'keyword_clinical']]
+
+            return result
+
+
+
+        def get_recommendation(input, weight_paper, weight_trial, weight_paper_impact, weight_sim):
+            
+            print('추출(검색)된 질병 : ', end = ' ')
+            print('추출된 질병 (한글명 매칭): ', end = ' ')
+            print(disease_match(input))
+
+            paper_grade = paper_score(input, weight_paper_impact, weight_sim)
+            clinical_grade = clinical_score(input)
+            
+            person_grade = pd.concat([paper_grade,clinical_grade], axis = 1)
+            person_grade['total_score'] = person_grade.apply( lambda x: (x['total_paper']*weight_paper + x['total_clinical']*weight_trial)/(weight_paper+weight_trial) , axis= 1) 
+            ranking = person_grade.sort_values(by='total_score', ascending=False)[0:10]
+            ranking['ranking'] = range(1,11)
+            ranking['cosine_simil_paper'] = round(ranking['cosine_simil_paper'], 2)
+            ranking['total_clinical'] = round(ranking['total_clinical'], 2)
+            ranking['total_score'] = round(ranking['total_score'], 2)
+            ranking['paper_impact'] = round(ranking['paper_impact'], 2)
+            temp = ranking.to_json(orient = 'records')
+
+            return temp
+
+        return Response(get_recommendation(input, weight_paper, weight_trial, weight_paper_impact=3, weight_sim=7))
+
+
+class Recommend2API(APIView):
+    
+    def get(self, request):
+        input = request.GET.get('input', 'I20.9')
+        weight_paper = request.GET.get('weight_paper', 3)
+        weight_trial = request.GET.get('weight_trial', 1)
+
+        dataset = pd.DataFrame(list(DoctorTotalDisease.objects.all().values()))
+        disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
+        
+        dataset = dataset.fillna("")
+
+        def disease_match(text):
+            text = text.split(', ')
+            result = dict()
+
+            for word in text:          
+                disease_indexs = disease_table[disease_table['disease_code'] == word].index
+                if(len(disease_indexs)):
+                    result[word] = disease_table['disease_kor'][disease_indexs[0]]
+            return result
+        
+        def paper_score(input):
+            
+            doctor_paper_data = dataset.copy()
+            
+            def preprocess(text):
+                text = text.replace('.', "dot")
+                return text
+
+            def overlap_paper(text):
+                paper_overlap = 0
+                papers = text.split('/ ')
+                for paper in papers:
+                    paper = paper.split(', ')
+                    if all( temp in paper for temp in std):
+                        paper_overlap += 1
+                return paper_overlap
+
+            def overlap_keyword(text):
+                words_count = {}
+                text = text.replace('/ ', ', ')
+                words = text.split(', ')
+                word_target = set(words)
+                add_keyword = set(std) & word_target
+
+                for word in words:
+                    if word in words_count:
+                        words_count[word] += 1
+                    else:
+                        words_count[word] = 1
+
+                sorted_words = sorted([(k, v) for k, v in words_count.items()], key=lambda word_count: -word_count[1])
+                keyword = [w for w in sorted_words if w[0] in add_keyword]
+                if(len(keyword) >= 5):
+                    keyword = keyword[0:5]
+                return keyword
+
+            def disease_kor_match(text):
+                for idx in range(0, len(text)):
+                    name_kor = disease_match(text[idx][0])
+                    if(len(name_kor) != 0): name_kor = name_kor[text[idx][0]]
+                    else: name_kor = 'x'
+                    text[idx] = [text[idx][0], name_kor, text[idx][1]]
+                return text
+
+            def simil_large(text):
+                target_input = text
+                target_name = list(doctor_paper_data['name_kor'])
+                target_index = len(target_name)
+                target_name.append('target')
+
+                text = list(doctor_paper_data['paper_disease_all'])
+                target_text = [ preprocess(t) for t in text ]
+                target_text.append(target_input)
+
+                doctors = pd.DataFrame({'name': target_name,
+                                        'text': target_text})
+
+                tfidf_vector = TfidfVectorizer(min_df =3, max_features = 6000)
+                tfidf_matrix = tfidf_vector.fit_transform(doctors['text']).toarray()
+
+                cosine_sim = cosine_similarity(tfidf_matrix)
+                cosine_sim_df = pd.DataFrame(cosine_sim, columns = doctors.name)
+                cosine_sim_df.head()
+
+                temp = cosine_sim_df['target'][0:target_index]
+                doctor_paper_data['cosine_simil_paper_large'] = temp
+
+                return doctor_paper_data['cosine_simil_paper_large']
+
+            simil_large(input)
+
+            target_input = preprocess(input)
+            target_name = list(doctor_paper_data['name_kor'])
+            target_index = len(target_name)
+            target_name.append('target')
+
+            text = list(doctor_paper_data['paper_disease_all'])
+            target_text = [ preprocess(t) for t in text ]
+            target_text.append(target_input)
+
+            doctors = pd.DataFrame({'name': target_name,'text': target_text})
+
+            tfidf_vector = TfidfVectorizer(min_df =3, max_features = 6000)
+            tfidf_matrix = tfidf_vector.fit_transform(doctors['text']).toarray()
+
+            cosine_sim = cosine_similarity(tfidf_matrix)
+            cosine_sim_df = pd.DataFrame(cosine_sim, columns = doctors.name)
+            cosine_sim_df.head()
+
+            temp = cosine_sim_df['target'][0:target_index]
+            doctor_paper_data['cosine_simil_paper'] = temp
+
+            std = input.split(', ')
+
+            doctor_paper_data['keyword_paper'] = doctor_paper_data.apply(lambda x: overlap_keyword(x['paper_disease_all']), axis = 1)
+            doctor_paper_data['keyword_paper'] = doctor_paper_data.apply(lambda x: disease_kor_match(x['keyword_paper']), axis = 1)
+            doctor_paper_data['overlap_paper'] = doctor_paper_data.apply(lambda x: overlap_paper(x['paper_disease_all']), axis = 1)
+            doctor_paper_data['cosine_simul_paper'] =  doctor_paper_data.apply(lambda x: (x['cosine_simil_paper']*0.7+x['cosine_simil_paper_large']*0.3), axis = 1)
+
+            return doctor_paper_data
+        
+        def clinical_score(input):
+            
+            doctor_disease_data =  pd.DataFrame({'chief_name': dataset['name_kor'],
+                                                'belong': dataset['belong'],
+                                                'clinical_count': dataset['clinical_count'],
+                                                'clinical_disease_all': dataset['clinical_disease_all']
+                                                })
+
+            def preprocess(text):
+                text = text.replace('.', "dot")
+                return text
+
+            def overlap_clinical(text):
+                clinical_overlap = 0
+                clinicals = text.split('/ ')
+                for clinical in clinicals:
+                    clinical = clinical.split(', ')
+                    if all( temp in clinical for temp in std):
+                        clinical_overlap += 1
+                
+                return clinical_overlap
+
+            def overlap_keyword(text):
+                text = text.replace('/ ', ', ')
+                words = text.split(', ')
+                word_target = set(words)
+                add_keyword = set(std) & word_target
+
+                words_count = {}
+                for word in words:
+                    if word in words_count:
+                        words_count[word] += 1
+                    else:
+                        words_count[word] = 1
+
+                sorted_words = sorted([(k, v) for k, v in words_count.items()], key=lambda word_count: -word_count[1])
+                keyword = [w for w in sorted_words if w[0] in add_keyword]
+                if(len(keyword) >= 5):
+                    keyword = keyword[0:5]
+
+                return keyword
+
+            def disease_kor_match(text):
+                for idx in range(0, len(text)):
+                    name_kor = disease_match(text[idx][0])
+                    if len(name_kor):
+                        name_kor = name_kor[text[idx][0]]
+                        text[idx] = [text[idx][0], name_kor, text[idx][1]]
+
+                return text
+
+            def simil_large(text):
+                target_input = text
+                target_name = list(doctor_disease_data['chief_name'])
+                target_index = len(target_name)
+                target_name.append('target')
+
+                text = list(doctor_disease_data['clinical_disease_all'])
+                target_text = [ preprocess(t) for t in text ]
+                target_text.append(target_input)
+
+                doctors = pd.DataFrame({'name': target_name,'text': target_text})
+
+                tfidf_vector = TfidfVectorizer(min_df =3, max_features = 6000)
+                tfidf_matrix = tfidf_vector.fit_transform(doctors['text']).toarray()
+
+                cosine_sim = cosine_similarity(tfidf_matrix)
+                cosine_sim_df = pd.DataFrame(cosine_sim, columns = doctors.name)
+                cosine_sim_df.head()
+
+                doctor_disease_data['cosine_simil_clinical_large'] = cosine_sim_df['target'][:target_index]
+
+                return doctor_disease_data['cosine_simil_clinical_large']
+
+            simil_large(input)
+
+            target_input = preprocess(input)
+            target_name = list(doctor_disease_data['chief_name'])
+            target_index = len(target_name)
+            target_name.append('target')
+
+            text = list(doctor_disease_data['clinical_disease_all'])
+            target_text = [ preprocess(t) for t in text ]
+            target_text.append(target_input)
+
+            doctors = pd.DataFrame({'name': target_name,'text': target_text})
+
+            tfidf_vector = TfidfVectorizer(min_df =3, max_features = 6000)
+            tfidf_matrix = tfidf_vector.fit_transform(doctors['text']).toarray()
+
+            cosine_sim = cosine_similarity(tfidf_matrix)
+            cosine_sim_df = pd.DataFrame(cosine_sim, columns = doctors.name)
+            cosine_sim_df.head()
+
+            doctor_disease_data['cosine_simil_clinical'] = cosine_sim_df['target'][:target_index]
+
+            std = input.split(', ')
+
+            doctor_disease_data['keyword_clinical'] = doctor_disease_data.apply(lambda x: overlap_keyword(x['clinical_disease_all']), axis = 1)
+            doctor_disease_data['keyword_clinical'] = doctor_disease_data.apply(lambda x: disease_kor_match(x['keyword_clinical']), axis = 1)
+            doctor_disease_data['overlap_clinical'] = doctor_disease_data.apply(lambda x: overlap_clinical(x['clinical_disease_all']), axis = 1)
+            doctor_disease_data['total_clinical'] =  doctor_disease_data.apply(lambda x: (x['cosine_simil_clinical']*0.7+x['cosine_simil_clinical_large']*0.3), axis = 1)
+            doctor_disease_data['index'] = range(target_index)
+            result = doctor_disease_data[['total_clinical', 'overlap_clinical', 'keyword_clinical']]
+
+            return result
+        
+        def get_recommendation(input, weight_paper, weight_trial):
+            
+            print('추출(검색)된 질병 : ', end = ' ')
+            print('추출된 질병 (한글명 매칭): ', end = ' ')
+            print(disease_match(input))
+
+            paper_grade = paper_score(input)
+            clinical_grade = clinical_score(input)
+            
+            person_grade = pd.concat([paper_grade,clinical_grade], axis = 1)
+            person_grade['total_score'] = person_grade.apply( lambda x: (x['cosine_simil_paper']*weight_paper + x['total_clinical']*weight_trial)/(weight_paper+weight_trial) , axis= 1) 
+            ranking = person_grade.sort_values(by='total_score', ascending=False)[0:10]
+            ranking['cosine_simil_paper'] = round(ranking['cosine_simil_paper'], 2)
+            ranking['total_clinical'] = round(ranking['total_clinical'], 2)
+            ranking['total_score'] = round(ranking['total_score'], 2)
+            ranking['paper_impact'] = round(ranking['paper_impact'], 2)
+            ranking['ranking'] = range(1,11)
+            temp = ranking.to_json(orient = 'records')
+            
+            return temp
+        
+        return Response(get_recommendation(input, weight_paper, weight_trial))
+
+
+
+class CountAPI(APIView):
+
+    def get(self, request):
+
+        diseases = request.GET.get('input', "I20.1")
+        diseases = diseases.split(', ')
+
+        q1=Q()
+        q2=Q()
+        q3=Q()
+        q4=Q()
+        if diseases:
+            for disease in diseases:
+                q1 &= Q(paper_disease_all__icontains=disease)
+                q2 &= Q(clinical_disease_all__icontains=disease)
+                q3 |= Q(paper_disease_all__icontains=disease)
+                q4 |= Q(clinical_disease_all__icontains=disease)
+
+        q1 |= q2
+        q3 |= q4
+        queryset1 = DoctorTotalDisease.objects.filter(q1)
+        queryset2 = DoctorTotalDisease.objects.filter(q3)
+        overall_count = queryset1.count()
+        partition_count = queryset2.count()
+
+        result = {'overall_count': overall_count,
+                    'partition_count': partition_count}
+
+        return Response(json.dumps(result))
+
+
+class DiseaseMatchAPI(APIView):
+  
+    def get(self, request):
+
+        diseases = request.GET.get('input', "I20.1")
+        diseases = diseases.split(', ')
+
+        diseasecode_disease = pd.DataFrame(list(Totaldisease.objects.all().values()))
+
+
+        result = dict()
+        for word in diseases:          
+            disease_indexs = diseasecode_disease[diseasecode_disease['disease_code'] == word].index
+            if(len(disease_indexs)):
+                result[word] = diseasecode_disease['disease_kor'][disease_indexs[0]]
+            else:
+                result[word] = "x"
+
+
+        return Response(json.dumps(result))
+
+class ExtractDieaseAPI(APIView):
+
+    def get(self, request):
+
+        client = boto3.client(
+            service_name=get_secret('service_name'),
+            region_name=get_secret('region_name'),
+            aws_access_key_id=get_secret('aws_access_key_id'),
+            aws_secret_access_key=get_secret('aws_secret_access_key'),
+        )
+
+        ## API 호출
+        text=request.GET.get('summary', "");
+        resp = client.infer_icd10_cm(Text=text)
+
+        ## return된 dic 타입을 후처리하고 list로 질병코드 추출
+        data=resp
+        for i, values in enumerate(data.values()):
+            if i==0:
+                df2=pd.DataFrame(values)
+
+        df = df2[['ICD10CMConcepts']]
+        d=[]
+        for k,v in enumerate(df['ICD10CMConcepts']):
+            for i, j in enumerate(v):
+                if i <= 3:
+                    d.append(j)
+
+        df1=pd.DataFrame(d)
+        df1.rename(columns={'Code':'disease_code'}, inplace=True)
+        disease_code = list(df1['disease_code'])
+        disease_code = list(set(disease_code))
+
+        return Response(json.dumps(disease_code))
+
