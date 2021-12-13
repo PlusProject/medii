@@ -90,3 +90,33 @@ class Disease(models.Model):
     class Meta:
         managed = False
         db_table = 'disease'
+
+
+
+class DoctorTotalDisease(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name_kor = models.CharField(max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
+    belong = models.CharField(max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
+    major = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    paper_count = models.IntegerField(blank=True, null=True)
+    paper_impact = models.FloatField(blank=True, null=True)
+    paper_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    clinical_count = models.IntegerField(blank=True, null=True)
+    clinical_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    img = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'doctor_total_disease'
+
+
+
+class Totaldisease(models.Model):
+    id = models.IntegerField(primary_key=True)
+    disease_code = models.TextField(blank=True, null=True)
+    disease_kor = models.TextField(blank=True, null=True)
+    disease_eng = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'totaldisease'
