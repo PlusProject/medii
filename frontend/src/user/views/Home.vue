@@ -5,7 +5,7 @@
       :class="showInfoPage ? 'search-container' + ' transition-move' : 'search-container'" 
     >
       <p :class="showInfoPage ? 'logo' + ' fade-out' : 'logo'">
-        MEDIAI +
+        MEDIAI <strong class="red--text text--lighten-1">+</strong> 
       </p>
       <v-toolbar
         class="toolbar-sheet rounded-pill"
@@ -20,7 +20,7 @@
       >
         <v-text-field
           class="toobar-textfield"
-          placeholder="질병명을 입력하세요(고혈압, 심근경색, 순환계통 / I00, C00, ...)"
+          placeholder="질병코드를 (, ) 로 구분해서 입력하세요. [ 예시: I21.9, Q23 ]"
           solo
           flat
           hide-details
@@ -63,25 +63,50 @@
           width="800px"
         />
       </v-expand-transition>
-      <div class="btn-search-detail" v-if="!showInfoPage">
-        <v-btn
+
+      <div class="d-flex justify-center">
+                 
+          <v-btn
           elevation="8"
           large
           rounded
-          @click="showSearchDetailsTrigger()"
-          color="#93A2FF"
-          :style="{ 'color': '#F3F5FF' }"
-        >
-          상세검색
-          <v-icon right> mdi-filter-variant </v-icon>
-        </v-btn>
+          class = 'indigo lighten-3 my-8 mx-1'
+          dark
+          @click = "$router.push({
+          name: 'recommend',
+          params : {
+              disease: 'I20.1',
+          }
+        })">
+            의료진 추천
+          </v-btn>
+        
+
+
+        <div class="btn-search-detail" v-if="!showInfoPage">
+          <v-btn
+            elevation="8"
+            large
+            rounded
+            @click="showSearchDetailsTrigger()"
+            color="#93A2FF"
+            class = 'mx-1'
+            :style="{ 'color': '#F3F5FF' }"
+          >
+            상세검색
+            <v-icon right> mdi-filter-variant </v-icon>
+          </v-btn>
+        </div>
+      </div>
+     
+      
         <v-expand-transition>
           <SearchDetail
             v-show="showSearchDetails"
             width="800px"
           />
         </v-expand-transition>
-      </div>
+      
 
       <div class="btn-show-info" v-if="false">
         <v-btn
@@ -103,6 +128,9 @@
         <database-info v-if="loadInfoPage" class="infopage"/>
       </transition>
     </div>
+
+    
+
   </div>
 </template>
 
@@ -145,13 +173,15 @@ export default {
           this.showSearchResults()
       })
     },
-    showSearchResults () {
-      // this.showSearchDetails = !this.showSearchDetails
-      this.clearSearchQuery()
-      this.setDiseaseQuery(this.searchByDisease)
-      if (this.$route.name !== 'DoctorList') {
-        this.$router.push({ name: 'DoctorList' })
-      }
+    showSearchResults () {      
+      
+        this.$router.push({
+          name: 'recommend',
+          params : {
+              disease: this.searchByDisease,
+          }
+        })
+      
     },
     showSearchDetailsTrigger () {
       this.searchByDisease = ''
