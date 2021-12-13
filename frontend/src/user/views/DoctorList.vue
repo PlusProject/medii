@@ -99,11 +99,11 @@
             </v-btn>
           </v-toolbar>
         </template>
-        <template v-slot:item.name_kor="{ item }">
+        <template v-slot:[`item.name_kor`]="{ item }">
           <a v-if="item.doctor_info" :href="item.doctor_info.url" target="_blank">{{ item.name_kor }}</a>
           <span v-else>{{ item.name_kor }}</span>
         </template>
-        <template v-slot:item.participate_num="{ item }">
+        <template v-slot:[`item.participate_num`]="{ item }">
           <v-btn
             @click.stop="showParticipateInfo(item)"
             :disabled="item.participate_num === 0"
@@ -111,7 +111,7 @@
             {{ item.participate_num }}
           </v-btn>
         </template>
-        <template v-slot:item.writes_num="{ item }">
+        <template v-slot:[`item.writes_num`]="{ item }">
           <v-btn
             @click.stop="showWritesInfo(item)"
             :disabled="item.writes_num === 0"
@@ -185,7 +185,7 @@
             item-key="title"
             :search="clinicalTrialsSearch"
           >
-            <template v-slot:item.index="{ index }">
+            <template v-slot:[`item.index`]="{ index }">
               {{ index + 1}}
             </template>
           </v-data-table>
@@ -213,7 +213,7 @@
             item-key="title"
             :search="thesisSearch"
           >
-            <template v-slot:item.index="{ index }">
+            <template v-slot:[`item.index`]="{ index }">
               {{ index + 1}}
             </template>
           </v-data-table>
