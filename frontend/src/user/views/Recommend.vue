@@ -49,7 +49,7 @@
             dark
             @click = chageapi
           >
-            추천 {{click}}
+             {{click}} 추천
           </v-btn>
       </div>
     </div>
@@ -259,7 +259,7 @@ export default {
             summary: "",
             toggle: false,
             color: 'primary',
-            click: 'A',
+            click: 'paper impact 고려된 ',
             previous:'I20.1',
             target: [],
             rules: [
@@ -334,13 +334,13 @@ export default {
     
      if(this.toggle === true){
        this.color = 'cyan accent-6'
-       this.click = 'B'
+       this.click = '중분류 질병 체계 고려한 '
        this.input = this.previous
        this.getRecommendResults2()     
      }
      else{
        this.color = 'primary'
-       this.click = 'A'
+       this.click = 'paper impact 고려된 '
        this.input = this.previous
        this.getRecommendResults()
      }
@@ -355,7 +355,7 @@ export default {
       this.getDiseaseMatchResults();
       this.toggle = false;
       this.color = 'primary'
-      this.click = 'A'
+      this.click = 'paper impact 고려된 '
       this.previous = this.input;
       this.input= ""
     },
