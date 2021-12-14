@@ -255,7 +255,7 @@ export default {
             return{
             title: "",
             showextractdisease: false,
-            extractdisease : ['I20.1', 'I21.9', 'I55.9'],
+            extractdisease : [],
             summary: "",
             toggle: false,
             color: 'primary',
@@ -326,6 +326,7 @@ export default {
      this.title = ""
      this.input = this.target.join(', ')
      this.target = []
+     this.extractdisease = []
      this.re2()
    },
    chageapi(){
