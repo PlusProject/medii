@@ -136,7 +136,7 @@
 
         <v-item-group multiple
         v-if = "showextractdisease">
-          <v-subheader>추출된 질병명</v-subheader>
+          <v-subheader>추출된 질병명 중 추천에서 제외할 질병 코드를 선택하세요 [질병코드(frequency)]</v-subheader>
 
             <v-item
               v-for="( item, i ) in extractdisease"
@@ -307,7 +307,7 @@ export default {
 
    },
    updateDiseaseSet(active, item){
-     if(active === true){
+     if(active === false){
        for(let i = 0; i < this.target.length; i++) {
         if(this.target[i] === item){
           this.target.splice(i, 1);
@@ -324,6 +324,10 @@ export default {
      this.detail_search = false
      this.summary = ""
      this.title = ""
+     this.target = this.target.map(element => {  
+       return element.split('(')[0]
+     });
+     console.log(this.target)
      this.input = this.target.join(', ')
      this.target = []
      this.extractdisease = []
@@ -443,6 +447,7 @@ export default {
         const res = await api.getExtractDisease(params)
         let result = res['data']
         this.extractdisease = JSON.parse(result)
+        this.target = this.extractdisease
 
       } catch (err) {
         console.log(err)
