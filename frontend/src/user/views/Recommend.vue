@@ -68,18 +68,31 @@
 
     <v-dialog
       v-model="dialog"
-      max-width="700px"
+      max-width="850px"
     >
-      <v-card>
+      <v-card class="text-sm-left pa-7">
         <v-card-title>추천 로직</v-card-title>
 
-        <v-card-text>
+        
+          <p class='blue lighten-3'> paper impact 고려된 추천 </p>
+          <v-spacer></v-spacer>
           <p> 의료진의 저명성: 논문 impact = citation값과 논문이 등재된 저널의 jci 값을 다 더한 후 정규화한 값</p>
           <p> 의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험 관련 질병명 간의 코사인 유사도를 구한 값</p>
           <v-spacer></v-spacer>
           <p>전체 점수 = 논문 점수*0.7 + 임상시험 질병 유사도 점수*0.3 </p>
           <p>논문 점수 = 논문 질병 유사도 점수*0.7 + 논문 impact*0.3</p>
-        </v-card-text>
+          <v-spacer></v-spacer>
+          <p class = 'blue lighten-3'> 중분류 질병 체계 고려한 추천<p>
+          <v-spacer></v-spacer>
+          <p>중분류 질병 체계 고려: 추천 받고 싶은 소분류 질병코드 입력 시 중분류까지 고려해서 추천( 예: 질병코드 I20.9은 I20과도 유사하다고 판단)</p>
+          <p>의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험 관련 질병명 간의 코사인 유사도를 구한 값</p>
+          <v-spacer></v-spacer>
+          <p>전체 점수 = 논문 점수*0.7 + 임상시험 질병 유사도 점수*0.3</p>
+          <p>논문 점수 = 논문 질병 소분류 유사도 점수*0.7 + 논문 질병 중분류 유사도 점수*0.3</p>
+          <p>임상 점수= 임상 질병 소분류 유사도 점수*0.7 + 임상 질병 중분류 유사도 점수*0.3</p>
+
+
+        
 
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -172,6 +185,8 @@
       :items="items"
       hide-default-footer
       class="elevation-1"
+      :loading="loading"
+      loading-text="Loading... Please wait"
     >
 
       <template v-slot:top>
@@ -181,6 +196,31 @@
             있습니다.
           </v-toolbar-title>
           <v-spacer></v-spacer>
+
+          <v-slider
+          v-model="clinical.val"
+          :color="clinical.color"
+          :label="clinical.label"
+          thumb-label="always"
+          max="10"
+        ></v-slider>
+
+        <v-slider
+          v-model="paper.val"
+          :label="paper.label"
+          :color="paper.color"
+          thumb-label="always"
+          max="10"
+        ></v-slider>
+
+        <v-btn
+            color="light-blue darken-4"
+            @click="changeWeight"
+            class ="font-weight-black white--text px-3 ma-5"
+          >
+            가중치 변경
+        </v-btn>
+
         </v-toolbar>
       </template>
 
@@ -197,7 +237,7 @@
         </tr> 
       </thead>
     </template>
-
+     
       <template v-slot:[`item.img`] ="{ item }">
 
           <img :src="item.img" />
@@ -253,6 +293,9 @@ import api from '../api';
 export default {
         data(){
             return{
+            clinical: { label: '임상시험 가중치', val: 3, color: 'primary darken-3' },
+            paper: { label: '논문 가중치', val: 7, color: 'blue-grey darken-2' },
+            loading : true,
             title: "",
             showextractdisease: false,
             extractdisease : [],
@@ -300,6 +343,17 @@ export default {
     },
 
  methods: {
+   changeWeight(){
+     this.items = []
+     this.loading = true
+     this.input = this.previous
+     if(this.toggle === true){
+      this.getRecommendResults2()  
+     }
+     else{
+      this.getRecommendResults()
+     }
+   },
    getSummaryInput(){
      
      this.showextractdisease = true
@@ -335,6 +389,8 @@ export default {
    },
    chageapi(){
      this.toggle = !this.toggle
+     this.items = []
+     this.loading = true
     
      if(this.toggle === true){
        this.color = 'cyan accent-6'
@@ -353,7 +409,8 @@ export default {
      this.input= ""
    },
     re2() {
-      
+      this.loading = true
+      this.items = []
       this.getRecommendResults();
       this.getCountResults();
       this.getDiseaseMatchResults();
@@ -370,11 +427,14 @@ export default {
         
         const params = {
           input : temp,
+          weight_paper: this.paper.val,
+          weight_trial: this.clinical.val,
         }
-        
+        console.log(this.paper.val)
         const res = await api.recommend(params)
         this.items = res['data']
         this.items = JSON.parse(this.items)
+        this.loading = false
 
       } catch (err) {
         console.log(err)
@@ -388,12 +448,15 @@ export default {
         
         const params = {
           input : temp,
+          weight_paper: this.paper.val,
+          weight_trial: this.clinical.val,
         }
         
         const res = await api.recommend2(params)
         
         this.items = res['data']
         this.items = JSON.parse(this.items)
+        this.loading = false
   
 
       } catch (err) {
@@ -408,6 +471,7 @@ export default {
           
         const params = {
           input : temp,
+
         }
         
         const res = await api.getCount(params)
@@ -444,6 +508,8 @@ export default {
         const params = {
           input : temp,
         }
+        console.log(this.paper.val)
+        console.log(this.clinical.val)
         const res = await api.getExtractDisease(params)
         let result = res['data']
         this.extractdisease = JSON.parse(result)
@@ -477,6 +543,9 @@ mounted: function () {
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@700&display=swap');
 
 section {
+  font-family: 'Nanum Gothic', sans-serif;
+}
+p {
   font-family: 'Nanum Gothic', sans-serif;
 }
 
