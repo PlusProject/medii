@@ -188,8 +188,11 @@ class RecommendAPI(APIView):
   
     def get(self, request):
         input = request.GET.get('input', 'I20.9')
-        weight_paper = request.GET.get('weight_paper', 3)
-        weight_trial = request.GET.get('weight_trial', 1)
+        weight_paper = request.GET.get('weight_paper', 7)
+        weight_trial = request.GET.get('weight_trial', 3)
+
+        weight_paper = int(weight_paper)
+        weight_trial = int(weight_trial)
 
         doctor_totaldisease = pd.DataFrame(list(DoctorTotalDisease.objects.all().values()))
         diseasecode_disease = pd.DataFrame(list(Totaldisease.objects.all().values()))
@@ -411,8 +414,11 @@ class Recommend2API(APIView):
     
     def get(self, request):
         input = request.GET.get('input', 'I20.9')
-        weight_paper = request.GET.get('weight_paper', 3)
-        weight_trial = request.GET.get('weight_trial', 1)
+        weight_paper = request.GET.get('weight_paper', 7)
+        weight_trial = request.GET.get('weight_trial', 3)
+
+        weight_paper = int(weight_paper)
+        weight_trial = int(weight_trial)
 
         dataset = pd.DataFrame(list(DoctorTotalDisease.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
@@ -642,6 +648,8 @@ class Recommend2API(APIView):
             print('추출(검색)된 질병 : ', end = ' ')
             print('추출된 질병 (한글명 매칭): ', end = ' ')
             print(disease_match(input))
+            print(weight_paper)
+            print(weight_trial)
 
             paper_grade = paper_score(input)
             clinical_grade = clinical_score(input)
