@@ -709,7 +709,7 @@ class DiseaseMatchAPI(APIView):
             if(len(disease_indexs)):
                 result[word] = diseasecode_disease['disease_kor'][disease_indexs[0]]
             else:
-                result[word] = "x"
+                result[word] = "한글 질병명 x"
 
 
         return Response(json.dumps(result))
@@ -729,23 +729,46 @@ class ExtractDieaseAPI(APIView):
         text=request.GET.get('summary', "");
         resp = client.infer_icd10_cm(Text=text)
 
-        ## return된 dic 타입을 후처리하고 list로 질병코드 추출
-        data=resp
+        data = resp
         for i, values in enumerate(data.values()):
-            if i==0:
-                df2=pd.DataFrame(values)
+            if i == 0:
+                df2 = pd.DataFrame(values)
 
-        df = df2[['ICD10CMConcepts']]
-        d=[]
-        for k,v in enumerate(df['ICD10CMConcepts']):
-            for i, j in enumerate(v):
-                if i <= 3:
+        try:
+            df = df2[['ICD10CMConcepts']]
+            # print(df)
+        except:
+            pass
+
+        disease_code = []
+        for k, v in enumerate(df['ICD10CMConcepts']):
+            if v != []:
+                d = []
+                for i, j in enumerate(v):
                     d.append(j)
+                # print(d)
 
-        df1=pd.DataFrame(d)
-        df1.rename(columns={'Code':'disease_code'}, inplace=True)
-        disease_code = list(df1['disease_code'])
-        disease_code = list(set(disease_code))
+                df1 = pd.DataFrame(d)
+                # print(df1)
+                disease_codes = list(df1['Code'])  ## ACM으로 분석된 질병코드
+                disease_code += disease_codes
+        # print(Counter(disease_code))
 
-        return Response(json.dumps(disease_code))
+        freq_list = sorted(disease_code, key=lambda x: (-disease_code.count(x), disease_code.index(x)))
+        # print(freq_list)
+
+        temp = list(dict.fromkeys(freq_list))
+        # print(temp)
+        code_list = []
+
+        for i in temp:
+            cnt = 0
+            for l in freq_list:
+                if i == l:
+                    cnt += 1
+            code_list.append(i + '(' + str(cnt) + ')')
+            result = code_list
+
+        return Response(json.dumps(result))
+
 
