@@ -3,7 +3,7 @@
 # On the fit😎
 
 <p align="center">
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/c45f8cda-f3dd-47f3-b3e1-db71bc1e222e/Untitled.png)
+![image](https://user-images.githubusercontent.com/66810905/146679402-0e36c9cf-4541-47a3-924e-74508b100345.png)
 
 </p>
 <p align="center">
