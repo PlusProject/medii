@@ -67,7 +67,7 @@ npm run serve
 3. 그러면 그 질병 코드와 관련된 의료진이 의료진의 질병 전문성, 영향력, 저명도에 점수를 매겨 추천되게 됩니다.
 4. 오른쪽 상단에 paper impact를 고려한 추천 버튼을 누르면 다른 api를 통해 나온 중분류 체계를 고려한 추천도 보실 수 있습니다. ( 기본으로 제공되는 추천은 paper impact를 고려한 추천입니다)
 
-![image](https://user-images.githubusercontent.com/66810905/146680290-60d2e531-0184-40dd-9ea0-420d59900ae9.png)
+![image](https://user-images.githubusercontent.com/66810905/146680544-fe95348f-93dc-4722-ac1a-c74f509fe699.png)
 
 
 ![image](https://user-images.githubusercontent.com/66810905/146680309-85e891cd-8ed7-48be-9db4-8d914daffd32.png)
