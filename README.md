@@ -1,27 +1,15 @@
-# web-demo
+# mediai+
 
-# On the fit😎
+'''
+스타트업 기업인 메디아이플러스와 성균관대학교 소프트웨어 학과가 함께 진행한 산학협력프로젝트입니다. 
+메디아이플러스는 바이오벤처를 대상으로 임상시험 데이터를 제공해주는 기업입니다.
+'''
 
+# 의료진 추천 시스템
 
+이번 프로젝트에서는 심장희귀질병에 관하여 임상시험이 가능한 의료진을 추천해주는 시스템을 만들고자 하였습니다.
 ![image](https://user-images.githubusercontent.com/66810905/146679402-0e36c9cf-4541-47a3-924e-74508b100345.png)
 
-<p align="center">
-
-![npm](https://img.shields.io/badge/npm-7.20.1-blue)
-![vue](https://img.shields.io/badge/Vue-2.6.11-green)
-![vuetify](https://img.shields.io/badge/Vuetify-2.4.0-9cf)
-
-
-![issues](https://img.shields.io/github/issues/gyuri2020/codethestudent)
-![issues closed](https://img.shields.io/github/issues-closed/gyuri2020/codethestudent)
-![pr](https://img.shields.io/github/issues-pr/gyuri2020/codethestudent)
-![pr closed](https://img.shields.io/github/issues-pr-closed/gyuri2020/codethestudent)
-
-</p>
-
-대학생들을 위한, 성균관대학생을 위한, 바쁜 율전사람들을 위한,
-
-패션 추천 시스템 "On the fit" 입니다.
 
 
 ## Overview 👋
