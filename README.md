@@ -36,20 +36,28 @@ git clone https://github.com/PlusProject/web-demo.git
 ```
 2. dependencies 설치
 ```
-<frontend dependencies>
-cd web-demo
-cd frontend
-npm install
-```
-```
 <backend dependencies>
 cd web-demo
 cd backend
 가상 환경 및 기타 실행에 필요한 library를 pip를 이용해 설치해줍니다.
 ```
+```
+<frontend dependencies>
+cd web-demo
+cd frontend
+npm install
+```
+
 3. 로컬 서버 열기
 ```
+<backend local server>
+cd backend
+python manage.py runserver
+
+<frontend local server>
+cd frontend
 npm run serve
+
 ```
 
 ## How to use 🤔
