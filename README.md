@@ -2,10 +2,9 @@
 
 # On the fit😎
 
-<p align="center">
+
 ![image](https://user-images.githubusercontent.com/66810905/146679402-0e36c9cf-4541-47a3-924e-74508b100345.png)
 
-</p>
 <p align="center">
 
 ![npm](https://img.shields.io/badge/npm-7.20.1-blue)
