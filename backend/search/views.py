@@ -459,232 +459,7 @@ class Recommend2API(APIView):
                     result[word] = disease_table['disease_kor'][disease_indexs[0]]
             return result
 
-        def paper_score(input):
-
-            doctor_paper_data = dataset.copy()
-
-            def preprocess(text):
-                text = text.replace('.', "dot")
-                return text
-
-            def overlap_paper(text):
-                paper_overlap = 0
-                papers = text.split('/ ')
-                for paper in papers:
-                    paper = paper.split(', ')
-                    if all(temp in paper for temp in std):
-                        paper_overlap += 1
-                return paper_overlap
-
-            def overlap_keyword(text):
-                words_count = {}
-                text = text.replace('/ ', ', ')
-                words = text.split(', ')
-                word_target = set(words)
-                add_keyword = set(std) & word_target
-
-                for word in words:
-                    if word in words_count:
-                        words_count[word] += 1
-                    else:
-                        words_count[word] = 1
-
-                sorted_words = sorted(
-                    [(k, v) for k, v in words_count.items()], key=lambda word_count: -word_count[1])
-                keyword = [w for w in sorted_words if w[0] in add_keyword]
-                if(len(keyword) >= 5):
-                    keyword = keyword[0:5]
-                return keyword
-
-            def disease_kor_match(text):
-                for idx in range(0, len(text)):
-                    name_kor = disease_match(text[idx][0])
-                    if(len(name_kor) != 0):
-                        name_kor = name_kor[text[idx][0]]
-                    else:
-                        name_kor = 'x'
-                    text[idx] = [text[idx][0], name_kor, text[idx][1]]
-                return text
-
-            def simil_large(text):
-                target_input = text
-                target_name = list(doctor_paper_data['name_kor'])
-                target_index = len(target_name)
-                target_name.append('target')
-
-                text = list(doctor_paper_data['paper_disease_all'])
-                target_text = [preprocess(t) for t in text]
-                target_text.append(target_input)
-
-                doctors = pd.DataFrame({'name': target_name,
-                                        'text': target_text})
-
-                tfidf_vector = TfidfVectorizer(min_df=3, max_features=6000)
-                tfidf_matrix = tfidf_vector.fit_transform(
-                    doctors['text']).toarray()
-
-                cosine_sim = cosine_similarity(tfidf_matrix)
-                cosine_sim_df = pd.DataFrame(cosine_sim, columns=doctors.name)
-                cosine_sim_df.head()
-
-                temp = cosine_sim_df['target'][0:target_index]
-                doctor_paper_data['cosine_simil_paper_large'] = temp
-
-                return doctor_paper_data['cosine_simil_paper_large']
-
-            simil_large(input)
-
-            target_input = preprocess(input)
-            target_name = list(doctor_paper_data['name_kor'])
-            target_index = len(target_name)
-            target_name.append('target')
-
-            text = list(doctor_paper_data['paper_disease_all'])
-            target_text = [preprocess(t) for t in text]
-            target_text.append(target_input)
-
-            doctors = pd.DataFrame({'name': target_name, 'text': target_text})
-
-            tfidf_vector = TfidfVectorizer(min_df=3, max_features=6000)
-            tfidf_matrix = tfidf_vector.fit_transform(
-                doctors['text']).toarray()
-
-            cosine_sim = cosine_similarity(tfidf_matrix)
-            cosine_sim_df = pd.DataFrame(cosine_sim, columns=doctors.name)
-            cosine_sim_df.head()
-
-            temp = cosine_sim_df['target'][0:target_index]
-            doctor_paper_data['cosine_simil_paper'] = temp
-
-            std = input.split(', ')
-
-            doctor_paper_data['keyword_paper'] = doctor_paper_data.apply(
-                lambda x: overlap_keyword(x['paper_disease_all']), axis=1)
-            doctor_paper_data['keyword_paper'] = doctor_paper_data.apply(
-                lambda x: disease_kor_match(x['keyword_paper']), axis=1)
-            doctor_paper_data['overlap_paper'] = doctor_paper_data.apply(
-                lambda x: overlap_paper(x['paper_disease_all']), axis=1)
-            doctor_paper_data['cosine_simul_paper'] = doctor_paper_data.apply(lambda x: (
-                x['cosine_simil_paper']*0.7+x['cosine_simil_paper_large']*0.3), axis=1)
-
-            return doctor_paper_data
-
-        def clinical_score(input):
-
-            doctor_disease_data = pd.DataFrame({'chief_name': dataset['name_kor'],
-                                                'belong': dataset['belong'],
-                                                'clinical_count': dataset['clinical_count'],
-                                                'clinical_disease_all': dataset['clinical_disease_all']
-                                                })
-
-            def preprocess(text):
-                text = text.replace('.', "dot")
-                return text
-
-            def overlap_clinical(text):
-                clinical_overlap = 0
-                clinicals = text.split('/ ')
-                for clinical in clinicals:
-                    clinical = clinical.split(', ')
-                    if all(temp in clinical for temp in std):
-                        clinical_overlap += 1
-
-                return clinical_overlap
-
-            def overlap_keyword(text):
-                text = text.replace('/ ', ', ')
-                words = text.split(', ')
-                word_target = set(words)
-                add_keyword = set(std) & word_target
-
-                words_count = {}
-                for word in words:
-                    if word in words_count:
-                        words_count[word] += 1
-                    else:
-                        words_count[word] = 1
-
-                sorted_words = sorted(
-                    [(k, v) for k, v in words_count.items()], key=lambda word_count: -word_count[1])
-                keyword = [w for w in sorted_words if w[0] in add_keyword]
-                if(len(keyword) >= 5):
-                    keyword = keyword[0:5]
-
-                return keyword
-
-            def disease_kor_match(text):
-                for idx in range(0, len(text)):
-                    name_kor = disease_match(text[idx][0])
-                    if len(name_kor):
-                        name_kor = name_kor[text[idx][0]]
-                        text[idx] = [text[idx][0], name_kor, text[idx][1]]
-
-                return text
-
-            def simil_large(text):
-                target_input = text
-                target_name = list(doctor_disease_data['chief_name'])
-                target_index = len(target_name)
-                target_name.append('target')
-
-                text = list(doctor_disease_data['clinical_disease_all'])
-                target_text = [preprocess(t) for t in text]
-                target_text.append(target_input)
-
-                doctors = pd.DataFrame(
-                    {'name': target_name, 'text': target_text})
-
-                tfidf_vector = TfidfVectorizer(min_df=3, max_features=6000)
-                tfidf_matrix = tfidf_vector.fit_transform(
-                    doctors['text']).toarray()
-
-                cosine_sim = cosine_similarity(tfidf_matrix)
-                cosine_sim_df = pd.DataFrame(cosine_sim, columns=doctors.name)
-                cosine_sim_df.head()
-
-                doctor_disease_data['cosine_simil_clinical_large'] = cosine_sim_df['target'][:target_index]
-
-                return doctor_disease_data['cosine_simil_clinical_large']
-
-            simil_large(input)
-
-            target_input = preprocess(input)
-            target_name = list(doctor_disease_data['chief_name'])
-            target_index = len(target_name)
-            target_name.append('target')
-
-            text = list(doctor_disease_data['clinical_disease_all'])
-            target_text = [preprocess(t) for t in text]
-            target_text.append(target_input)
-
-            doctors = pd.DataFrame({'name': target_name, 'text': target_text})
-
-            tfidf_vector = TfidfVectorizer(min_df=3, max_features=6000)
-            tfidf_matrix = tfidf_vector.fit_transform(
-                doctors['text']).toarray()
-
-            cosine_sim = cosine_similarity(tfidf_matrix)
-            cosine_sim_df = pd.DataFrame(cosine_sim, columns=doctors.name)
-            cosine_sim_df.head()
-
-            doctor_disease_data['cosine_simil_clinical'] = cosine_sim_df['target'][:target_index]
-
-            std = input.split(', ')
-
-            doctor_disease_data['keyword_clinical'] = doctor_disease_data.apply(
-                lambda x: overlap_keyword(x['clinical_disease_all']), axis=1)
-            doctor_disease_data['keyword_clinical'] = doctor_disease_data.apply(
-                lambda x: disease_kor_match(x['keyword_clinical']), axis=1)
-            doctor_disease_data['overlap_clinical'] = doctor_disease_data.apply(
-                lambda x: overlap_clinical(x['clinical_disease_all']), axis=1)
-            doctor_disease_data['total_clinical'] = doctor_disease_data.apply(lambda x: (
-                x['cosine_simil_clinical']*0.7+x['cosine_simil_clinical_large']*0.3), axis=1)
-            doctor_disease_data['index'] = range(target_index)
-            result = doctor_disease_data[[
-                'total_clinical', 'overlap_clinical', 'keyword_clinical']]
-
-            return result
-
+        # 새로운 추천 알고리즘
         def get_recommendation(input, weight_paper, weight_trial):
             def calcul_sim(x, y):
                 if x[0] == 'p':
@@ -700,19 +475,11 @@ class Recommend2API(APIView):
                 if x[0] == y[0]:
                     similarity += 0.0001
                 return similarity*weight*100
-            print('추출(검색)된 질병 : ', end=' ')
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
-            print(weight_paper)
-            print(weight_trial)
 
-            paper_grade = paper_score(input)
-            clinical_grade = clinical_score(input)
-            
-            person_grade = pd.concat([paper_grade, clinical_grade], axis=1)
-            
-            person_grade['total_score'] = person_grade.apply(lambda x: (
-                x['cosine_simil_paper']*weight_paper + x['total_clinical']*weight_trial)/(weight_paper+weight_trial), axis=1)
+            person_grade = dataset.copy()
+            person_grade['total_score'] = person_grade.apply(lambda x: 0.0, axis=1)
             df['total_score']=""
             for i in df.index:
                 total_score = 0.0
@@ -732,25 +499,19 @@ class Recommend2API(APIView):
                 dic = eval(sorted_df['disease'][i])
                 delete = []
                 for j in dic:
-                    if dic[j] == 0:
-                        t = 0
-                    else:
-                        t = float(dic[j]) * float(calcul_sim(j, input))
+                    if dic[j] == 0: t = 0
+                    else: t = float(dic[j]) * float(calcul_sim(j, input))
                     dic[j] = round(t, 2)
-                    if(t == 0.0):
-                        delete.append(j)
-                for j in delete:
-                    del dic[j]
+                    if(t == 0.0): delete.append(j)
+                for j in delete: del dic[j]
                 sdic = sorted(
                     dic.items(), key=lambda x: x[1], reverse=True)[0:5]
-                codess = ", ".join([str(_) for _ in sdic])
+                codes = ", ".join([str(_) for _ in sdic])
 
-                # 임시
-                belong_name = sorted_df['belong_name'][i]
                 belong = sorted_df['belong_name'][i].split('병원')[0] + "병원"
                 name = sorted_df['belong_name'][i].split('병원')[1]
 
-                person_grade['major'][i] = codess
+                person_grade['major'][i] = codes
                 person_grade['belong'][i] = belong
                 person_grade['name_kor'][i] = name
                 person_grade['total_score'][i] = sorted_df['total_score'][i]
