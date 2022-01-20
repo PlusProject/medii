@@ -198,7 +198,7 @@ class CrisCoworkerAPI(APIView):
         return Response(CrisCoworkerSerializer(coworker_list, many=True).data)
 
 
-class RecommendAPI(APIView):
+class Recommend2API(APIView):
 
     def get(self, request):
         input = request.GET.get('input', 'I20.9')
@@ -433,7 +433,7 @@ class RecommendAPI(APIView):
         return Response(get_recommendation(input, weight_paper, weight_trial, weight_paper_impact=3, weight_sim=7))
 
 
-class Recommend2API(APIView):
+class RecommendAPI(APIView):
 
     def get(self, request):
         input = request.GET.get('input', 'I20.2')
@@ -506,8 +506,8 @@ class Recommend2API(APIView):
                 for j in delete: del dic[j]
                 sdic = sorted(
                     dic.items(), key=lambda x: x[1], reverse=True)[0:5]
-                codes = ", ".join([str(_) for _ in sdic])
-
+                codes = ", ".join([str(_) for _ in sdic]).replace('p-','논문-').replace('t-','임상-')
+                codes = codes.replace('\',',':').replace('(','[').replace(')',']').replace(',','  ')
                 belong = sorted_df['belong_name'][i].split('병원')[0] + "병원"
                 name = sorted_df['belong_name'][i].split('병원')[1]
 

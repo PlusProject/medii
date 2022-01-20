@@ -49,7 +49,7 @@
             dark
             @click = chageapi
           >
-             {{click}} 추천
+             {{click}} 추천 알고리즘으로 변경 ->
           </v-btn>
       </div>
     </div>
