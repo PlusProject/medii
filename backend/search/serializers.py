@@ -1,7 +1,8 @@
 from django.db import models
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from .models import ClinicalTrials, Disease, Doctor, Person, Participate, Thesis, Writes, Totaldisease, DoctorTotalDisease
+from .models import ClinicalTrials, Disease, Doctor, Person, Participate, Thesis, Writes, Totaldisease, DoctorTotalDisease, DoctorAllscore
+
 
 class DoctorSerializer(serializers.ModelSerializer):
 
@@ -9,11 +10,12 @@ class DoctorSerializer(serializers.ModelSerializer):
         model = Doctor
         fields = "__all__"
 
+
 class PersonSerializer(serializers.ModelSerializer):
     doctor_info = DoctorSerializer(source="doctor", read_only=True)
     participate_num = serializers.SerializerMethodField(read_only=True)
     writes_num = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_participate_num(self, instance):
         return instance.participate.count()
 
@@ -33,7 +35,7 @@ class NameSerializer(serializers.ModelSerializer):
 
 
 class HospitalSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Person
         fields = ("belong",)
@@ -47,10 +49,11 @@ class ClinicalTrialsSerializer(serializers.ModelSerializer):
 
 
 class ThesisSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Thesis
-        fields = ("tid", "title", "journal", "publication_date", "citation", "coworker",)
+        fields = ("tid", "title", "journal",
+                  "publication_date", "citation", "coworker",)
 
 
 class ParticipateSerializer(serializers.ModelSerializer):
@@ -61,7 +64,7 @@ class ParticipateSerializer(serializers.ModelSerializer):
     # def get_filtered_cid(self, obj):
     #     keyword = self.context["keyword"]
     #     if keyword:
-            
+
     #     else:
     #         return 0
 
@@ -80,7 +83,7 @@ class WritesSerializer(serializers.ModelSerializer):
 
 
 class ThesisCoworkerSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Thesis
         fields = ("tid", "title",)
@@ -100,14 +103,23 @@ class DiseaseSerializer(serializers.ModelSerializer):
         model = Disease
         fields = "__all__"
 
+
 class DoctorTotalDiseaseSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = DoctorTotalDisease
         fields = "__all__"
 
-class DiseaseSerializer(serializers.ModelSerializer):
-    
+
+class TotalDiseaseSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Totaldisease
+        fields = "__all__"
+
+
+class DoctorAllscoreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DoctorAllscore
         fields = "__all__"

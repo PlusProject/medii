@@ -74,7 +74,7 @@
         <v-card-title>추천 로직</v-card-title>
 
         
-          <p class='blue lighten-3'> paper impact 고려된 추천 </p>
+          <p class='blue lighten-3'> 기존 추천 </p>
           <v-spacer></v-spacer>
           <p> 의료진의 저명성: 논문 impact = citation값과 논문이 등재된 저널의 jci 값을 다 더한 후 정규화한 값</p>
           <p> 의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험 관련 질병명 간의 코사인 유사도를 구한 값</p>
@@ -82,7 +82,7 @@
           <p>전체 점수 = 논문 점수*0.7 + 임상시험 질병 유사도 점수*0.3 </p>
           <p>논문 점수 = 논문 질병 유사도 점수*0.7 + 논문 impact*0.3</p>
           <v-spacer></v-spacer>
-          <p class = 'blue lighten-3'> 중분류 질병 체계 고려한 추천<p>
+          <p class = 'blue lighten-3'> 신규 추천<p>
           <v-spacer></v-spacer>
           <p>중분류 질병 체계 고려: 추천 받고 싶은 소분류 질병코드 입력 시 중분류까지 고려해서 추천( 예: 질병코드 I20.9은 I20과도 유사하다고 판단)</p>
           <p>의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험 관련 질병명 간의 코사인 유사도를 구한 값</p>
@@ -303,7 +303,7 @@ export default {
             summary: "",
             toggle: false,
             color: 'primary',
-            click: 'paper impact 고려된 ',
+            click: '기존 ',
             previous:'I20.1',
             target: [],
             rules: [
@@ -396,13 +396,13 @@ export default {
     
      if(this.toggle === true){
        this.color = 'cyan accent-6'
-       this.click = '중분류 질병 체계 고려한 '
+       this.click = '신규 '
        this.input = this.previous
        this.getRecommendResults2()     
      }
      else{
        this.color = 'primary'
-       this.click = 'paper impact 고려된 '
+       this.click = '기존 '
        this.input = this.previous
        this.getRecommendResults()
      }
@@ -418,7 +418,7 @@ export default {
       this.getDiseaseMatchResults();
       this.toggle = false;
       this.color = 'primary'
-      this.click = 'paper impact 고려된 '
+      this.click = '기존 '
       this.previous = this.input;
       this.input= ""
     },

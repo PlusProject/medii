@@ -1,6 +1,8 @@
 from django.db import models
 
 # Create your models here.
+
+
 class ClinicalTrials(models.Model):
     cid = models.AutoField(primary_key=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
@@ -27,13 +29,15 @@ class Person(models.Model):
     belong = models.CharField(max_length=255, blank=True, null=True)
     job = models.CharField(max_length=255, blank=True, null=True)
     major = models.TextField(blank=True, null=True)
+
     class Meta:
         managed = False
         db_table = 'person'
 
 
 class Doctor(models.Model):
-    pid = models.OneToOneField(Person, models.DO_NOTHING, db_column='pid', primary_key=True, related_name='doctor')
+    pid = models.OneToOneField(
+        Person, models.DO_NOTHING, db_column='pid', primary_key=True, related_name='doctor')
     education = models.TextField(blank=True, null=True)
     career = models.TextField(blank=True, null=True)
     url = models.TextField(blank=True, null=True)
@@ -45,8 +49,10 @@ class Doctor(models.Model):
 
 class Participate(models.Model):
     pcid = models.AutoField(primary_key=True)
-    pid = models.ForeignKey(Person, models.DO_NOTHING, db_column='pid', related_name='participate')
-    cid = models.ForeignKey(ClinicalTrials, models.DO_NOTHING, db_column='cid', related_name='clinical_trials')
+    pid = models.ForeignKey(Person, models.DO_NOTHING,
+                            db_column='pid', related_name='participate')
+    cid = models.ForeignKey(ClinicalTrials, models.DO_NOTHING,
+                            db_column='cid', related_name='clinical_trials')
     position = models.CharField(max_length=255, blank=True, null=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
 
@@ -73,7 +79,8 @@ class Thesis(models.Model):
 
 class Writes(models.Model):
     wid = models.AutoField(primary_key=True)
-    pid = models.ForeignKey(Person, models.DO_NOTHING, db_column='pid', related_name='writes')
+    pid = models.ForeignKey(Person, models.DO_NOTHING,
+                            db_column='pid', related_name='writes')
     tid = models.ForeignKey(Thesis, models.DO_NOTHING, db_column='tid')
 
     class Meta:
@@ -92,23 +99,25 @@ class Disease(models.Model):
         db_table = 'disease'
 
 
-
 class DoctorTotalDisease(models.Model):
     id = models.IntegerField(primary_key=True)
-    name_kor = models.CharField(max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
-    belong = models.CharField(max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
+    name_kor = models.CharField(
+        max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
+    belong = models.CharField(
+        max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
     major = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
     paper_count = models.IntegerField(blank=True, null=True)
     paper_impact = models.FloatField(blank=True, null=True)
-    paper_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    paper_disease_all = models.TextField(
+        db_collation='utf8mb4_bin', blank=True, null=True)
     clinical_count = models.IntegerField(blank=True, null=True)
-    clinical_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    clinical_disease_all = models.TextField(
+        db_collation='utf8mb4_bin', blank=True, null=True)
     img = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'doctor_total_disease'
-
 
 
 class Totaldisease(models.Model):
@@ -120,3 +129,14 @@ class Totaldisease(models.Model):
     class Meta:
         managed = False
         db_table = 'totaldisease'
+
+
+class DoctorAllscore(models.Model):
+    belong_name = models.CharField(
+        primary_key=True, max_length=255, db_collation='utf8_general_ci')
+    disease = models.TextField(
+        db_collation='utf8_general_ci', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'doctor_allscore'
