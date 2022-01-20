@@ -458,7 +458,13 @@ class RecommendAPI(APIView):
                 if(len(disease_indexs)):
                     result[word] = disease_table['disease_kor'][disease_indexs[0]]
             return result
-
+        
+        def disease_match_one(text):
+            disease_indexs = disease_table[disease_table['disease_code'] == text].index
+            if(len(disease_indexs)):
+                return " {" + disease_table['disease_kor'][disease_indexs[0]] + "} "
+            else:
+                return ""
         # 새로운 추천 알고리즘
         def get_recommendation(input, weight_paper, weight_trial):
             def calcul_sim(x, y):
@@ -506,11 +512,16 @@ class RecommendAPI(APIView):
                 for j in delete: del dic[j]
                 sdic = sorted(
                     dic.items(), key=lambda x: x[1], reverse=True)[0:5]
+                explain = ""
+                for j in sdic:
+                    explain += disease_match_one(j[0][2:])
+
                 codes = ", ".join([str(_) for _ in sdic]).replace('p-','논문-').replace('t-','임상-')
                 codes = codes.replace('\',',':').replace('(','[').replace(')',']').replace(',','  ')
+                codes += explain
                 belong = sorted_df['belong_name'][i].split('병원')[0] + "병원"
                 name = sorted_df['belong_name'][i].split('병원')[1]
-
+                
                 person_grade['major'][i] = codes
                 person_grade['belong'][i] = belong
                 person_grade['name_kor'][i] = name
