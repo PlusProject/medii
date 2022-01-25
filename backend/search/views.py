@@ -483,7 +483,6 @@ class RecommendAPI(APIView):
         def disease_match(text):
             text = text.split(', ')
             result = dict()
-
             for word in text:
                 disease_indexs = disease_table[disease_table['disease_code'] == word].index
                 if(len(disease_indexs)):
@@ -506,27 +505,29 @@ class RecommendAPI(APIView):
                 x = x[2:]
                 similarity = 0.0
                 if(x == y):
-                    similarity += 1
+                    similarity += 100
                 if x.split('.')[0] == y.split('.')[0]:
-                    similarity += 0.01
+                    similarity += 1
                 if x[0] == y[0]:
-                    similarity += 0.0001
-                return similarity*weight*100
+                    similarity += 0.01
+                return similarity*weight
+            
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
-
             person_grade = dataset.copy()
             person_grade['total_score'] = person_grade.apply(lambda x: 0.0, axis=1)
+            input_codes = input.split(', ')
             df['total_score']=""
             for i in df.index:
                 total_score = 0.0
                 codes = eval(df['disease'][i])
-                for code in codes:
-                    # 논문/임상시험 가중치 계산
-                    sim = calcul_sim(code, input)
-                    temp = sim*codes[code]
-                    total_score += temp
-                df['total_score'][i] = total_score
+                # 논문/임상시험 가중치 계산
+                for input_code in input_codes:
+                    for code in codes:
+                        sim = calcul_sim(code, input_code)
+                        temp = sim*codes[code]
+                        total_score += temp
+                df['total_score'][i] = float(total_score)
 
             sorted_df = df.sort_values(
                 by=['total_score'], axis=0, ascending=False)
@@ -536,8 +537,9 @@ class RecommendAPI(APIView):
                 dic = eval(sorted_df['disease'][i])
                 delete = []
                 for j in dic:
-                    if dic[j] == 0: t = 0
-                    else: t = float(dic[j]) * float(calcul_sim(j, input))
+                    t=0
+                    for input_code in input_codes:
+                        t += float(dic[j]) * float(calcul_sim(j, input_code))
                     dic[j] = round(t, 2)
                     if(t == 0.0): delete.append(j)
                 for j in delete: del dic[j]
