@@ -140,3 +140,75 @@ class DoctorAllscore(models.Model):
     class Meta:
         managed = False
         db_table = 'doctor_allscore'
+
+#동완
+class SnPaper(models.Model):
+    id = models.AutoField(primary_key=True)
+    label = models.TextField(blank=True, null=True)
+    title = models.TextField(blank=True, null=True)
+    shape = models.TextField(blank=True, null=True)
+    color = models.TextField(blank=True, null=True)
+    size = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'SN_paper'
+
+
+class SnPaperCnt(models.Model):
+    id = models.IntegerField(primary_key=True)
+    fromit = models.IntegerField(blank=True, null=True)
+    toit = models.IntegerField(blank=True, null=True)
+    width = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'SN_paper_cnt'
+
+class NodeCris(models.Model):
+    id = models.IntegerField(primary_key=True)
+    label = models.TextField(blank=True, null=True)
+    title = models.TextField(blank=True, null=True)
+    shape = models.TextField(blank=True, null=True)
+    color = models.TextField(blank=True, null=True)
+    size = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'node_cris'
+
+
+class NodeCrisCnt(models.Model):
+    id = models.IntegerField(primary_key=True)
+    fromit = models.IntegerField(blank=True, null=True)
+    toit = models.IntegerField(blank=True, null=True)
+    width = models.FloatField(blank=True, null=True)
+    title = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'node_cris_cnt'
+
+
+class SnPaper50(models.Model):
+    id = models.AutoField(primary_key=True)
+    label = models.TextField(blank=True, null=True)
+    title = models.TextField(blank=True, null=True)
+    shape = models.TextField(blank=True, null=True)
+    color = models.TextField(blank=True, null=True)
+    size = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'SN_paper50'
+
+
+class SnPaperCnt50(models.Model):
+    id = models.IntegerField(primary_key=True)
+    fromit = models.IntegerField(blank=True, null=True)
+    toit = models.IntegerField(blank=True, null=True)
+    width = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'SN_paper_cnt50'

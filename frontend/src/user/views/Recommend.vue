@@ -42,17 +42,9 @@
         </span>
       </div>
 
-      <div class="d-flex align-start flex-wrap mb-6 ml-auto">
-          <v-btn
-            rounded
-            :color=color
-            dark
-            @click = chageapi
-          >
-             {{click}} 추천 알고리즘으로 변경 ->
-          </v-btn>
-      </div>
+
     </div>
+
 
 
    
@@ -74,7 +66,7 @@
         <v-card-title>추천 로직</v-card-title>
 
         
-          <p class='blue lighten-3'> 기존 추천 </p>
+<p class='blue lighten-3'> 기존 추천 </p>
           <v-spacer></v-spacer>
           <p> 의료진의 저명성: 논문 impact = citation값과 논문이 등재된 저널의 jci 값을 다 더한 후 정규화한 값</p>
           <p> 의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험 관련 질병명 간의 코사인 유사도를 구한 값</p>
@@ -90,6 +82,7 @@
           <p>전체 점수 = 논문 점수*0.7 + 임상시험 질병 유사도 점수*0.3</p>
           <p>논문 점수 = 논문 질병 소분류 유사도 점수*0.7 + 논문 질병 중분류 유사도 점수*0.3</p>
           <p>임상 점수= 임상 질병 소분류 유사도 점수*0.7 + 임상 질병 중분류 유사도 점수*0.3</p>
+
 
 
         
@@ -230,15 +223,45 @@
          <tr> 
           <th colspan="5" scope="colgroup">추천 결과</th> 
           </tr> 
+
           <tr>
-          <th colspan="5" ></th>
+          <th colspan="3">
+               <input type="checkbox" id = "all_check" value = "selectAll" onclick="selectAll(this)"/>
+              <v-btn id = "network"
+              x-small
+            class = 'indigo lighten-3 my-8 mx-1'
+            dark
+            @click = "$router.push({
+            name: 'PartialNetwork',
+            })">
+            의사 network 보기
+             </v-btn>
+
+
+            </th>
+          <th colspan="3" >
+                      <v-btn
+            rounded
+            :color=color
+            dark
+            @click = chageapi
+          >
+             {{click}} 추천 알고리즘으로 변경 ->
+          </v-btn>
+          </th>
           <th colspan="2"> <p class="text-center">질병 전문성</p></th>
           <th scope="col"> <p class="text-center">저명성</p></th>
           <th colspan="2"> <p class="text-center">활동성</p></th> 
         </tr> 
       </thead>
+
     </template>
-     
+      <template v-slot:[`item.checkbox`]>
+
+          <input type="checkbox" name = "doc"/>
+
+      </template>
+
       <template v-slot:[`item.img`] ="{ item }">
 
           <img :src="item.img" />
@@ -323,6 +346,7 @@ export default {
             groupDesc: [],
             headers: [
             { text: '추천순', value: 'ranking'},
+            {text: 'network', value: 'checkbox'},
             { text: '', value: 'img'},
             {
               text: 'Totalscore', value: 'total_score',
@@ -335,15 +359,21 @@ export default {
             { text: '전체 논문 수', value: 'paper_count' },
             { text: '전체 임상 수', value: 'clinical_count' },
                      
-        ],
-           
+            ],
             };
         },
         watch: {
 
-    },
+        },
 
  methods: {
+   selectAll(selectAll){
+      const checkboxes = document.getElementsByName("doc");
+      checkboxes.forEach((checkbox)=>{
+        checkbox.checked = selectAll.checked;
+      })
+   },
+
    changeWeight(){
      this.items = []
      this.loading = true
@@ -389,6 +419,7 @@ export default {
      this.extractdisease = []
      this.re2()
    },
+
    chageapi(){
      this.toggle = !this.toggle
      this.items = []
@@ -402,7 +433,7 @@ export default {
      }
      else{
        this.color = 'primary'
-       this.click = '기존 '
+       this.click = '기존  '
        this.input = this.previous
        this.getRecommendResults()
      }
@@ -410,6 +441,7 @@ export default {
       this.getDiseaseMatchResults() 
      this.input= ""
    },
+   
     re2() {
       this.loading = true
       this.items = []
@@ -520,10 +552,72 @@ export default {
         console.log(err)
       }
     },
-    
-    
+  
  },
 
+ 
+ /*
+  computed:{
+    checkAll : { 
+				//getter
+				get: function(){
+					if((this.select.length != this.history.length) || this.history.length == 0)
+						return false;
+					else
+            console.log(this.select)
+						return true;							
+				},
+				//setter
+				set: function(e){
+					
+					if(e){
+            this.select = true
+						for(var i=0; i<this.history.length; i++){
+              
+							this.selected.push(this.history[i].selected);
+						}	
+					}
+					else{
+						this.select = false
+						//this.selected = [];
+					}
+								
+				}
+			},
+
+    selected:{
+				get: function(){
+					if((this.select.length != this.history.length) || this.history.length == 0)
+						return false;
+					else
+            console.log("true")
+						return true;							
+				},
+				//setter
+				set: function(e){
+					
+					if(e){
+            this.select = true
+
+						for(var i=0; i<this.history.length; i++){
+              
+							this.selected.push(this.history[i].selected);
+						}	
+
+          }
+					else{
+						this.select = false
+						//this.selected = [];
+					}
+								
+				}
+
+  
+      }
+
+    },
+    */
+    
 
 mounted: function () {
     this.input = this.$route.params.disease;
@@ -532,7 +626,7 @@ mounted: function () {
     this.re2()
     
   },
-       
+
 };
 
 </script>
@@ -556,6 +650,16 @@ img {
   object-fit: cover;
   border-radius: 70%;
   padding: 0.5rem;
+}
+
+#network{
+  left:70px;
+}
+
+#all_check{
+  position:relative;
+  left:5px;
+  top:4px;
 }
 
 </style>

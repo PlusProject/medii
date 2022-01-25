@@ -185,5 +185,53 @@ export default {
     } catch (error) {
         console.error(error)
     }
-  }, 
+  },
+  async getSnPaper() {
+    try {
+      const response = await axios.get("socialnetwork");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getSnPaperCnt() {
+    try {
+      const response = await axios.get("socialnetwork_cnt");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getNodeCris() {
+    try {
+      const response = await axios.get("socialnetwork_cris");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getNodeCrisCnt() {
+    try {
+      const response = await axios.get("socialnetwork_cris_cnt");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getSnPaper50() {
+    try {
+      const response = await axios.get("socialnetwork50");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getSnPaperCnt50() {
+    try {
+      const response = await axios.get("socialnetwork_cnt50");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 }

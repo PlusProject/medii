@@ -2,10 +2,11 @@ from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50
 from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer,
                           PersonSerializer, ParticipateSerializer, WritesSerializer,
-                          CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer, DiseaseSerializer, DoctorTotalDiseaseSerializer, Totaldisease, DoctorAllscoreSerializer)
+                          CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer, DiseaseSerializer, DoctorTotalDiseaseSerializer, Totaldisease, DoctorAllscoreSerializer,
+                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer)
 from django.db.models import Q
 import re
 import pandas as pd
@@ -129,6 +130,36 @@ class ThesisAPI(APIView):
         return Response(writes.data)
 
 
+@api_view(['GET'])
+def snpaper_view(request):
+    snpapers=SnPaper.objects.all()
+    return Response(SnPaperSerializer(snpapers, many=True).data)
+
+@api_view(['GET'])
+def snpapercnt_view(request):
+    snpapercnts=SnPaperCnt.objects.all()
+    return Response(SnPaperCntSerializer(snpapercnts, many=True).data)
+
+@api_view(['GET'])
+def nodecris_view(request):
+    nodecriss=NodeCris.objects.all()
+    return Response(NodeCrisSerializer(nodecriss, many=True).data)
+
+@api_view(['GET'])
+def nodecriscnt_view(request):
+    nodecriscnts=NodeCrisCnt.objects.all()
+    return Response(NodeCrisCntSerializer(nodecriscnts, many=True).data)
+
+@api_view(['GET'])
+def snpaper50_view(request):
+    snpapers50=SnPaper50.objects.all()
+    return Response(SnPaper50Serializer(snpapers50, many=True).data)
+
+@api_view(['GET'])
+def snpapercnt50_view(request):
+    snpapercnts50=SnPaperCnt50.objects.all()
+    return Response(SnPaperCnt50Serializer(snpapercnts50, many=True).data)
+    
 @api_view(['GET'])
 def name_list(request):
     nameQuery = Person.objects.filter(job='의사').values('name_kor')

@@ -1,9 +1,11 @@
 import Home from './Home.vue'
 import DoctorList from './DoctorList'
 import ClinicalTrialsList from './ClinicalTrialsList'
-import Page4 from './Page4'
+import SocialNetwork from './SocialNetwork'
 import Recommend from './Recommend'
 
+import PartialNetwork from './PartialNetwork'
+
 export {
-  Home, DoctorList, ClinicalTrialsList, Page4, Recommend
+  Home, DoctorList, ClinicalTrialsList, SocialNetwork, Recommend, PartialNetwork
 }

@@ -65,7 +65,23 @@
       </v-expand-transition>
 
       <div class="d-flex justify-center">
-                 
+
+          <v-btn
+          elevation="8"
+          large
+          rounded
+          class="my-8 mx-1"
+          color="light green"
+          dark
+          @click="
+            $router.push({
+              name: 'socialnetwork',
+            })
+          "
+        >
+          전체 네트워크
+        </v-btn>
+          
           <v-btn
           elevation="8"
           large

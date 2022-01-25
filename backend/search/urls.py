@@ -18,5 +18,11 @@ urlpatterns = [
     path('count', views.CountAPI.as_view(), name='Count'),
     path('diseasematch', views.DiseaseMatchAPI.as_view(), name='DiseaseMatch'),
     path('extractdisease', views.ExtractDieaseAPI.as_view(), name='ExtractDisease'),
+    path('socialnetwork', views.snpaper_view, name="snpaper_view"),
+    path('socialnetwork_cnt', views.snpapercnt_view, name="snpapercnt_view"),
+    path('socialnetwork_cris', views.nodecris_view, name="nodecris_view"),
+    path('socialnetwork_cris_cnt', views.nodecriscnt_view, name="nodecriscnt_view"),
+    path('socialnetwork50', views.snpaper50_view, name="snpaper50_view"),
+    path('socialnetwork_cnt50', views.snpapercnt50_view, name="snpapercnt50_view"),
     # path('coworker_cris', views.get_cris_coworker, name="CrisCoworker"),
 ]
