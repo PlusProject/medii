@@ -2,11 +2,11 @@ from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, DoctorAll
 from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer,
                           PersonSerializer, ParticipateSerializer, WritesSerializer,
                           CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer, DiseaseSerializer, DoctorTotalDiseaseSerializer, Totaldisease, DoctorAllscoreSerializer,
-                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer)
+                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer,DoctorAllSerializer)
 from django.db.models import Q
 import re
 import pandas as pd
@@ -475,11 +475,9 @@ class RecommendAPI(APIView):
         weight_paper = int(weight_paper)
         weight_trial = int(weight_trial)
 
-        dataset = pd.DataFrame(list(DoctorTotalDisease.objects.all().values()))
+        df = pd.DataFrame(list(DoctorAll.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
-        dataset = dataset.fillna("")
-
-        df = pd.DataFrame(list(DoctorAllscore.objects.all().values()))
+        df = df.fillna("")
 
         def disease_match(text):
             text = text.split(', ')
@@ -515,7 +513,7 @@ class RecommendAPI(APIView):
             
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
-            person_grade = dataset.copy()
+            person_grade = df.copy()
             person_grade['total_score'] = person_grade.apply(lambda x: 0.0, axis=1)
             person_grade['real_total_score'] = person_grade.apply(lambda x: 0.0, axis=1)
             input_codes = input.split(', ')
@@ -561,24 +559,25 @@ class RecommendAPI(APIView):
                 codes = ", ".join([str(_) for _ in sdic]).replace('p-','논문-').replace('t-','임상-')
                 codes = codes.replace('\',',':').replace('(','[').replace(')',']').replace(',','  ')
                 codes += explain
-                belong = sorted_df['belong_name'][i].split('병원')[0] + "병원"
-                name = sorted_df['belong_name'][i].split('병원')[1]
                 
                 person_grade['major'][i] = codes
-                person_grade['belong'][i] = belong
-                person_grade['name_kor'][i] = name
+                person_grade['belong'][i] = sorted_df['belong'][i]
+                person_grade['name_kor'][i] = sorted_df['name'][i]
                 person_grade['total_score'][i] = sorted_df['real_total_score'][i]
+                person_grade['img'][i] = sorted_df['img'][i]
 
 
             ranking = person_grade.sort_values(
                 by='total_score', ascending=False)[0:10]
-            ranking['cosine_simil_paper'] = 0
-            ranking['total_clinical'] = 0
-            ranking['paper_impact'] = 0
+            ranking['cosine_simil_paper'] = 'NA'
+            ranking['total_clinical'] = 'NA'
+            ranking['paper_impact'] = 'NA'
             ranking['total_score'] = round(ranking['total_score'], 2)
-
             ranking['ranking'] = range(1, 11)
+            ranking['paper_count'] = 'NA'
+            ranking['clinical_count'] = 'NA'
             temp = ranking.to_json(orient='records')
+            print(ranking)
 
             return temp
 

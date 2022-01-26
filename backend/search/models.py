@@ -212,3 +212,23 @@ class SnPaperCnt50(models.Model):
     class Meta:
         managed = False
         db_table = 'SN_paper_cnt50'
+        
+        
+class DoctorAll(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    belong = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    disease = models.TextField(db_collation='utf8_general_ci', blank=True, null=True)
+    img = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    name_kor = models.CharField(max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
+    belong2 = models.CharField(max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
+    major = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    paper_count = models.IntegerField(blank=True, null=True)
+    paper_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    clinical_count = models.IntegerField(blank=True, null=True)
+    clinical_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    paper_impact = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'doctor_all'
