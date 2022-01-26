@@ -12,6 +12,7 @@ import re
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import minmax_scale
 import json
 from pathlib import Path
 import os
@@ -516,21 +517,29 @@ class RecommendAPI(APIView):
             print(disease_match(input))
             person_grade = dataset.copy()
             person_grade['total_score'] = person_grade.apply(lambda x: 0.0, axis=1)
+            person_grade['real_total_score'] = person_grade.apply(lambda x: 0.0, axis=1)
             input_codes = input.split(', ')
             df['total_score']=""
-            for i in df.index:
-                total_score = 0.0
-                codes = eval(df['disease'][i])
-                # 논문/임상시험 가중치 계산
-                for input_code in input_codes:
+            df['real_total_score']=""
+            df['total_score'] = df.apply(lambda x: 0.0, axis=1)
+            df['real_total_score'] = df.apply(lambda x: 0.0, axis=1)
+            
+            for input_code in input_codes:
+                for i in df.index:
+                    total_score = 0.0
+                    codes = eval(df['disease'][i])
+                    # 논문/임상시험 가중치 계산
                     for code in codes:
                         sim = calcul_sim(code, input_code)
                         temp = sim*codes[code]
                         total_score += temp
-                df['total_score'][i] = float(total_score)
+                    df['total_score'][i] = float(total_score)
+                
+                df['total_score'] = minmax_scale(df['total_score'], axis=0, copy=True)
+                df['real_total_score'] += df['total_score']*100.0
 
             sorted_df = df.sort_values(
-                by=['total_score'], axis=0, ascending=False)
+                by=['real_total_score'], axis=0, ascending=False)
             sorted_df = sorted_df.reset_index()
 
             for i in sorted_df.index:
@@ -558,7 +567,8 @@ class RecommendAPI(APIView):
                 person_grade['major'][i] = codes
                 person_grade['belong'][i] = belong
                 person_grade['name_kor'][i] = name
-                person_grade['total_score'][i] = sorted_df['total_score'][i]
+                person_grade['total_score'][i] = sorted_df['real_total_score'][i]
+
 
             ranking = person_grade.sort_values(
                 by='total_score', ascending=False)[0:10]
