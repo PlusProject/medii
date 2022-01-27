@@ -18,6 +18,9 @@ from pathlib import Path
 import os
 from django.core.exceptions import ImproperlyConfigured
 import boto3
+import time
+import warnings
+warnings.filterwarnings(action='ignore')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
@@ -468,6 +471,7 @@ class Recommend2API(APIView):
 class RecommendAPI(APIView):
 
     def get(self, request):
+        time1 = time.time()
         input = request.GET.get('input', 'I20.2')
         weight_paper = request.GET.get('weight_paper', 7)
         weight_trial = request.GET.get('weight_trial', 3)
@@ -522,6 +526,9 @@ class RecommendAPI(APIView):
             df['total_score'] = df.apply(lambda x: 0.0, axis=1)
             df['real_total_score'] = df.apply(lambda x: 0.0, axis=1)
             
+            time2 = time.time()
+            print(str(round(time2-time1,3)) + "초 소요 : 1")
+            
             for input_code in input_codes:
                 for i in df.index:
                     total_score = 0.0
@@ -536,6 +543,9 @@ class RecommendAPI(APIView):
                 df['total_score'] = minmax_scale(df['total_score'], axis=0, copy=True)
                 df['real_total_score'] += df['total_score']*100.0
 
+            
+            time3 = time.time()
+            print(str(round(time3-time2,3)) + "초 소요 : 2")
             sorted_df = df.sort_values(
                 by=['real_total_score'], axis=0, ascending=False)
             sorted_df = sorted_df.reset_index()
@@ -577,8 +587,8 @@ class RecommendAPI(APIView):
             ranking['paper_count'] = 'NA'
             ranking['clinical_count'] = 'NA'
             temp = ranking.to_json(orient='records')
-            print(ranking)
-
+            time4 = time.time()
+            print(str(round(time4-time3,3)) + "초 소요: 3")
             return temp
 
         return Response(get_recommendation(input, weight_paper, weight_trial))
