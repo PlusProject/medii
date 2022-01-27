@@ -471,7 +471,6 @@ class Recommend2API(APIView):
 
 
 class RecommendAPI(APIView):
-
     def get(self, request):
         time1 = time.time()
         input = request.GET.get('input', 'I20.2')
@@ -483,8 +482,6 @@ class RecommendAPI(APIView):
 
         df = pd.DataFrame(list(DoctorAll2.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
-<<<<<<< HEAD
-        
         input_codes = input.split(', ')
         
         # 불필요한 칼럼 삭제
@@ -494,9 +491,7 @@ class RecommendAPI(APIView):
         for i in range(ord('a'),ord('z')+1):
             if chr(i) not in big_codes:
                 df.drop(chr(i), inplace=True, axis=1)
-        
-=======
->>>>>>> 8871107a720b19baeec5047e4bf0144de750ce47
+
         def disease_match(text):
             text = text.split(', ')
             result = dict()
@@ -515,15 +510,12 @@ class RecommendAPI(APIView):
             
         # 새로운 추천 알고리즘
         def get_recommendation(input, weight_paper, weight_trial):
-
-            std = input.split(', ')
-
             def overlap(text):
                 overlap = 0
                 clinicals = text.split('/ ')
                 for clinical in clinicals:
                     clinical = clinical.split(', ')
-                    if all(temp in clinical for temp in std):
+                    if all(temp in clinical for temp in input_codes):
                         overlap += 1
                 return overlap
 
@@ -544,8 +536,8 @@ class RecommendAPI(APIView):
             
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
-            df['total_score'] = df.apply(lambda x: 0.0, axis=1)
-            df['real_total_score'] = df.apply(lambda x: 0.0, axis=1)
+            df['total_score'] = 0
+            df['real_total_score'] = 0
             df['o_p'] = 0
             df['o_c'] = 0
             
@@ -572,7 +564,6 @@ class RecommendAPI(APIView):
                 df['total_score'] = (df['total_score']-mean_score)/std_score
                 df['real_total_score'] += df['total_score']*10.0
             
-
             time3 = time.time()
             print(str(round(time3-time2,3)) + "초 소요 : 2")
             
