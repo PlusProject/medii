@@ -483,7 +483,6 @@ class RecommendAPI(APIView):
 
         df = pd.DataFrame(list(DoctorAll2.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
-
         def disease_match(text):
             text = text.split(', ')
             result = dict()
@@ -502,6 +501,18 @@ class RecommendAPI(APIView):
             
         # 새로운 추천 알고리즘
         def get_recommendation(input, weight_paper, weight_trial):
+
+            std = input.split(', ')
+
+            def overlap(text):
+                overlap = 0
+                clinicals = text.split('/ ')
+                for clinical in clinicals:
+                    clinical = clinical.split(', ')
+                    if all(temp in clinical for temp in std):
+                        overlap += 1
+                return overlap
+
             def calcul_sim(x, y):
                 if x[0] == 'p':
                     weight = float(weight_paper/(weight_paper+weight_trial))
@@ -524,6 +535,8 @@ class RecommendAPI(APIView):
             df['real_total_score']=""
             df['total_score'] = df.apply(lambda x: 0.0, axis=1)
             df['real_total_score'] = df.apply(lambda x: 0.0, axis=1)
+            df['o_p'] = 0
+            df['o_c'] = 0
             
             time2 = time.time()
             print(str(round(time2-time1,3)) + "초 소요 : 1")
@@ -557,7 +570,8 @@ class RecommendAPI(APIView):
             sorted_df = df.sort_values(
                 by=['total_score'], axis=0, ascending=False)[0:20]
             sorted_df = sorted_df.reset_index()
-
+            sorted_df['paper_disease_all'] = sorted_df['paper_disease_all'].fillna("")
+            sorted_df['clinical_disease_all'] = sorted_df['clinical_disease_all'].fillna("")
             for i in sorted_df.index:
                 dic = eval(sorted_df['disease'][i])
                 delete = []
@@ -580,6 +594,9 @@ class RecommendAPI(APIView):
                 
                 sorted_df['name_kor'][i] = sorted_df['name'][i]
                 sorted_df['major'][i] = codes
+                #print(type(sorted_df['paper_disease_all'][i]))
+                sorted_df['o_p'][i] = overlap(sorted_df['paper_disease_all'][i])
+                sorted_df['o_c'][i] = overlap(sorted_df['clinical_disease_all'][i])
 
             
             time4 = time.time()
