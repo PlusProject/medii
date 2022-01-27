@@ -534,7 +534,8 @@ class RecommendAPI(APIView):
                     input_big = input_code[0].lower()
                     codes = eval(df[input_big][i])
                     # 논문/임상시험 가중치 계산
-                    for code in codes:
+                    
+                    for code in codes: 
                         sim = calcul_sim(code, input_code)
                         temp = sim*codes[code]
                         total_score += temp
