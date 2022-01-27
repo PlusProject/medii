@@ -2,11 +2,11 @@ from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, DoctorAll
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, DoctorAll, DoctorAll2
 from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer,
                           PersonSerializer, ParticipateSerializer, WritesSerializer,
                           CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer, DiseaseSerializer, DoctorTotalDiseaseSerializer, Totaldisease, DoctorAllscoreSerializer,
-                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer,DoctorAllSerializer)
+                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer,DoctorAllSerializer,DoctorAll2Serializer)
 from django.db.models import Q
 import re
 import pandas as pd
@@ -454,8 +454,8 @@ class Recommend2API(APIView):
             person_grade['total_score'] = person_grade.apply(lambda x: (
                 x['total_paper']*weight_paper + x['total_clinical']*weight_trial)/(weight_paper+weight_trial), axis=1)
             ranking = person_grade.sort_values(
-                by='total_score', ascending=False)[0:10]
-            ranking['ranking'] = range(1, 11)
+                by='total_score', ascending=False)[0:20]
+            ranking['ranking'] = range(1, 21)
             ranking['cosine_simil_paper'] = round(
                 ranking['cosine_simil_paper'], 2)
             ranking['total_clinical'] = round(ranking['total_clinical'], 2)
@@ -479,7 +479,7 @@ class RecommendAPI(APIView):
         weight_paper = int(weight_paper)
         weight_trial = int(weight_trial)
 
-        df = pd.DataFrame(list(DoctorAll.objects.all().values()))
+        df = pd.DataFrame(list(DoctorAll2.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
 
         def disease_match(text):
@@ -497,6 +497,7 @@ class RecommendAPI(APIView):
                 return " {" + disease_table['disease_kor'][disease_indexs[0]] + "} "
             else:
                 return ""
+            
         # 새로운 추천 알고리즘
         def get_recommendation(input, weight_paper, weight_trial):
             def calcul_sim(x, y):
@@ -528,7 +529,10 @@ class RecommendAPI(APIView):
             for input_code in input_codes:
                 for i in df.index:
                     total_score = 0.0
-                    codes = eval(df['disease'][i])
+                    
+                    # 대분류 도입
+                    input_big = input_code[0].lower()
+                    codes = eval(df[input_big][i])
                     # 논문/임상시험 가중치 계산
                     for code in codes:
                         sim = calcul_sim(code, input_code)
@@ -536,15 +540,19 @@ class RecommendAPI(APIView):
                         total_score += temp
                     df['total_score'][i] = float(total_score)
                 
-                df['total_score'] = minmax_scale(df['total_score'], axis=0, copy=True)
-                df['real_total_score'] += df['total_score']*100.0
+                mean_score = df['total_score'].mean()
+                std_score = df['total_score'].std()
+                df['total_score'] = (df['total_score']-mean_score)/std_score
+                df['real_total_score'] += df['total_score']*10.0
+                
+                
 
             time3 = time.time()
             print(str(round(time3-time2,3)) + "초 소요 : 2")
             
             df['total_score'] = df['real_total_score']
             sorted_df = df.sort_values(
-                by=['total_score'], axis=0, ascending=False)[0:10]
+                by=['total_score'], axis=0, ascending=False)[0:20]
             sorted_df = sorted_df.reset_index()
 
             for i in sorted_df.index:
@@ -569,7 +577,6 @@ class RecommendAPI(APIView):
                 
                 sorted_df['name_kor'][i] = sorted_df['name'][i]
                 sorted_df['major'][i] = codes
-                sorted_df['total_score'][i] = sorted_df['real_total_score'][i]
 
             
             time4 = time.time()
@@ -577,7 +584,7 @@ class RecommendAPI(APIView):
             print(sorted_df.columns)
             
             sorted_df['total_score'] = round(sorted_df['total_score'], 2)
-            sorted_df['ranking'] = range(1, 11)
+            sorted_df['ranking'] = range(1, 21)
             temp = sorted_df.to_json(orient='records')
             
             time5 = time.time()

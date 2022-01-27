@@ -1,123 +1,110 @@
 <template>
-  <section class = 'ma-10' >
-
+  <section class="ma-10">
     <div class="overflow-hidden pa-5 ma-5 d-flex justify-start">
-
       <v-row>
-        <v-col cols='6'>
+        <v-col cols="6">
+          <v-text-field
+            label="질병코드를 (, ) 로 구분해서 입력하세요. [ 예시: I21.9, Q23 ]"
+            hint="질병코드를 (, ) 로 구분해서 입력하세요. [ 예시: I21.9, Q23 ]"
+            persistent-hint
+            rounded
+            outlined
+            solo
+            @keyup.enter="re2"
+            v-model="input"
+          >
+          </v-text-field>
+        </v-col>
 
-            <v-text-field
-              label="질병코드를 (, ) 로 구분해서 입력하세요. [ 예시: I21.9, Q23 ]"
-              hint="질병코드를 (, ) 로 구분해서 입력하세요. [ 예시: I21.9, Q23 ]"
-              persistent-hint
-              rounded
-              outlined
-              solo
-              @keyup.enter = "re2"
-              v-model=input
-            >
-            </v-text-field>
-          </v-col>
-
-          <v-col cols='1' >
-            
-            <v-btn
-              class = 'ma-3'
-              color="light-blue lighten-2"
-              @click="detail_search = !detail_search"
-            >
-              상세 검색
-            </v-btn>
-            
-        </v-col> 
-      </v-row>   
-
+        <v-col cols="1">
+          <v-btn
+            class="ma-3"
+            color="light-blue lighten-2"
+            @click="detail_search = !detail_search"
+          >
+            상세 검색
+          </v-btn>
+        </v-col>
+      </v-row>
     </div>
-    
-    <div class='d-flex  flex-wrap'>
+
+    <div class="d-flex flex-wrap">
       <div class="d-flex flex-wrap">
         <span><strong>질병명: </strong></span>
-        <span v-bind:key='key' v-for="(value, key) in diseasematch" > 
-          <strong class="px-2 text-center blue lighten-3 rounded-xl mx-2">{{key}} - {{value}}</strong>
+        <span v-bind:key="key" v-for="(value, key) in diseasematch">
+          <strong class="px-2 text-center blue lighten-3 rounded-xl mx-2"
+            >{{ key }} - {{ value }}</strong
+          >
         </span>
       </div>
-
-
     </div>
 
-
-
-   
-    <v-btn
-      fab
-      color="cyan accent-2"
-      right
-      absolute
-      @click="dialog = !dialog"
-    >
+    <v-btn fab color="cyan accent-2" right absolute @click="dialog = !dialog">
       <v-icon> mdi-comment-question </v-icon>
     </v-btn>
 
-    <v-dialog
-      v-model="dialog"
-      max-width="850px"
-    >
+    <v-dialog v-model="dialog" max-width="850px">
       <v-card class="text-sm-left pa-7">
         <v-card-title>추천 로직</v-card-title>
 
-        
-<p class='blue lighten-3'> 기존 추천 </p>
+        <p class="blue lighten-3">기존 추천</p>
+        <v-spacer></v-spacer>
+        <p>
+          의료진의 저명성: 논문 impact = citation값과 논문이 등재된 저널의 jci
+          값을 다 더한 후 정규화한 값
+        </p>
+        <p>
+          의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험
+          관련 질병명 간의 코사인 유사도를 구한 값
+        </p>
+        <v-spacer></v-spacer>
+        <p>전체 점수 = 논문 점수*0.7 + 임상시험 질병 유사도 점수*0.3</p>
+        <p>논문 점수 = 논문 질병 유사도 점수*0.7 + 논문 impact*0.3</p>
+        <v-spacer></v-spacer>
+        <p class="blue lighten-3">신규 추천</p>
+        <p>
           <v-spacer></v-spacer>
-          <p> 의료진의 저명성: 논문 impact = citation값과 논문이 등재된 저널의 jci 값을 다 더한 후 정규화한 값</p>
-          <p> 의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험 관련 질병명 간의 코사인 유사도를 구한 값</p>
-          <v-spacer></v-spacer>
-          <p>전체 점수 = 논문 점수*0.7 + 임상시험 질병 유사도 점수*0.3 </p>
-          <p>논문 점수 = 논문 질병 유사도 점수*0.7 + 논문 impact*0.3</p>
-          <v-spacer></v-spacer>
-          <p class = 'blue lighten-3'> 신규 추천<p>
-          <v-spacer></v-spacer>
-          <p>중분류 질병 체계 고려: 추천 받고 싶은 소분류 질병코드 입력 시 중분류까지 고려해서 추천( 예: 질병코드 I20.9은 I20과도 유사하다고 판단)</p>
-          <p>의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험 관련 질병명 간의 코사인 유사도를 구한 값</p>
-          <v-spacer></v-spacer>
-          <p>전체 점수 = 논문 점수*0.7 + 임상시험 질병 유사도 점수*0.3</p>
-          <p>논문 점수 = 논문 질병 소분류 유사도 점수*0.7 + 논문 질병 중분류 유사도 점수*0.3</p>
-          <p>임상 점수= 임상 질병 소분류 유사도 점수*0.7 + 임상 질병 중분류 유사도 점수*0.3</p>
+        </p>
 
-
-
-        
+        <p>
+          중분류 질병 체계 고려: 추천 받고 싶은 소분류 질병코드 입력 시
+          중분류까지 고려해서 추천( 예: 질병코드 I20.9은 I20과도 유사하다고
+          판단)
+        </p>
+        <p>
+          의료진의 질병분야 전문성: 검색 질병명과 의료진이 쓴 논문, 임상시험
+          관련 질병명 간의 코사인 유사도를 구한 값
+        </p>
+        <v-spacer></v-spacer>
+        <p>전체 점수 = 논문 점수*0.7 + 임상시험 질병 유사도 점수*0.3</p>
+        <p>
+          논문 점수 = 논문 질병 소분류 유사도 점수*0.7 + 논문 질병 중분류 유사도
+          점수*0.3
+        </p>
+        <p>
+          임상 점수= 임상 질병 소분류 유사도 점수*0.7 + 임상 질병 중분류 유사도
+          점수*0.3
+        </p>
 
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn
-            text
-            color="primary"
-            @click="dialog = false"
-          >
-            Close
-          </v-btn>
+          <v-btn text color="primary" @click="dialog = false"> Close </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="detail_search"
-      max-width="900px"
-      width='900px'
-    >
+    <v-dialog v-model="detail_search" max-width="900px" width="900px">
       <v-card>
-        
-        <div class= 'pa-6 ma-5'>
-          <h3 class="font-weight-black"> 임상시험명 </h3>
+        <div class="pa-6 ma-5">
+          <h3 class="font-weight-black">임상시험명</h3>
           <v-text-field
             :rules="rules"
             hide-details="auto"
-            v-model='title'
+            v-model="title"
           ></v-text-field>
-          
 
-          <h3 class ="font-weight-black text-align-left mt-4"> Brief Summary </h3>
+          <h3 class="font-weight-black text-align-left mt-4">Brief Summary</h3>
           <v-textarea
             :rules="rules"
             v-model="summary"
@@ -125,52 +112,51 @@
             filled
             color="deep-purple"
             rows="4"
-            class = 'my-5'
+            class="my-5"
           ></v-textarea>
-       
+
           <v-spacer></v-spacer>
 
           <v-btn
-            
             color="primary"
             @click="getSummaryInput"
-            class ="font-weight-black"
+            class="font-weight-black"
           >
             Submit
           </v-btn>
         </div>
 
-        <v-item-group multiple
-        v-if = "showextractdisease">
-         <v-subhearder>추출된 질병명 </v-subhearder>
-          <v-subheader> (추천에 사용될 질병코드를 선택해주세요 선택하지 않으신 경우 모든 질병 코드가 추천에 사용됩니다)</v-subheader>
+        <v-item-group multiple v-if="showextractdisease">
+          <v-subhearder>추출된 질병명 </v-subhearder>
+          <v-subheader>
+            (추천에 사용될 질병코드를 선택해주세요 선택하지 않으신 경우 모든
+            질병 코드가 추천에 사용됩니다)</v-subheader
+          >
 
-            <v-item
-              v-for="( item, i ) in extractdisease"
-              :key="i"
-              class='pa-3 ma-3'
-              v-slot="{ active, toggle }"
+          <v-item
+            v-for="(item, i) in extractdisease"
+            :key="i"
+            class="pa-3 ma-3"
+            v-slot="{ active, toggle }"
+          >
+            <v-chip
+              active-class="purple--text"
+              :input-value="active"
+              @click="[toggle(), updateDiseaseSet(active, item)]"
             >
-              <v-chip
-                active-class="purple--text"
-                :input-value="active"
-                @click="[toggle(), updateDiseaseSet(active, item)]"             
-              >
-
-                {{item}}
-              </v-chip>
-            </v-item>
+              {{ item }}
+            </v-chip>
+          </v-item>
         </v-item-group>
 
         <v-btn
-            v-if = "showextractdisease"
-            color="primary"
-            @click="readyforRecommend"
-            class ="font-weight-black mb-5"
-          >
-            추천
-          </v-btn>
-        
+          v-if="showextractdisease"
+          color="primary"
+          @click="readyforRecommend"
+          class="font-weight-black mb-5"
+        >
+          추천
+        </v-btn>
       </v-card>
     </v-dialog>
 
@@ -182,381 +168,342 @@
       :loading="loading"
       loading-text="Loading... Please wait"
     >
-
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>
-            검색 결과 <span class="text-no-wrap light-blue lighten-4">{{partition_count}}</span>명의 의료진이
-            있습니다.
+            검색 결과
+            <span class="text-no-wrap light-blue lighten-4">{{
+              partition_count
+            }}</span
+            >명의 의료진이 있습니다.
           </v-toolbar-title>
           <v-spacer></v-spacer>
 
           <v-slider
-          v-model="clinical.val"
-          :color="clinical.color"
-          :label="clinical.label"
-          thumb-label="always"
-          max="10"
-        ></v-slider>
+            v-model="clinical.val"
+            :color="clinical.color"
+            :label="clinical.label"
+            thumb-label="always"
+            max="10"
+          ></v-slider>
 
-        <v-slider
-          v-model="paper.val"
-          :label="paper.label"
-          :color="paper.color"
-          thumb-label="always"
-          max="10"
-        ></v-slider>
+          <v-slider
+            v-model="paper.val"
+            :label="paper.label"
+            :color="paper.color"
+            thumb-label="always"
+            max="10"
+          ></v-slider>
 
-        <v-btn
+          <v-btn
             color="light-blue darken-4"
             @click="changeWeight"
-            class ="font-weight-black white--text px-3 ma-5"
+            class="font-weight-black white--text px-3 ma-5"
           >
             가중치 변경
-        </v-btn>
-
+          </v-btn>
         </v-toolbar>
       </template>
 
-    <template v-slot:header>
-      <thead>
-         <tr> 
-          <th colspan="5" scope="colgroup">추천 결과</th> 
-          </tr> 
+      <template v-slot:header>
+        <thead>
+          <tr>
+            <th colspan="5" scope="colgroup">추천 결과</th>
+          </tr>
 
           <tr>
-          <th colspan="3">
-               <input type="checkbox" id = "all_check" value = "selectAll" onclick="selectAll(this)"/>
-              <v-btn id = "network"
-              x-small
-            class = 'indigo lighten-3 my-8 mx-1'
-            dark
-            @click = "$router.push({
-            name: 'PartialNetwork',
-            })">
-            의사 network 보기
-             </v-btn>
-
-
+            <th colspan="3">
+              <input
+                type="checkbox"
+                id="all_check"
+                value="selectAll"
+                onclick="selectAll(this)"
+              />
+              <v-btn
+                id="network"
+                x-small
+                class="indigo lighten-3 my-8 mx-1"
+                dark
+                @click="
+                  $router.push({
+                    name: 'PartialNetwork',
+                  })
+                "
+              >
+                의사 network 보기
+              </v-btn>
             </th>
-          <th colspan="3" >
-                      <v-btn
-            rounded
-            :color=color
-            dark
-            @click = chageapi
-          >
-             {{click}} 추천 알고리즘으로 변경 ->
-          </v-btn>
-          </th>
-          <th colspan="2"> <p class="text-center">질병 전문성</p></th>
-          <th scope="col"> <p class="text-center">저명성</p></th>
-          <th colspan="2"> <p class="text-center">활동성</p></th> 
-        </tr> 
-      </thead>
-
-    </template>
+            <th colspan="3">
+              <v-btn rounded :color="color" dark @click="chageapi">
+                {{ click }} 추천 알고리즘으로 변경 ->
+              </v-btn>
+            </th>
+            <th colspan="2"><p class="text-center">질병 전문성</p></th>
+            <th scope="col"><p class="text-center">저명성</p></th>
+            <th colspan="2"><p class="text-center">활동성</p></th>
+          </tr>
+        </thead>
+      </template>
       <template v-slot:[`item.checkbox`]>
-
-          <input type="checkbox" name = "doc"/>
-
+        <input type="checkbox" name="doc" />
       </template>
 
-      <template v-slot:[`item.img`] ="{ item }">
-
-          <img :src="item.img" />
+      <template v-slot:[`item.img`]="{ item }">
+        <img :src="item.img" />
       </template>
 
-
-      <template v-slot:[`item.name_kor`] ="{ item }">
-
-          {{ item.name_kor }}
-          <v-spacer></v-spacer>
-          {{ item.belong }}
-
+      <template v-slot:[`item.name_kor`]="{ item }">
+        {{ item.name_kor }}
+        <v-spacer></v-spacer>
+        {{ item.belong }}
       </template>
 
-      <template v-slot:[`item.total_clinical`] ="{ item }">
-
-          {{ item.total_clinical }}
-          <v-spacer></v-spacer>
-          ({{ item.overlap_clinical}}<span>건</span>)
-
+      <template v-slot:[`item.total_clinical`]="{ item }">
+        {{ item.total_clinical }}
+        <v-spacer></v-spacer>
+        ({{ item.overlap_clinical }}<span>건</span>)
       </template>
 
-      <template v-slot:[`item.cosine_simil_paper`] ="{ item }">
-
-          {{ item.cosine_simil_paper }}
-          <v-spacer></v-spacer>
-          ({{ item.overlap_paper}}<span>건</span>)
-
+      <template v-slot:[`item.cosine_simil_paper`]="{ item }">
+        {{ item.cosine_simil_paper }}
+        <v-spacer></v-spacer>
+        ({{ item.overlap_paper }}<span>건</span>)
       </template>
 
-      <template v-slot:[`item.paper_count`] ="{ item }">
-
-          {{ item.paper_count }}<span>건</span>
-
+      <template v-slot:[`item.paper_count`]="{ item }">
+        {{ item.paper_count }}<span>건</span>
       </template>
 
-      <template v-slot:[`item.clinical_count`] ="{ item }">
-
-          {{ item.clinical_count }} 
-          <span>건</span>
-
+      <template v-slot:[`item.clinical_count`]="{ item }">
+        {{ item.clinical_count }}
+        <span>건</span>
       </template>
-
     </v-data-table>
-
   </section>
 </template>
 
 <script>
-import api from '../api';
-
+import api from "../api";
 
 export default {
-        data(){
-            return{
-            clinical: { label: '임상시험 가중치', val: 3, color: 'primary darken-3' },
-            paper: { label: '논문 가중치', val: 7, color: 'blue-grey darken-2' },
-            loading : true,
-            title: "",
-            showextractdisease: false,
-            extractdisease : [],
-            summary: "",
-            toggle: false,
-            color: 'primary',
-            click: '기존 ',
-            previous:'I20.1',
-            target: [],
-            rules: [
-                    value => !!value || 'Required.',
-                    value => (value && value.length >= 3) || 'Min 3 characters',
-                  ],
-            dialog: false,
-            detail_search: false,
-            overall_count: 0,
-            partition_count: 0,
-            diseasematch: {},
-            value: 1,
-            active: false,
-            input : "I20.1",
-            items : [],
-            groupBy: [],
-            groupDesc: [],
-            headers: [
-            { text: '추천순', value: 'ranking'},
-            {text: 'network', value: 'checkbox'},
-            { text: '', value: 'img'},
-            {
-              text: 'Totalscore', value: 'total_score',
-            },
-            { text: 'Name', value: 'name_kor' , sortable: false, },
-            { text: 'Major', value: 'major' , sortable: false,},
-            { text: '논문', value: 'cosine_simil_paper'},
-            { text: '임상시험', value: 'total_clinical' },           
-            { text: 'paper_impact', value: 'paper_impact' },
-            { text: '전체 논문 수', value: 'paper_count' },
-            { text: '전체 임상 수', value: 'clinical_count' },
-                     
-            ],
-            };
+  data() {
+    return {
+      clinical: { label: "임상시험 가중치", val: 3, color: "primary darken-3" },
+      paper: { label: "논문 가중치", val: 7, color: "blue-grey darken-2" },
+      loading: true,
+      title: "",
+      showextractdisease: false,
+      extractdisease: [],
+      summary: "",
+      toggle: false,
+      color: "primary",
+      click: "기존 ",
+      previous: "I20.1",
+      target: [],
+      rules: [
+        (value) => !!value || "Required.",
+        (value) => (value && value.length >= 3) || "Min 3 characters",
+      ],
+      dialog: false,
+      detail_search: false,
+      overall_count: 0,
+      partition_count: 0,
+      diseasematch: {},
+      value: 1,
+      active: false,
+      input: "I20.1",
+      items: [],
+      groupBy: [],
+      groupDesc: [],
+      headers: [
+        { text: "추천순", value: "ranking" },
+        { text: "network", value: "checkbox" },
+        { text: "", value: "img" },
+        {
+          text: "Totalscore",
+          value: "total_score",
         },
-        watch: {
+        { text: "Name", value: "name_kor", sortable: false },
+        { text: "Major", value: "major", sortable: false },
+        { text: "논문", value: "cosine_simil_paper" },
+        { text: "임상시험", value: "total_clinical" },
+        { text: "paper_impact", value: "paper_impact" },
+        { text: "전체 논문 수", value: "paper_count" },
+        { text: "전체 임상 수", value: "clinical_count" },
+      ],
+    };
+  },
+  watch: {},
 
-        },
-
- methods: {
-   selectAll(selectAll){
+  methods: {
+    selectAll(selectAll) {
       const checkboxes = document.getElementsByName("doc");
-      checkboxes.forEach((checkbox)=>{
+      checkboxes.forEach((checkbox) => {
         checkbox.checked = selectAll.checked;
-      })
-   },
+      });
+    },
 
-   changeWeight(){
-     this.items = []
-     this.loading = true
-     this.input = this.previous
-     if(this.toggle === true){
-      this.getRecommendResults2()  
-     }
-     else{
-      this.getRecommendResults()
-     }
-   },
-   getSummaryInput(){
-     
-     this.showextractdisease = true
-     this.getExtractDiseaseResults()
-
-   },
-   updateDiseaseSet(active, item){
-     if(active === true){
-       for(let i = 0; i < this.target.length; i++) {
-        if(this.target[i] === item){
-          this.target.splice(i, 1);
-        }
+    changeWeight() {
+      this.items = [];
+      this.loading = true;
+      this.input = this.previous;
+      if (this.toggle === true) {
+        this.getRecommendResults2();
+      } else {
+        this.getRecommendResults();
       }
-     }
-     else{
-       this.target.push(item)
-     }
-     
-   },
-   readyforRecommend(){
-     this.showextractdisease = false
-     this.detail_search = false
-     this.summary = ""
-     this.title = ""
-     if(this.target.length === 0) this.target = this.extractdisease
-     this.target = this.target.map(element => {  
-       return element.split('(')[0]
-     });
-     console.log(this.target)
-     this.input = this.target.join(', ')
-     this.target = []
-     this.extractdisease = []
-     this.re2()
-   },
+    },
+    getSummaryInput() {
+      this.showextractdisease = true;
+      this.getExtractDiseaseResults();
+    },
+    updateDiseaseSet(active, item) {
+      if (active === true) {
+        for (let i = 0; i < this.target.length; i++) {
+          if (this.target[i] === item) {
+            this.target.splice(i, 1);
+          }
+        }
+      } else {
+        this.target.push(item);
+      }
+    },
+    readyforRecommend() {
+      this.showextractdisease = false;
+      this.detail_search = false;
+      this.summary = "";
+      this.title = "";
+      if (this.target.length === 0) this.target = this.extractdisease;
+      this.target = this.target.map((element) => {
+        return element.split("(")[0];
+      });
+      console.log(this.target);
+      this.input = this.target.join(", ");
+      this.target = [];
+      this.extractdisease = [];
+      this.re2();
+    },
 
-   chageapi(){
-     this.toggle = !this.toggle
-     this.items = []
-     this.loading = true
-    
-     if(this.toggle === true){
-       this.color = 'cyan accent-6'
-       this.click = '신규 '
-       this.input = this.previous
-       this.getRecommendResults2()     
-     }
-     else{
-       this.color = 'primary'
-       this.click = '기존  '
-       this.input = this.previous
-       this.getRecommendResults()
-     }
-      this.getCountResults()
-      this.getDiseaseMatchResults() 
-     this.input= ""
-   },
-   
+    chageapi() {
+      this.toggle = !this.toggle;
+      this.items = [];
+      this.loading = true;
+
+      if (this.toggle === true) {
+        this.color = "cyan accent-6";
+        this.click = "신규 ";
+        this.input = this.previous;
+        this.getRecommendResults2();
+      } else {
+        this.color = "primary";
+        this.click = "기존  ";
+        this.input = this.previous;
+        this.getRecommendResults();
+      }
+      this.getCountResults();
+      this.getDiseaseMatchResults();
+      this.input = "";
+    },
+
     re2() {
-      this.loading = true
-      this.items = []
+      this.loading = true;
+      this.items = [];
       this.getRecommendResults();
       this.getCountResults();
       this.getDiseaseMatchResults();
       this.toggle = false;
-      this.color = 'primary'
-      this.click = '기존 '
+      this.color = "primary";
+      this.click = "기존 ";
       this.previous = this.input;
-      this.input= ""
+      this.input = "";
     },
-    async getRecommendResults () {
-      
+    async getRecommendResults() {
       try {
-         const temp = this.input
-        
+        const temp = this.input;
+
         const params = {
-          input : temp,
+          input: temp,
           weight_paper: this.paper.val,
           weight_trial: this.clinical.val,
-        }
-        console.log(this.paper.val)
-        const res = await api.recommend(params)
-        this.items = res['data']
-        this.items = JSON.parse(this.items)
-        this.loading = false
-
+        };
+        console.log(this.paper.val);
+        const res = await api.recommend(params);
+        this.items = res["data"];
+        this.items = JSON.parse(this.items);
+        this.loading = false;
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
-
     },
-    async getRecommendResults2 () {
-      
+    async getRecommendResults2() {
       try {
-         const temp = this.input
-        
+        const temp = this.input;
+
         const params = {
-          input : temp,
+          input: temp,
           weight_paper: this.paper.val,
           weight_trial: this.clinical.val,
-        }
-        
-        const res = await api.recommend2(params)
-        
-        this.items = res['data']
-        this.items = JSON.parse(this.items)
-        this.loading = false
-  
+        };
 
+        const res = await api.recommend2(params);
+
+        this.items = res["data"];
+        this.items = JSON.parse(this.items);
+        print(this.items);
+        this.loading = false;
       } catch (err) {
-        console.log(err)
-      }
-
-    },
-    async getCountResults () {
-    
-      try {
-          const temp = this.input
-          
-        const params = {
-          input : temp,
-
-        }
-        
-        const res = await api.getCount(params)
-        
-        let result = res['data']
-        result = JSON.parse(result)
-        this.overall_count = result['overall_count']
-        this.partition_count = result['partition_count']
-        
-
-      } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
-    async getDiseaseMatchResults () {
-    
+    async getCountResults() {
       try {
-          const temp = this.input
-        const params = {
-          input : temp,
-        }
-        const res = await api.getDiseaseMatch(params)
-        let result = res['data']
-        this.diseasematch = JSON.parse(result)
+        const temp = this.input;
 
+        const params = {
+          input: temp,
+        };
+
+        const res = await api.getCount(params);
+
+        let result = res["data"];
+        result = JSON.parse(result);
+        this.overall_count = result["overall_count"];
+        this.partition_count = result["partition_count"];
       } catch (err) {
-        console.log(err)
+        console.log(err);
+      }
+    },
+    async getDiseaseMatchResults() {
+      try {
+        const temp = this.input;
+        const params = {
+          input: temp,
+        };
+        const res = await api.getDiseaseMatch(params);
+        let result = res["data"];
+        this.diseasematch = JSON.parse(result);
+      } catch (err) {
+        console.log(err);
       }
     },
     async getExtractDiseaseResults() {
-    
       try {
-          const temp = this.summary
+        const temp = this.summary;
         const params = {
-          input : temp,
-        }
-        console.log(this.paper.val)
-        console.log(this.clinical.val)
-        const res = await api.getExtractDisease(params)
-        let result = res['data']
-        this.extractdisease = JSON.parse(result)
-
+          input: temp,
+        };
+        console.log(this.paper.val);
+        console.log(this.clinical.val);
+        const res = await api.getExtractDisease(params);
+        let result = res["data"];
+        this.extractdisease = JSON.parse(result);
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
-  
- },
+  },
 
- 
- /*
+  /*
   computed:{
     checkAll : { 
 				//getter
@@ -617,31 +564,26 @@ export default {
 
     },
     */
-    
 
-mounted: function () {
+  mounted: function () {
     this.input = this.$route.params.disease;
-    if(this.input === '') this.input = "I20.1";
+    if (this.input === "") this.input = "I20.1";
     this.previous = this.input;
-    this.re2()
-    
+    this.re2();
   },
-
 };
-
 </script>
 
 
 
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@700&display=swap");
 
 section {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: "Nanum Gothic", sans-serif;
 }
 p {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: "Nanum Gothic", sans-serif;
 }
 
 img {
@@ -652,14 +594,13 @@ img {
   padding: 0.5rem;
 }
 
-#network{
-  left:70px;
+#network {
+  left: 70px;
 }
 
-#all_check{
-  position:relative;
-  left:5px;
-  top:4px;
+#all_check {
+  position: relative;
+  left: 5px;
+  top: 4px;
 }
-
 </style>

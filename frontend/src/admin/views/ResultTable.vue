@@ -2,7 +2,11 @@
   <div class="container">
     <b-row>
       <b-col>
-        <b-form-group label="정렬 기준" label-cols-lg="2" v-slot="{ ariaDescribedby }">
+        <b-form-group
+          label="정렬 기준"
+          label-cols-lg="2"
+          v-slot="{ ariaDescribedby }"
+        >
           <b-form-radio-group
             v-model="sortBy"
             :aria-describedby="ariaDescribedby"
@@ -23,10 +27,9 @@
           </b-form-radio-group>
         </b-form-group>
       </b-col>
-      <b-col span="6">
-      </b-col>
+      <b-col span="6"> </b-col>
     </b-row>
-    
+
     <b-table
       id="result-table"
       :items="getPerson"
@@ -42,17 +45,27 @@
         </b-link>
       </template>
       <template #cell(participate_num)="row">
-        <b-button v-b-modal.clinical-trials-modal size="md" @click="renderClinicalTrialsTable(row.item.pid)" class="mr-1">
+        <b-button
+          v-b-modal.clinical-trials-modal
+          size="md"
+          @click="renderClinicalTrialsTable(row.item.pid)"
+          class="mr-1"
+        >
           show <b-badge variant="light">{{ row.item.participate_num }}</b-badge>
         </b-button>
       </template>
 
       <template #cell(writes_num)="row">
-        <b-button v-b-modal.thesis-modal size="md" @click="renderthesisTable(row.item.pid)" class="mr-1">
+        <b-button
+          v-b-modal.thesis-modal
+          size="md"
+          @click="renderthesisTable(row.item.pid)"
+          class="mr-1"
+        >
           show <b-badge variant="light">{{ row.item.writes_num }}</b-badge>
         </b-button>
       </template>
-      
+
       <!--<template #cell(specializedfield)="row">
         <span
           v-if="limitCheck(row.item.specializedfield)"
@@ -89,7 +102,11 @@
         :per-page="clinicalTrialsPerPage"
       >
         <template #cell(index)="row">
-          {{ (clinicalTrialsCurrentPage-1) * clinicalTrialsPerPage + row.index + 1 }}
+          {{
+            (clinicalTrialsCurrentPage - 1) * clinicalTrialsPerPage +
+            row.index +
+            1
+          }}
         </template>
       </b-table>
       <b-pagination
@@ -118,10 +135,15 @@
         busy.sync="isBusy"
       >
         <template #cell(index)="row">
-          {{ (thesisCurrentPage-1) * thesisPerPage + row.index + 1 }}
+          {{ (thesisCurrentPage - 1) * thesisPerPage + row.index + 1 }}
         </template>
       </b-table>
-      <b-spinner v-if="isBusy" variant="primary" label="Spinning" class="table-spinner"></b-spinner>
+      <b-spinner
+        v-if="isBusy"
+        variant="primary"
+        label="Spinning"
+        class="table-spinner"
+      ></b-spinner>
       <b-pagination
         v-model="thesisCurrentPage"
         :total-rows="thesisLength"
@@ -133,38 +155,111 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import api from '../api'
+import { mapGetters } from "vuex";
+import api from "../api";
 
 export default {
-  name: 'ResultTable',
-  data () {
+  name: "ResultTable",
+  data() {
     return {
-      sortBy: 'participate_num',
+      sortBy: "participate_num",
       sortDesc: true,
       personFields: [
-        { key: 'name_kor', label: '이름', thClass: 'name', tdClass: 'name', sortable: true },
-        { key: 'belong', label: '병원', thClass: 'belong', tdClass: 'belong', sortable: true },
-        { key: 'major', label: '진료 분야', thClass: 'major', tdClass: 'major' },
-        { key: 'participate_num', label: '임상 시험', tdClass: 'button', thClass: 'button', sortable: true },
-        { key: 'writes_num', label: '논문', tdClass: 'button', thClass: 'button', sortable: true },
+        {
+          key: "name_kor",
+          label: "이름",
+          thClass: "name",
+          tdClass: "name",
+          sortable: true,
+        },
+        {
+          key: "belong",
+          label: "병원",
+          thClass: "belong",
+          tdClass: "belong",
+          sortable: true,
+        },
+        {
+          key: "major",
+          label: "진료 분야",
+          thClass: "major",
+          tdClass: "major",
+        },
+        {
+          key: "participate_num",
+          label: "임상 시험",
+          tdClass: "button",
+          thClass: "button",
+          sortable: true,
+        },
+        {
+          key: "writes_num",
+          label: "논문",
+          tdClass: "button",
+          thClass: "button",
+          sortable: true,
+        },
       ],
       clinicalTrialsFields: [
-        { key: 'index', label: 'Index', tdClass: 'index', thClass: 'index' },
-        { key: 'title_kor', label: '연구제목', sortable: true, thClass: 'clinicalTitle' },
-        { key: 'title_eng', label: 'Scientific Title', thClass: 'title_eng',sortable: true },
-        { key: 'source_name', label: 'Source', thClass: 'source', sortable: true },
-        { key: 'start_date', label: 'Start Date', thClass: 'startDate', sortable:true}
+        { key: "index", label: "Index", tdClass: "index", thClass: "index" },
+        {
+          key: "title_kor",
+          label: "연구제목",
+          sortable: true,
+          thClass: "clinicalTitle",
+        },
+        {
+          key: "title_eng",
+          label: "Scientific Title",
+          thClass: "title_eng",
+          sortable: true,
+        },
+        {
+          key: "source_name",
+          label: "Source",
+          thClass: "source",
+          sortable: true,
+        },
+        {
+          key: "start_date",
+          label: "Start Date",
+          thClass: "startDate",
+          sortable: true,
+        },
       ],
       thesisFields: [
-        { key: 'index', label: 'Index', tdClass: 'index', thClass: 'index' },
-        { key: 'title', label: 'Title', sortable: true, thClass: 'thesisTitle', tdClass: 'thesisTitle' },
-        { key: 'journal', label: 'Journal', tdClass: 'journal', thClass: 'journal', sortable: true },
-        { key: 'publication_date', label: 'Year', tdClass: 'publication_date', thClass: 'publication_date', sortable: true },
-        { key: 'citation', label: 'Citation', tdClass: 'citation', thClass: 'citation', sortable: true }
+        { key: "index", label: "Index", tdClass: "index", thClass: "index" },
+        {
+          key: "title",
+          label: "Title",
+          sortable: true,
+          thClass: "thesisTitle",
+          tdClass: "thesisTitle",
+        },
+        {
+          key: "journal",
+          label: "Journal",
+          tdClass: "journal",
+          thClass: "journal",
+          sortable: true,
+        },
+        {
+          key: "publication_date",
+          label: "Year",
+          tdClass: "publication_date",
+          thClass: "publication_date",
+          sortable: true,
+        },
+        {
+          key: "citation",
+          label: "Citation",
+          tdClass: "citation",
+          thClass: "citation",
+          sortable: true,
+        },
       ],
-      hidedetails: true,
-      personPerPage: 10,
+      hidedetails: false,
+      personPerPage: 20,
       personCurrentPage: 1,
       clinicalTrialsPerPage: 6,
       clinicalTrialsCurrentPage: 1,
@@ -173,119 +268,123 @@ export default {
       showClinicalTrials: false,
       showThesis: false,
       participateItems: [],
-      thesisData: '',
+      thesisData: "",
       thesisItems: [],
-      isBusy: false
-    } 
+      isBusy: false,
+    };
   },
   computed: {
-    ...mapGetters([ 'getPerson', 'getParticipate', 'getWrites', 'getDoctorInfo', 'getPersonLength' ]),
-    participateLength () {
-      return this.participateItems.length
+    ...mapGetters([
+      "getPerson",
+      "getParticipate",
+      "getWrites",
+      "getDoctorInfo",
+      "getPersonLength",
+    ]),
+    participateLength() {
+      return this.participateItems.length;
     },
-    thesisLength () {
-      return this.thesisItems.length
-    }
+    thesisLength() {
+      return this.thesisItems.length;
+    },
   },
   methods: {
-    async renderClinicalTrialsTable (pid) {
+    async renderClinicalTrialsTable(pid) {
       // pid로 임상 데이터 가져오기, api 추가
-      this.participateItems = []
+      this.participateItems = [];
       try {
-        const res = await api.getClinicalTrials(pid)
-        const participateData = res.data
-        const participateItems = []
+        const res = await api.getClinicalTrials(pid);
+        const participateData = res.data;
+        const participateItems = [];
         for (let data of participateData) {
-          participateItems.push(data.clinical_trials)
+          participateItems.push(data.clinical_trials);
         }
-        participateItems.sort(function(a, b) {
-          if (a.start_date === '') {
+        participateItems.sort(function (a, b) {
+          if (a.start_date === "") {
             return 1;
-          }
-          else if (b.start_date === '') {
+          } else if (b.start_date === "") {
             return -1;
           }
-          return new Date(b.start_date) - new Date(a.start_date)
-        })
-        this.participateItems = participateItems
+          return new Date(b.start_date) - new Date(a.start_date);
+        });
+        this.participateItems = participateItems;
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
-    async renderthesisTable (pid) {
+    async renderthesisTable(pid) {
       // this.isBusy = true
-      this.thesisItems = []
+      this.thesisItems = [];
       try {
-        const res = await api.getThesis(pid)
-        const thesisData = res.data
-        const thesisItems = []
+        const res = await api.getThesis(pid);
+        const thesisData = res.data;
+        const thesisItems = [];
         for (let data of thesisData) {
-          thesisItems.push(data.thesis)
+          thesisItems.push(data.thesis);
         }
         thesisItems.sort(function (a, b) {
-          if (a.citation === '') {
+          if (a.citation === "") {
             return 1;
-          }
-          else if (b.citation === '') {
+          } else if (b.citation === "") {
             return -1;
           }
-          return b.citation - a.citation
-        })
-        this.thesisItems = thesisItems
+          return b.citation - a.citation;
+        });
+        this.thesisItems = thesisItems;
         // this.isBusy = false
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>
-  .container {
-    margin-top: 32px
-  }
-  .name {
-    width: 10%;
-  }
-  .belong {
-    width: 15%;
-  }
-  .major {
-    width: 45%;
-    word-break: break-all;
-  }
-  .clinicalTitle {
-    width: 40%;
-  }
-  .startDate {
-    width: 10%;
-  }
-  .title_eng {
-    width: 30%;
-  }
-  .source {
-    width: 15%;
-  }
-  .thesisTitle {
-    width: 70%;
-  }
-  .journal {
-    width: 15%;
-  }
-  .table-container {
-    position: relative;
-    width: 100%;
-  }
-  .b-table[aria-busy="true"] + .table-spinner {
-    /* this assumes that the spinner component has a width and height */
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10; /* make sure spinner is over table */
-  }
-  .index {
-    width: 5%;
-  }
+.container {
+  margin-top: 32px;
+}
+.name {
+  width: 10%;
+}
+.belong {
+  width: 15%;
+}
+.major {
+  width: 45%;
+  word-break: break-all;
+}
+.clinicalTitle {
+  width: 40%;
+}
+.startDate {
+  width: 10%;
+}
+.title_eng {
+  width: 30%;
+}
+.source {
+  width: 15%;
+}
+.thesisTitle {
+  width: 70%;
+}
+.journal {
+  width: 15%;
+}
+.table-container {
+  position: relative;
+  width: 100%;
+}
+.b-table[aria-busy="true"] + .table-spinner {
+  /* this assumes that the spinner component has a width and height */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20; /* make sure spinner is over table */
+}
+.index {
+  width: 5%;
+}
 </style>
