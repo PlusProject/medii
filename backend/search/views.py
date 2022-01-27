@@ -483,7 +483,17 @@ class RecommendAPI(APIView):
 
         df = pd.DataFrame(list(DoctorAll2.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
-
+        
+        input_codes = input.split(', ')
+        
+        # 불필요한 칼럼 삭제
+        big_codes = []
+        for input_code in input_codes:
+            big_codes.append((input_code[0]).lower())
+        for i in range(ord('a'),ord('z')+1):
+            if chr(i) not in big_codes:
+                df.drop(chr(i), inplace=True, axis=1)
+        
         def disease_match(text):
             text = text.split(', ')
             result = dict()
@@ -519,9 +529,6 @@ class RecommendAPI(APIView):
             
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
-            input_codes = input.split(', ')
-            df['total_score']=""
-            df['real_total_score']=""
             df['total_score'] = df.apply(lambda x: 0.0, axis=1)
             df['real_total_score'] = df.apply(lambda x: 0.0, axis=1)
             
@@ -535,8 +542,8 @@ class RecommendAPI(APIView):
                     # 대분류 도입
                     input_big = input_code[0].lower()
                     codes = eval(df[input_big][i])
-                    # 논문/임상시험 가중치 계산
                     
+                    # 논문/임상시험 가중치 계산
                     for code in codes: 
                         sim = calcul_sim(code, input_code)
                         temp = sim*codes[code]
@@ -547,8 +554,7 @@ class RecommendAPI(APIView):
                 std_score = df['total_score'].std()
                 df['total_score'] = (df['total_score']-mean_score)/std_score
                 df['real_total_score'] += df['total_score']*10.0
-                
-                
+            
 
             time3 = time.time()
             print(str(round(time3-time2,3)) + "초 소요 : 2")

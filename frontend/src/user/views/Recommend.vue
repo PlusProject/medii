@@ -449,7 +449,7 @@ export default {
 
         this.items = res["data"];
         this.items = JSON.parse(this.items);
-        print(this.items);
+        console.log(this.items);
         this.loading = false;
       } catch (err) {
         console.log(err);
