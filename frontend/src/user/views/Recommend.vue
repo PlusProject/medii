@@ -167,6 +167,7 @@
       class="elevation-1"
       :loading="loading"
       loading-text="Loading... Please wait"
+      :items-per-page="20"
     >
       <template v-slot:top>
         <v-toolbar flat>
