@@ -598,6 +598,7 @@ class RecommendAPI(APIView):
                 #print(type(sorted_df['paper_disease_all'][i]))
                 sorted_df['o_p'][i] = overlap(sorted_df['paper_disease_all'][i])
                 sorted_df['o_c'][i] = overlap(sorted_df['clinical_disease_all'][i])
+                sorted_df['paper_impact'][i] = 'NA'
 
             
             time4 = time.time()
