@@ -516,9 +516,6 @@ class RecommendAPI(APIView):
             
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
-            person_grade = df.copy()
-            person_grade['total_score'] = person_grade.apply(lambda x: 0.0, axis=1)
-            person_grade['real_total_score'] = person_grade.apply(lambda x: 0.0, axis=1)
             input_codes = input.split(', ')
             df['total_score']=""
             df['real_total_score']=""
@@ -542,10 +539,8 @@ class RecommendAPI(APIView):
                 df['total_score'] = minmax_scale(df['total_score'], axis=0, copy=True)
                 df['real_total_score'] += df['total_score']*100.0
 
-            
             time3 = time.time()
             print(str(round(time3-time2,3)) + "초 소요 : 2")
-            
             
             df['total_score'] = df['real_total_score']
             sorted_df = df.sort_values(
@@ -572,32 +567,21 @@ class RecommendAPI(APIView):
                 codes = codes.replace('\',',':').replace('(','[').replace(')',']').replace(',','  ')
                 codes += explain
                 
-                person_grade['major'][i] = codes
-                person_grade['belong'][i] = sorted_df['belong'][i]
-                person_grade['name_kor'][i] = sorted_df['name'][i]
-                person_grade['total_score'][i] = sorted_df['real_total_score'][i]
-                person_grade['img'][i] = sorted_df['img'][i]
+                sorted_df['name_kor'][i] = sorted_df['name'][i]
+                sorted_df['major'][i] = codes
+                sorted_df['total_score'][i] = sorted_df['real_total_score'][i]
 
             
             time4 = time.time()
             print(str(round(time4-time3,3)) + "초 소요: 3")
+            print(sorted_df.columns)
             
-
-            ranking = person_grade.sort_values(
-                by='total_score', ascending=False)[0:10]
-            ranking['cosine_simil_paper'] = 'NA'
-            ranking['total_clinical'] = 'NA'
-            ranking['paper_impact'] = 'NA'
-            ranking['total_score'] = round(ranking['total_score'], 2)
-            ranking['ranking'] = range(1, 11)
-            ranking['paper_count'] = 'NA'
-            ranking['clinical_count'] = 'NA'
-            temp = ranking.to_json(orient='records')
-            
+            sorted_df['total_score'] = round(sorted_df['total_score'], 2)
+            sorted_df['ranking'] = range(1, 11)
+            temp = sorted_df.to_json(orient='records')
             
             time5 = time.time()
-            print(str(round(time5-time4,3)) + "초 소요: 4")
-            
+            print(str(round(time5-time4,3)) + "초 소요: 4")            
             print("총 소요 시간: " + str(round(time5-time1,3)) + "초")
             
             return temp
