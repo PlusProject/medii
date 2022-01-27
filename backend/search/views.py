@@ -481,7 +481,6 @@ class RecommendAPI(APIView):
 
         df = pd.DataFrame(list(DoctorAll.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
-        df = df.fillna("")
 
         def disease_match(text):
             text = text.split(', ')
@@ -546,8 +545,11 @@ class RecommendAPI(APIView):
             
             time3 = time.time()
             print(str(round(time3-time2,3)) + "초 소요 : 2")
+            
+            
+            df['total_score'] = df['real_total_score']
             sorted_df = df.sort_values(
-                by=['real_total_score'], axis=0, ascending=False)
+                by=['total_score'], axis=0, ascending=False)[0:10]
             sorted_df = sorted_df.reset_index()
 
             for i in sorted_df.index:
@@ -576,6 +578,10 @@ class RecommendAPI(APIView):
                 person_grade['total_score'][i] = sorted_df['real_total_score'][i]
                 person_grade['img'][i] = sorted_df['img'][i]
 
+            
+            time4 = time.time()
+            print(str(round(time4-time3,3)) + "초 소요: 3")
+            
 
             ranking = person_grade.sort_values(
                 by='total_score', ascending=False)[0:10]
@@ -587,8 +593,13 @@ class RecommendAPI(APIView):
             ranking['paper_count'] = 'NA'
             ranking['clinical_count'] = 'NA'
             temp = ranking.to_json(orient='records')
-            time4 = time.time()
-            print(str(round(time4-time3,3)) + "초 소요: 3")
+            
+            
+            time5 = time.time()
+            print(str(round(time5-time4,3)) + "초 소요: 4")
+            
+            print("총 소요 시간: " + str(round(time5-time1,3)) + "초")
+            
             return temp
 
         return Response(get_recommendation(input, weight_paper, weight_trial))
