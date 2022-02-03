@@ -314,6 +314,8 @@ export default {
       active: false,
       input: "I20.1",
       items: [],
+      previous_items: null,
+      previous_items2: null,
       groupBy: [],
       groupDesc: [],
       headers: [
@@ -387,19 +389,30 @@ export default {
 
     chageapi() {
       this.toggle = !this.toggle;
-      this.items = [];
       this.loading = true;
 
       if (this.toggle === true) {
         this.color = "cyan accent-6";
         this.click = "신규 ";
         this.input = this.previous;
-        this.getRecommendResults2();
+        console.log(this.previous_items2);
+        if (this.previous_items2 == null) {
+          this.getRecommendResults2();
+        } else {
+          this.items = this.previous_items2;
+          this.loading = false;
+        }
       } else {
         this.color = "primary";
         this.click = "기존  ";
         this.input = this.previous;
-        this.getRecommendResults();
+        console.log(this.previous_items);
+        if (this.previous_items == null) {
+          this.getRecommendResults();
+        } else {
+          this.items = this.previous_items;
+          this.loading = false;
+        }
       }
       this.getCountResults();
       this.getDiseaseMatchResults();
@@ -410,6 +423,7 @@ export default {
       this.loading = true;
       this.items = [];
       this.getRecommendResults();
+      this.previous_items = this.items;
       this.getCountResults();
       this.getDiseaseMatchResults();
       this.toggle = false;
@@ -421,16 +435,16 @@ export default {
     async getRecommendResults() {
       try {
         const temp = this.input;
-
         const params = {
           input: temp,
           weight_paper: this.paper.val,
           weight_trial: this.clinical.val,
         };
-        console.log(this.paper.val);
         const res = await api.recommend(params);
         this.items = res["data"];
         this.items = JSON.parse(this.items);
+        console.log(this.items);
+        this.previous_items = this.items;
         this.loading = false;
       } catch (err) {
         console.log(err);
@@ -439,18 +453,16 @@ export default {
     async getRecommendResults2() {
       try {
         const temp = this.input;
-
         const params = {
           input: temp,
           weight_paper: this.paper.val,
           weight_trial: this.clinical.val,
         };
-
         const res = await api.recommend2(params);
-
         this.items = res["data"];
         this.items = JSON.parse(this.items);
         console.log(this.items);
+        this.previous_items2 = this.items;
         this.loading = false;
       } catch (err) {
         console.log(err);
