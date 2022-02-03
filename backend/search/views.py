@@ -536,14 +536,14 @@ class RecommendAPI(APIView):
             
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
-            df['total_score'] = 0
-            df['real_total_score'] = 0
-            df['o_p'] = 0
-            df['o_c'] = 0
+            df['total_score'] = 0.0
+            df['real_total_score'] = 0.0
+            df['o_p'] = 0.0
+            df['o_c'] = 0.0
             
             time2 = time.time()
             print(str(round(time2-time1,3)) + "초 소요 : 1")
-            
+            code_num = len(input_codes)
             for input_code in input_codes:
                 for i in df.index:
                     total_score = 0.0
@@ -557,11 +557,12 @@ class RecommendAPI(APIView):
                         sim = calcul_sim(code, input_code)
                         temp = sim*codes[code]
                         total_score += temp
-                    df['total_score'][i] = float(total_score)
+                    df['total_score'][i] = total_score
                 
-                mean_score = df['total_score'].mean()
-                std_score = df['total_score'].std()
-                df['total_score'] = (df['total_score']-mean_score)/std_score
+                if(code_num>1):
+                    mean_score = df['total_score'].mean()
+                    std_score = df['total_score'].std()
+                    df['total_score'] = (df['total_score']-mean_score)/std_score
                 df['real_total_score'] += df['total_score']*10.0
             
             time3 = time.time()
