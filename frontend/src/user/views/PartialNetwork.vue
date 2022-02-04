@@ -92,9 +92,9 @@ export default {
 </script>
 
 <style>
-* {
+/* * {
   font-family: sans-serif;
-}
+} */
 
 .wrapper {
   padding: 20px 50px;
