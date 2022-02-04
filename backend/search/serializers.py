@@ -1,9 +1,26 @@
 from django.db import models
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from .models import ClinicalTrials, Disease, Doctor, Person, Participate,Thesis, DoctorAll, DoctorAll2, Writes, Totaldisease, DoctorTotalDisease, DoctorAllscore, SnPaper, SnPaperCnt, NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50
+from .models import ClinicalTrials, Disease, Doctor, Person, Participate,Thesis, DoctorAll, DoctorAll2, Writes, Totaldisease, DoctorTotalDisease, DoctorAllscore, SnPaper, SnPaperCnt, NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, PartPaperNode,PartPaperEdge, SnPaperEdgeYear
 
+class PartPaperNodeSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = PartPaperNode
+        fields = "__all__"
 
+class PartPaperEdgeSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = PartPaperEdge
+        fields = "__all__"
+
+class SnPaperEdgeYearSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = SnPaperEdgeYear
+        fields = "__all__"
+        
 class DoctorSerializer(serializers.ModelSerializer):
 
     class Meta:

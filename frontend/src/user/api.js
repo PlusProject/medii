@@ -234,4 +234,28 @@ export default {
       console.error(error);
     }
   },
+  async getPartPaperNode() {
+    try {
+      const response = await axios.get("partpapernode");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getPartPaperEdge() {
+    try {
+      const response = await axios.get("partpaperedge");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getSnPaperEdgeYear() {
+    try {
+      const response = await axios.get("snpaperedgeyear");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 }

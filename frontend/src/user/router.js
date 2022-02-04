@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import {
-  Home, DoctorList, ClinicalTrialsList, SocialNetwork, Recommend,PartialNetwork
+  Home, DoctorList, ClinicalTrialsList, SocialNetwork, Recommend,PartialNetwork,Jstest
 } from './views'
 Vue.use(VueRouter)
 
@@ -39,6 +39,11 @@ const router = new VueRouter({
       path: '/partialnetwork',
       component: PartialNetwork,
     },
+    {
+      path: "/jstest",
+      name: "jstest",
+      component: Jstest,
+    }
   ]
 })
 

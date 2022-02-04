@@ -81,21 +81,22 @@
         >
           전체 네트워크
         </v-btn>
-          
-          <v-btn
+        <v-btn
           elevation="8"
           large
           rounded
-          class = 'indigo lighten-3 my-8 mx-1'
+          class="my-8 mx-1"
+          color="light green"
           dark
-          @click = "$router.push({
-          name: 'recommend',
-          params : {
-              disease: 'I20.1',
-          }
-        })">
-            의료진 추천
-          </v-btn>
+          @click="
+            $router.push({
+              name: 'jstest',
+            })
+          "
+        >
+          특정 의료진 네트워크
+        </v-btn>
+          
         
 
 

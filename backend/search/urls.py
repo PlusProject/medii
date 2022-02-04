@@ -24,5 +24,8 @@ urlpatterns = [
     path('socialnetwork_cris_cnt', views.nodecriscnt_view, name="nodecriscnt_view"),
     path('socialnetwork50', views.snpaper50_view, name="snpaper50_view"),
     path('socialnetwork_cnt50', views.snpapercnt50_view, name="snpapercnt50_view"),
+    path('partpapernode', views.partpapernode_view, name="partpapernode_view"),
+    path('partpaperedge', views.partpaperedge_view, name="partpaperedge_view"),
+    path('snpaperedgeyear', views.snpaperedgeyear_view, name="snpaperedgeyear_view"),
     # path('coworker_cris', views.get_cris_coworker, name="CrisCoworker"),
 ]

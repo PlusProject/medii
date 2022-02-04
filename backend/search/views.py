@@ -2,11 +2,12 @@ from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, DoctorAll, DoctorAll2
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, DoctorAll, DoctorAll2,PartPaperNode,PartPaperEdge,SnPaperEdgeYear
 from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer,
                           PersonSerializer, ParticipateSerializer, WritesSerializer,
                           CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer, DiseaseSerializer, DoctorTotalDiseaseSerializer, Totaldisease, DoctorAllscoreSerializer,
-                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer,DoctorAllSerializer,DoctorAll2Serializer)
+                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer,DoctorAllSerializer,DoctorAll2Serializer
+                          ,PartPaperNodeSerializer,PartPaperEdgeSerializer,SnPaperEdgeYearSerializer)
 from django.db.models import Q
 import re
 import pandas as pd
@@ -134,6 +135,22 @@ class ThesisAPI(APIView):
         writesQuery = Writes.objects.filter(pid=pid)
         writes = WritesSerializer(writesQuery, many=True)
         return Response(writes.data)
+
+
+@api_view(['GET'])
+def partpapernode_view(request):
+    partpapernode=PartPaperNode.objects.all()
+    return Response(PartPaperNodeSerializer(partpapernode, many=True).data)
+
+@api_view(['GET'])
+def partpaperedge_view(request):
+    partpaperedge=PartPaperEdge.objects.all()
+    return Response(PartPaperEdgeSerializer(partpaperedge, many=True).data)
+
+@api_view(['GET'])
+def snpaperedgeyear_view(request):
+    snpaperedgeyear=SnPaperEdgeYear.objects.all()
+    return Response(SnPaperEdgeYearSerializer(snpaperedgeyear, many=True).data)
 
 
 @api_view(['GET'])

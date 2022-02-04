@@ -141,7 +141,7 @@ class DoctorAllscore(models.Model):
         managed = False
         db_table = 'doctor_allscore'
 
-#동완
+#동완 네트워크
 class SnPaper(models.Model):
     id = models.AutoField(primary_key=True)
     label = models.TextField(blank=True, null=True)
@@ -149,11 +149,12 @@ class SnPaper(models.Model):
     shape = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     size = models.FloatField(blank=True, null=True)
+    borderWidth = models.IntegerField(blank=True, null=True)
+    belong = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'SN_paper'
-
 
 class SnPaperCnt(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -197,6 +198,7 @@ class SnPaper50(models.Model):
     shape = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     size = models.FloatField(blank=True, null=True)
+    borderWidth = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -212,8 +214,58 @@ class SnPaperCnt50(models.Model):
     class Meta:
         managed = False
         db_table = 'SN_paper_cnt50'
+class PartPaperEdge(models.Model):
+    id = models.IntegerField(primary_key=True)
+    fromit = models.IntegerField(blank=True, null=True)
+    toit = models.IntegerField(blank=True, null=True)
+    width = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'part_paper_edge'
+
+
+class PartPaperNode(models.Model):
+    id = models.IntegerField(primary_key=True)
+    label = models.TextField(blank=True, null=True)
+    title = models.TextField(blank=True, null=True)
+    shape = models.TextField(blank=True, null=True)
+    color = models.TextField(blank=True, null=True)
+    size = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'part_paper_node'
+
+class SnPaperEdgeYear(models.Model):
+    id = models.IntegerField(primary_key=True)
+    fromit = models.IntegerField(blank=True, null=True)
+    toit = models.IntegerField(blank=True, null=True)
+    total = models.IntegerField(blank=True, null=True)
+    y2021 = models.IntegerField(blank=True, null=True)
+    y2020 = models.IntegerField(blank=True, null=True)
+    y2019 = models.IntegerField(blank=True, null=True)
+    y2018 = models.IntegerField(blank=True, null=True)
+    y2017 = models.IntegerField(blank=True, null=True)
+    y2016 = models.IntegerField(blank=True, null=True)
+    y2015 = models.IntegerField(blank=True, null=True)
+    y2014 = models.IntegerField(blank=True, null=True)
+    y2013 = models.IntegerField(blank=True, null=True)
+    y2012 = models.IntegerField(blank=True, null=True)
+    y2011 = models.IntegerField(blank=True, null=True)
+    y2010 = models.IntegerField(blank=True, null=True)
+    y2009 = models.IntegerField(blank=True, null=True)
+    y2008 = models.IntegerField(blank=True, null=True)
+    y2007 = models.IntegerField(blank=True, null=True)
+    y2006 = models.IntegerField(blank=True, null=True)
+    to2005 = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'SN_paper_edge_year'
         
         
+#acm 추천
 class DoctorAll(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)

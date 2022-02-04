@@ -5,7 +5,9 @@ import SocialNetwork from './SocialNetwork'
 import Recommend from './Recommend'
 
 import PartialNetwork from './PartialNetwork'
+import Jstest from "./Jstest"
+
 
 export {
-  Home, DoctorList, ClinicalTrialsList, SocialNetwork, Recommend, PartialNetwork
+  Jstest,Home, DoctorList, ClinicalTrialsList, SocialNetwork, Recommend, PartialNetwork
 }
