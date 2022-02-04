@@ -355,7 +355,7 @@ class Recommend2API(APIView):
             cosine_sim_df.head()
 
             temp = cosine_sim_df['target'][0:target_index]
-            doctor_paper_data['cosine_simil_paper'] = temp
+            doctor_paper_data['o_p'] = temp
 
             doctor_paper_data['keyword_paper'] = doctor_paper_data.apply(
                 lambda x: overlap_keyword(x['paper_disease_all']), axis=1)
@@ -364,7 +364,7 @@ class Recommend2API(APIView):
             doctor_paper_data['overlap_paper'] = doctor_paper_data.apply(
                 lambda x: overlap_paper(x['paper_disease_all']), axis=1)
             doctor_paper_data['total_paper'] = doctor_paper_data.apply(
-                lambda x: (x['paper_impact']*w1+x['cosine_simil_paper']*w2)/(w1+w2), axis=1)
+                lambda x: (x['paper_impact']*w1+x['o_p']*w2)/(w1+w2), axis=1)
 
             return doctor_paper_data
 
@@ -401,7 +401,7 @@ class Recommend2API(APIView):
             cosine_sim_df = pd.DataFrame(cosine_sim, columns=doctors.name)
             cosine_sim_df.head()
 
-            doctor_disease_data['total_clinical'] = cosine_sim_df['target'][:target_index]
+            doctor_disease_data['o_c'] = cosine_sim_df['target'][:target_index]
 
             std = input.split(', ')
 
@@ -455,7 +455,7 @@ class Recommend2API(APIView):
             doctor_disease_data['index'] = range(target_index)
 
             result = doctor_disease_data[[
-                'total_clinical', 'overlap_clinical', 'keyword_clinical']]
+                'o_c', 'overlap_clinical', 'keyword_clinical']]
 
             return result
 
@@ -471,13 +471,12 @@ class Recommend2API(APIView):
             person_grade = pd.concat([paper_grade, clinical_grade], axis=1)
 
             person_grade['total_score'] = person_grade.apply(lambda x: (
-                x['total_paper']*weight_paper + x['total_clinical']*weight_trial)/(weight_paper+weight_trial), axis=1)
+                x['total_paper']*weight_paper + x['o_c']*weight_trial)/(weight_paper+weight_trial), axis=1)
             ranking = person_grade.sort_values(
                 by='total_score', ascending=False)[0:20]
             ranking['ranking'] = range(1, 21)
-            ranking['cosine_simil_paper'] = round(
-                ranking['cosine_simil_paper'], 2)
-            ranking['total_clinical'] = round(ranking['total_clinical'], 2)
+            ranking['o_p'] = round(ranking['o_p'], 2)
+            ranking['o_c'] = round(ranking['o_c'], 2)
             ranking['total_score'] = round(ranking['total_score'], 2)
             ranking['paper_impact'] = round(ranking['paper_impact'], 2)
             temp = ranking.to_json(orient='records')
