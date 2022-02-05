@@ -76,7 +76,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-ROOT_URLCONF = 'web_demo.urls'
+ROOT_URLCONF = 'medii.urls'
 
 TEMPLATES = [
     {
@@ -94,7 +94,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'web_demo.wsgi.application'
+WSGI_APPLICATION = 'medii.wsgi.application'
 
 
 # Database
