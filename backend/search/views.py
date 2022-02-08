@@ -539,7 +539,7 @@ class RecommendAPI(APIView):
                 if x[0] == 'p':
                     weight = float(weight_paper/(weight_paper+weight_trial))
                 else:
-                    weight = float(weight_trial/(weight_paper+weight_trial))
+                    weight = float(weight_trial/(weight_paper+weight_trial))*10
                 x = x[2:]
                 similarity = 0.0
                 if(x == y):
@@ -576,14 +576,18 @@ class RecommendAPI(APIView):
                         sim = calcul_sim(code, input_code)
                         temp = sim*codes[code]
                         total_score += temp
+                        if code[0]=='p':
+                            df['o_p'][i]+=temp
+                        if  code[0]=='t':
+                            df['o_c'][i]+=temp
                     df['total_score'][i] = total_score
                 
                 if(code_num>1):
                     mean_score = df['total_score'].mean()
                     std_score = df['total_score'].std()
                     df['total_score'] = (df['total_score']-mean_score)/std_score
-                df['real_total_score'] += df['total_score']*10.0
-            
+                df['real_total_score'] += df['total_score']
+                
             time3 = time.time()
             print(str(round(time3-time2,3)) + "초 소요 : 2")
             
@@ -615,23 +619,20 @@ class RecommendAPI(APIView):
                 
                 sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
-                #print(type(sorted_df['paper_disease_all'][i]))
-                sorted_df['o_p'][i] = 'NA'
-                sorted_df['o_c'][i] = 'NA'
-
+            
+            sorted_df['total_score'] = round(sorted_df['total_score']+sorted_df['paper_impact'], 2)
             
             time4 = time.time()
             print(str(round(time4-time3,3)) + "초 소요: 3")
-            print(sorted_df.columns)
-            
-            sorted_df['total_score'] = round(sorted_df['total_score'], 2)
-            sorted_df['ranking'] = range(1, 21)
+            sorted_df['ranking'] = range(1, 21)           
+            sorted_df['o_p'] = round(sorted_df['o_p'],2)
+            sorted_df['o_c'] = round(sorted_df['o_c'],2)
+
             temp = sorted_df.to_json(orient='records')
             
             time5 = time.time()
             print(str(round(time5-time4,3)) + "초 소요: 4")            
-            print("총 소요 시간: " + str(round(time5-time1,3)) + "초")
-            
+            print("총 소요 시간: " + str(round(time5-time1,3)) + "초")            
             return temp
 
         return Response(get_recommendation(input, weight_paper, weight_trial))
