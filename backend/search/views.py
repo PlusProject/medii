@@ -570,16 +570,19 @@ class RecommendAPI(APIView):
                     # 대분류 도입
                     input_big = input_code[0].lower()
                     codes = eval(df[input_big][i])
-                    
+                    ptemp = 0.0
+                    ctemp = 0.0
                     # 논문/임상시험 가중치 계산
                     for code in codes: 
                         sim = calcul_sim(code, input_code)
                         temp = sim*codes[code]
                         total_score += temp
                         if code[0]=='p':
-                            df['o_p'][i]+=temp
+                            ptemp+=temp
                         if  code[0]=='t':
-                            df['o_c'][i]+=temp
+                            ctemp+=temp
+                    df['o_c'][i]=ctemp
+                    df['o_p'][i]=ptemp
                     df['total_score'][i] = total_score
                 
                 if(code_num>1):
