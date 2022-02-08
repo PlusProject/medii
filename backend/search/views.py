@@ -553,7 +553,7 @@ class RecommendAPI(APIView):
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
             df['total_score'] = 0.0
-            df['real_total_score'] = 0.0
+            df['real_total_score'] = df['paper_impact']
             df['o_p'] = 0.0
             df['o_c'] = 0.0
             df['paper_count'] = df['paper_count'].fillna('0')
@@ -619,9 +619,8 @@ class RecommendAPI(APIView):
                 
                 sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
-                sorted_df['total_score'][i] = round(sorted_df['total_score'][i]+sorted_df['paper_impact'][i], 2)
+                sorted_df['total_score'][i] = round(sorted_df['total_score'][i], 2)
 
-            
             
             time4 = time.time()
             print(str(round(time4-time3,3)) + "초 소요: 3")
