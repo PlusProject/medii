@@ -2,11 +2,11 @@ from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, DoctorAll, DoctorAll2,PartPaperNode,PartPaperEdge,SnPaperEdgeYear
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, DoctorAll, DoctorAll2,DoctorAll3,PartPaperNode,PartPaperEdge,SnPaperEdgeYear
 from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer,
                           PersonSerializer, ParticipateSerializer, WritesSerializer,
                           CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer, DiseaseSerializer, DoctorTotalDiseaseSerializer, Totaldisease, DoctorAllscoreSerializer,
-                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer,DoctorAllSerializer,DoctorAll2Serializer
+                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer,DoctorAllSerializer,DoctorAll2Serializer,DoctorAll3Serializer
                           ,PartPaperNodeSerializer,PartPaperEdgeSerializer,SnPaperEdgeYearSerializer)
 from django.db.models import Q
 import re
@@ -496,7 +496,7 @@ class RecommendAPI(APIView):
         weight_paper = int(weight_paper)
         weight_trial = int(weight_trial)
 
-        df = pd.DataFrame(list(DoctorAll2.objects.all().values()))
+        df = pd.DataFrame(list(DoctorAll3.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
         input_codes = input.split(', ')
         
@@ -556,6 +556,9 @@ class RecommendAPI(APIView):
             df['real_total_score'] = 0.0
             df['o_p'] = 0.0
             df['o_c'] = 0.0
+            df['paper_count'] = df['paper_count'].fillna('0')
+            df['clinical_count'] = df['clinical_count'].fillna('0')
+            df['paper_impact'] = df['paper_impact'].fillna('0')
             
             time2 = time.time()
             print(str(round(time2-time1,3)) + "초 소요 : 1")
@@ -588,8 +591,8 @@ class RecommendAPI(APIView):
             sorted_df = df.sort_values(
                 by=['total_score'], axis=0, ascending=False)[0:20]
             sorted_df = sorted_df.reset_index()
-            sorted_df['paper_disease_all'] = sorted_df['paper_disease_all'].fillna("")
-            sorted_df['clinical_disease_all'] = sorted_df['clinical_disease_all'].fillna("")
+            # sorted_df['paper_disease_all'] = sorted_df['paper_disease_all'].fillna("")
+            # sorted_df['clinical_disease_all'] = sorted_df['clinical_disease_all'].fillna("")
             for i in sorted_df.index:
                 dic = eval(sorted_df['disease'][i])
                 delete = []
@@ -610,12 +613,11 @@ class RecommendAPI(APIView):
                 codes = codes.replace('\',',':').replace('(','[').replace(')',']').replace(',','  ')
                 codes += explain
                 
-                sorted_df['name_kor'][i] = sorted_df['name'][i]
+                sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
                 #print(type(sorted_df['paper_disease_all'][i]))
-                sorted_df['o_p'][i] = overlap(sorted_df['paper_disease_all'][i])
-                sorted_df['o_c'][i] = overlap(sorted_df['clinical_disease_all'][i])
-                sorted_df['paper_impact'][i] = 'NA'
+                sorted_df['o_p'][i] = 'NA'
+                sorted_df['o_c'][i] = 'NA'
 
             
             time4 = time.time()

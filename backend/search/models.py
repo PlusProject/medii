@@ -329,3 +329,48 @@ class DoctorAll2(models.Model):
     class Meta:
         managed = False
         db_table = 'doctor_all2'
+
+class DoctorAll3(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    name_kor = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    belong = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    major = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    education = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    career = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    img = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    link = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    hospital_code = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    disease = models.TextField(db_collation='utf8_general_ci', blank=True, null=True)
+    a = models.TextField(db_column='A', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    b = models.TextField(db_column='B', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    c = models.TextField(db_column='C', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    d = models.TextField(db_column='D', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    e = models.TextField(db_column='E', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    f = models.TextField(db_column='F', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    g = models.TextField(db_column='G', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    h = models.TextField(db_column='H', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    i = models.TextField(db_column='I', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    j = models.TextField(db_column='J', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    k = models.TextField(db_column='K', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    l = models.TextField(db_column='L', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    m = models.TextField(db_column='M', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    n = models.TextField(db_column='N', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    o = models.TextField(db_column='O', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    p = models.TextField(db_column='P', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    q = models.TextField(db_column='Q', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    r = models.TextField(db_column='R', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    s = models.TextField(db_column='S', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    t = models.TextField(db_column='T', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    u = models.TextField(db_column='U', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    v = models.TextField(db_column='V', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    w = models.TextField(db_column='W', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    x = models.TextField(db_column='X', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    y = models.TextField(db_column='Y', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    z = models.TextField(db_column='Z', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    paper_count = models.IntegerField(blank=True, null=True)
+    paper_impact = models.FloatField(blank=True, null=True)
+    clinical_count = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'doctor_all3'
