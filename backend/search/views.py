@@ -552,10 +552,10 @@ class RecommendAPI(APIView):
             
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
-            df['total_score'] = 0.0
-            df['real_total_score'] = 0.0
-            df['o_p'] = ""
-            df['o_c'] = ""
+            df['o_p'] = 0.0
+            df['real_o_p'] = 0.0
+            df['o_c'] = 0.0
+            df['real_o_c'] = 0.0
             
             df['paper_count'] = df['paper_count'].fillna('0')
             df['clinical_count'] = df['clinical_count'].fillna('0')
@@ -568,8 +568,6 @@ class RecommendAPI(APIView):
             code_num = len(input_codes)
             for input_code in input_codes:
                 for i in df.index:
-                    total_score = 0.0
-                    
                     # 대분류 도입
                     input_big = input_code[0].lower()
                     codes = eval(df[input_big][i])
@@ -579,29 +577,44 @@ class RecommendAPI(APIView):
                     for code in codes: 
                         sim = calcul_sim(code, input_code)
                         temp = sim*codes[code]
-                        total_score += temp
                         if code[0]=='p':
                             ptemp+=temp
-                        if  code[0]=='t':
+                        else:
                             ctemp+=temp
-                    df['o_c'][i]=str(round(ctemp,2))
-                    df['o_p'][i]=str(round(ptemp,2))
-                    df['total_score'][i] = total_score
+                    df['o_c'][i] = ctemp
+                    df['o_p'][i] = ptemp
                 
                 if(code_num>1):
-                    mean_score = df['total_score'].mean()
-                    std_score = df['total_score'].std()
-                    df['total_score'] = (df['total_score']-mean_score)/std_score
-                df['real_total_score'] += df['total_score']
+                    # mean_score = df['total_score'].mean()
+                    # std_score = df['total_score'].std()
+                    # df['total_score'] = (df['total_score']-mean_score)/std_score
+                    mean_score = df['o_p'].mean()
+                    std_score = df['o_p'].std()
+                    df['o_p'] = (df['o_p']-mean_score)/std_score
+                    mean_score = df['o_c'].mean()
+                    std_score = df['o_c'].std()
+                    df['o_c'] = (df['o_c']-mean_score)/std_score
+                df['real_o_p'] += df['o_p']
+                df['real_o_c'] += df['o_c']
                 
             time3 = time.time()
             print(str(round(time3-time2,3)) + "초 소요 : 2")
             
-            df['total_score'] = df['real_total_score']
+            wp = float(weight_paper)
+            wt = float(weight_trial)
+            wpt = wp+wt
+            csum = float(df['real_o_c'].sum())
+            psum = float(df['real_o_p'].sum())
+            df['o_p'] = (df['real_o_p']*100.0/psum)*wp/wpt
+            df['o_c'] = (df['real_o_c']*100.0/csum)*wp/wpt
+            print(psum,csum)
+            df['total_score'] = df['o_p'] + df['o_c']
+            print(wp,wt,wpt,wp/wpt,wt/wpt)
             sorted_df = df.sort_values(
                 by=['total_score'], axis=0, ascending=False)[0:20]
             sorted_df = sorted_df.reset_index()
             total_total_score = sorted_df['total_score'].sum()
+            print(total_total_score)
             sorted_df['total_ratio'] = sorted_df['total_score']*100/total_total_score
             # sorted_df['paper_disease_all'] = sorted_df['paper_disease_all'].fillna("")
             # sorted_df['clinical_disease_all'] = sorted_df['clinical_disease_all'].fillna("")
@@ -628,10 +641,10 @@ class RecommendAPI(APIView):
                 sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
 
-                sorted_df['o_p'][i] = str(sorted_df['o_p'][i]) +"\n"+"(" +str(overlap(sorted_df['paper_disease_all'][i])) +")"+"건"
-                sorted_df['o_c'][i] = str(sorted_df['o_c'][i]) +"\n"+"(" +str(overlap(sorted_df['clinical_disease_all'][i])) +")"+"건"
+                sorted_df['o_p'][i] = str(round(sorted_df['o_p'][i],2)) +"\n"+"(" +str(overlap(sorted_df['paper_disease_all'][i])) +")"+"건"
+                sorted_df['o_c'][i] = str(round(sorted_df['o_c'][i],2)) +"\n"+"(" +str(overlap(sorted_df['clinical_disease_all'][i])) +")"+"건"
                 sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  +"\n"+"(" +str(round(sorted_df['total_ratio'][i],2)) +"%)"
-                sorted_df['paper_impact'][i] = round(sorted_df['paper_impact'][i], 2)
+                # sorted_df['paper_impact'][i] = round(sorted_df['paper_impact'][i], 2)
             
             time4 = time.time()
             print(str(round(time4-time3,3)) + "초 소요: 3")
