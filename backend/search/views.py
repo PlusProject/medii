@@ -523,7 +523,7 @@ class RecommendAPI(APIView):
             if(len(disease_indexs)):
                 return " {" + disease_table['disease_kor'][disease_indexs[0]] + "} "
             else:
-                return ""
+                return " {-} "
             
         # 새로운 추천 알고리즘
         def get_recommendation(input, weight_paper, weight_trial):
@@ -537,19 +537,14 @@ class RecommendAPI(APIView):
                 return overlap
 
             def calcul_sim(x, y):
-                if x[0] == 'p':
-                    weight = float(weight_paper/(weight_paper+weight_trial))
-                else:
-                    weight = float(weight_trial/(weight_paper+weight_trial))*10
                 x = x[2:]
-                similarity = 0.0
                 if(x == y):
-                    similarity += 100
+                    return 100
                 if x.split('.')[0] == y.split('.')[0]:
-                    similarity += 1
+                    return 10
                 if x[0] == y[0]:
-                    similarity += 0.01
-                return similarity*weight
+                    return 0.01
+                return 0
             
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
@@ -561,9 +556,9 @@ class RecommendAPI(APIView):
             df['top2'] = ""
             df['top3'] = ""
             
-            df['paper_count'] = df['paper_count'].fillna('0')
-            df['clinical_count'] = df['clinical_count'].fillna('0')
-            df['paper_impact'] = df['paper_impact'].fillna('0')
+            df['paper_count'] = df['paper_count'].fillna(0)
+            df['clinical_count'] = df['clinical_count'].fillna(0)
+            df['paper_impact'] = df['paper_impact'].fillna(0.0)
             df['paper_disease_all'] = df['paper_disease_all'].fillna("")
             df['clinical_disease_all'] = df['clinical_disease_all'].fillna("")
             
@@ -607,26 +602,47 @@ class RecommendAPI(APIView):
             wp = float(weight_paper)
             wt = float(weight_trial)
             wpt = wp+wt
-            csum = float(df['real_o_c'].sum())
-            psum = float(df['real_o_p'].sum())
-            df['o_p'] = (df['real_o_p']*100.0/psum)*wp/wpt
-            df['o_c'] = (df['real_o_c']*100.0/csum)*wp/wpt
+            df['o_p'] = df['real_o_p']
+            df['o_c'] = df['real_o_c']
+            
+            pmax = df['o_p'].max()
+            pmin = df['o_p'].min()
+            pweight = 100*wp/((pmax-pmin)*wpt)
+            df['o_p'] = df['o_p']-pmin
+            df['o_p'] = df['o_p'] * pweight
+            
+            
+            cmax = df['o_c'].max()
+            cmin = df['o_c'].min()
+            cweight = 100*wt/((cmax-cmin)*wpt)
+            df['o_c'] = df['o_c']-cmin
+            df['o_c'] = df['o_c']*cweight
+            
+            print(cweight, pweight)
             df['total_score'] = df['o_p'] + df['o_c']
+            
             sorted_df = df.sort_values(
                 by=['total_score'], axis=0, ascending=False)[0:20]
             sorted_df = sorted_df.reset_index()
             total_total_score = sorted_df['total_score'].sum()
-            print(total_total_score)
-            sorted_df['total_ratio'] = sorted_df['total_score']*100/total_total_score
+            # 정규화
+            tmax = sorted_df['total_score'].max()
+            tmin = sorted_df['total_score'].min()
+            sorted_df['total_ratio'] = sorted_df['total_score']/total_total_score
+            # sorted_df['total_score'] = (sorted_df['total_score'] - tmin)/(tmax-tmin)
+            
             # sorted_df['paper_disease_all'] = sorted_df['paper_disease_all'].fillna("")
             # sorted_df['clinical_disease_all'] = sorted_df['clinical_disease_all'].fillna("")
             for i in sorted_df.index:
                 dic = eval(sorted_df['disease'][i])
                 delete = []
                 for j in dic:
-                    t=0
+                    t=0.0
                     for input_code in input_codes:
-                        t += float(dic[j]) * float(calcul_sim(j, input_code))
+                        if j[0]=='p':
+                            t += float(dic[j]) * float(calcul_sim(j, input_code)) * pweight
+                        else:
+                            t += float(dic[j]) * float(calcul_sim(j, input_code)) * cweight
                     dic[j] = round(t, 2)
                     if(t == 0.0): delete.append(j)
                 for j in delete: del dic[j]
@@ -647,6 +663,12 @@ class RecommendAPI(APIView):
                 explain1 = (explain.split("} ")[0])+"}"
                 explain2 = (explain.split("} ")[1])+"}"
                 explain3 = (explain.split("} ")[2])+"}"
+                if len(explain1)<5:
+                    explain1 = ""
+                if len(explain2)<5:
+                    explain2 = ""
+                if len(explain3)<5:
+                    explain3 = ""
                 sorted_df['top1'][i] = code1 + explain1
                 sorted_df['top2'][i] = code2 + explain2
                 sorted_df['top3'][i] = code3 + explain3
@@ -654,7 +676,8 @@ class RecommendAPI(APIView):
                 sorted_df['major'][i] = codes
                 sorted_df['o_p'][i] = str(round(sorted_df['o_p'][i],2)) +"\n"+"(" +str(overlap(sorted_df['paper_disease_all'][i])) +")"+"건"
                 sorted_df['o_c'][i] = str(round(sorted_df['o_c'][i],2)) +"\n"+"(" +str(overlap(sorted_df['clinical_disease_all'][i])) +")"+"건"
-                sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  +"\n"+"(" +str(round(sorted_df['total_ratio'][i],2)) +"%)"
+                # sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  +"\n"+"(" +str(round(sorted_df['total_ratio'][i],2)) +"%)"
+                sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  
                 sorted_df['paper_impact'][i] = str(round(float(sorted_df['paper_impact'][i]), 2))
             
             time4 = time.time()
