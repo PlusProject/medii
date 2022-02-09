@@ -496,7 +496,7 @@ class RecommendAPI(APIView):
         weight_paper = int(weight_paper)
         weight_trial = int(weight_trial)
 
-        df = pd.DataFrame(list(DoctorAll3.objects.all().values()))
+        df = pd.DataFrame(list(DoctorAll2.objects.all().values()))
         disease_table = pd.DataFrame(list(Totaldisease.objects.all().values()))
         input_codes = input.split(', ')
         
@@ -553,12 +553,15 @@ class RecommendAPI(APIView):
             print('추출된 질병 (한글명 매칭): ', end=' ')
             print(disease_match(input))
             df['total_score'] = 0.0
-            df['real_total_score'] = df['paper_impact']
-            df['o_p'] = 0.0
-            df['o_c'] = 0.0
+            df['real_total_score'] = 0.0
+            df['o_p'] = ""
+            df['o_c'] = ""
+            
             df['paper_count'] = df['paper_count'].fillna('0')
             df['clinical_count'] = df['clinical_count'].fillna('0')
             df['paper_impact'] = df['paper_impact'].fillna('0')
+            df['paper_disease_all'] = df['paper_disease_all'].fillna("")
+            df['clinical_disease_all'] = df['clinical_disease_all'].fillna("")
             
             time2 = time.time()
             print(str(round(time2-time1,3)) + "초 소요 : 1")
@@ -581,8 +584,8 @@ class RecommendAPI(APIView):
                             ptemp+=temp
                         if  code[0]=='t':
                             ctemp+=temp
-                    df['o_c'][i]=ctemp
-                    df['o_p'][i]=ptemp
+                    df['o_c'][i]=str(round(ctemp,2))
+                    df['o_p'][i]=str(round(ptemp,2))
                     df['total_score'][i] = total_score
                 
                 if(code_num>1):
@@ -624,12 +627,15 @@ class RecommendAPI(APIView):
                 sorted_df['major'][i] = codes
                 sorted_df['total_score'][i] = round(sorted_df['total_score'][i], 2)
 
+                sorted_df['o_p'][i] = str(sorted_df['o_p'][i]) +"\n"+"(" +str(overlap(sorted_df['paper_disease_all'][i])) +")"+"건"
+                sorted_df['o_c'][i] = str(sorted_df['o_c'][i]) +"\n"+"(" +str(overlap(sorted_df['clinical_disease_all'][i])) +")"+"건"
+                print(sorted_df['o_p'][i])
             
             time4 = time.time()
             print(str(round(time4-time3,3)) + "초 소요: 3")
             sorted_df['ranking'] = range(1, 21)           
-            sorted_df['o_p'] = round(sorted_df['o_p'],2)
-            sorted_df['o_c'] = round(sorted_df['o_c'],2)
+            # sorted_df['o_p'] = round(sorted_df['o_p'],2)
+            # sorted_df['o_c'] = round(sorted_df['o_c'],2)
 
             temp = sorted_df.to_json(orient='records')
             

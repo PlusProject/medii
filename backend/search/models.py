@@ -286,19 +286,16 @@ class DoctorAll(models.Model):
         db_table = 'doctor_all'
         
 class DoctorAll2(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    id = models.BigIntegerField(primary_key=True)
+    name_kor = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
     belong = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
-    disease = models.TextField(db_collation='utf8_general_ci', blank=True, null=True)
+    major = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    education = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    career = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
     img = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
-    name_kor = models.CharField(max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
-    belong2 = models.CharField(max_length=45, db_collation='utf8mb4_bin', blank=True, null=True)
-    major = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
-    paper_count = models.IntegerField(blank=True, null=True)
-    paper_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
-    clinical_count = models.IntegerField(blank=True, null=True)
-    clinical_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
-    paper_impact = models.FloatField(blank=True, null=True)
+    link = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    hospital_code = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    disease = models.TextField(db_collation='utf8_general_ci', blank=True, null=True)
     a = models.TextField(db_column='A', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
     b = models.TextField(db_column='B', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
     c = models.TextField(db_column='C', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
@@ -325,6 +322,11 @@ class DoctorAll2(models.Model):
     x = models.TextField(db_column='X', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
     y = models.TextField(db_column='Y', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
     z = models.TextField(db_column='Z', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
+    paper_count = models.IntegerField(blank=True, null=True)
+    paper_impact = models.FloatField(blank=True, null=True)
+    clinical_count = models.IntegerField(blank=True, null=True)
+    clinical_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    paper_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
 
     class Meta:
         managed = False
