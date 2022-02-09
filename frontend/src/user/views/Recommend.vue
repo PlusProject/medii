@@ -209,7 +209,12 @@
       <template v-slot:header>
         <thead>
           <tr>
-            <th colspan="5" scope="colgroup">추천 결과</th>
+            <th colspan="1" scope="colgroup">추천 결과</th>
+            <th colspan="3">
+              <v-btn rounded :color="color" dark @click="chageapi">
+                {{ click }} 추천 알고리즘으로 변경 ->
+              </v-btn>
+            </th>
           </tr>
 
           <tr>
@@ -234,14 +239,10 @@
                 의사 network 보기
               </v-btn>
             </th>
-            <th colspan="3">
-              <v-btn rounded :color="color" dark @click="chageapi">
-                {{ click }} 추천 알고리즘으로 변경 ->
-              </v-btn>
-            </th>
-            <th colspan="2"><p class="text-center">질병 전문성</p></th>
-            <th scope="col"><p class="text-center">저명성</p></th>
-            <th colspan="2"><p class="text-center">활동성</p></th>
+
+            <th colspan="5.5"><p class="text-center">질병 전문성</p></th>
+            <th colspan="3"><p class="text-center">저명성</p></th>
+            <th colspan="3"><p class="text-center">활동성</p></th>
           </tr>
         </thead>
       </template>
@@ -327,7 +328,10 @@ export default {
           value: "total_score",
         },
         { text: "Name", value: "name_kor", sortable: false },
-        { text: "Major", value: "major", sortable: false },
+        { text: "Top1", value: "top1", sortable: false },
+        { text: "Top2", value: "top2", sortable: false },
+        { text: "Top3", value: "top3", sortable: false },
+        // { text: "Major", value: "major", sortable: false },
         { text: "논문", value: "o_p" },
         { text: "임상시험", value: "o_c" },
         { text: "paper_impact", value: "paper_impact" },
@@ -336,6 +340,7 @@ export default {
       ],
     };
   },
+
   watch: {},
 
   methods: {
@@ -460,6 +465,7 @@ export default {
         };
         const res = await api.recommend2(params);
         this.items = res["data"];
+        console.log(this.items);
         this.items = JSON.parse(this.items);
         console.log(this.items);
         this.previous_items2 = this.items;

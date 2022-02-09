@@ -479,6 +479,7 @@ class Recommend2API(APIView):
             ranking['o_c'] = round(ranking['o_c'], 2)
             ranking['total_score'] = round(ranking['total_score'], 2)
             ranking['paper_impact'] = round(ranking['paper_impact'], 2)
+            ranking['top1'] = ranking['major']
             temp = ranking.to_json(orient='records')
 
             return temp
@@ -556,6 +557,9 @@ class RecommendAPI(APIView):
             df['real_o_p'] = 0.0
             df['o_c'] = 0.0
             df['real_o_c'] = 0.0
+            df['top1'] = ""
+            df['top2'] = ""
+            df['top3'] = ""
             
             df['paper_count'] = df['paper_count'].fillna('0')
             df['clinical_count'] = df['clinical_count'].fillna('0')
@@ -607,9 +611,7 @@ class RecommendAPI(APIView):
             psum = float(df['real_o_p'].sum())
             df['o_p'] = (df['real_o_p']*100.0/psum)*wp/wpt
             df['o_c'] = (df['real_o_c']*100.0/csum)*wp/wpt
-            print(psum,csum)
             df['total_score'] = df['o_p'] + df['o_c']
-            print(wp,wt,wpt,wp/wpt,wt/wpt)
             sorted_df = df.sort_values(
                 by=['total_score'], axis=0, ascending=False)[0:20]
             sorted_df = sorted_df.reset_index()
@@ -633,18 +635,27 @@ class RecommendAPI(APIView):
                 explain = ""
                 for j in sdic:
                     explain += disease_match_one(j[0][2:])
-
+              
                 codes = ", ".join([str(_) for _ in sdic]).replace('p-','논문-').replace('t-','임상-')
-                codes = codes.replace('\',',':').replace('(','[').replace(')',']').replace(',','  ')
+                codes = codes.replace('\',',':').replace('(','').replace(')','').replace(',',' ')
                 codes += explain
-                
+                # print(codes + "," + explain)
+                # print(codes.split(" "))
+                code1 = (codes.split(" ")[0] + codes.split(" ")[1]).lstrip("\'")+"\n"
+                code2 = (codes.split(" ")[3] + codes.split(" ")[4]).lstrip("\'")+"\n"
+                code3 = (codes.split(" ")[6] + codes.split(" ")[7]).lstrip("\'")+"\n"
+                explain1 = (explain.split("} ")[0])+"}"
+                explain2 = (explain.split("} ")[1])+"}"
+                explain3 = (explain.split("} ")[2])+"}"
+                sorted_df['top1'][i] = code1 + explain1
+                sorted_df['top2'][i] = code2 + explain2
+                sorted_df['top3'][i] = code3 + explain3
                 sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
-
                 sorted_df['o_p'][i] = str(round(sorted_df['o_p'][i],2)) +"\n"+"(" +str(overlap(sorted_df['paper_disease_all'][i])) +")"+"건"
                 sorted_df['o_c'][i] = str(round(sorted_df['o_c'][i],2)) +"\n"+"(" +str(overlap(sorted_df['clinical_disease_all'][i])) +")"+"건"
                 sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  +"\n"+"(" +str(round(sorted_df['total_ratio'][i],2)) +"%)"
-                # sorted_df['paper_impact'][i] = round(sorted_df['paper_impact'][i], 2)
+                sorted_df['paper_impact'][i] = str(round(float(sorted_df['paper_impact'][i]), 2))
             
             time4 = time.time()
             print(str(round(time4-time3,3)) + "초 소요: 3")
