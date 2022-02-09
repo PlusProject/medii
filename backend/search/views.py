@@ -601,6 +601,8 @@ class RecommendAPI(APIView):
             sorted_df = df.sort_values(
                 by=['total_score'], axis=0, ascending=False)[0:20]
             sorted_df = sorted_df.reset_index()
+            total_total_score = sorted_df['total_score'].sum()
+            sorted_df['total_ratio'] = sorted_df['total_score']*100/total_total_score
             # sorted_df['paper_disease_all'] = sorted_df['paper_disease_all'].fillna("")
             # sorted_df['clinical_disease_all'] = sorted_df['clinical_disease_all'].fillna("")
             for i in sorted_df.index:
@@ -625,11 +627,10 @@ class RecommendAPI(APIView):
                 
                 sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
-                sorted_df['total_score'][i] = round(sorted_df['total_score'][i], 2)
 
                 sorted_df['o_p'][i] = str(sorted_df['o_p'][i]) +"\n"+"(" +str(overlap(sorted_df['paper_disease_all'][i])) +")"+"건"
                 sorted_df['o_c'][i] = str(sorted_df['o_c'][i]) +"\n"+"(" +str(overlap(sorted_df['clinical_disease_all'][i])) +")"+"건"
-                print(sorted_df['o_p'][i])
+                sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  +"\n"+"(" +str(round(sorted_df['total_ratio'][i],2)) +"%)"
             
             time4 = time.time()
             print(str(round(time4-time3,3)) + "초 소요: 3")
