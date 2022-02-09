@@ -631,6 +631,7 @@ class RecommendAPI(APIView):
                 sorted_df['o_p'][i] = str(sorted_df['o_p'][i]) +"\n"+"(" +str(overlap(sorted_df['paper_disease_all'][i])) +")"+"건"
                 sorted_df['o_c'][i] = str(sorted_df['o_c'][i]) +"\n"+"(" +str(overlap(sorted_df['clinical_disease_all'][i])) +")"+"건"
                 sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  +"\n"+"(" +str(round(sorted_df['total_ratio'][i],2)) +"%)"
+                sorted_df['paper_impact'][i] = round(sorted_df['paper_impact'][i], 2)
             
             time4 = time.time()
             print(str(round(time4-time3,3)) + "초 소요: 3")
