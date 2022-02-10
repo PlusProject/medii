@@ -180,22 +180,14 @@
           </v-toolbar-title>
           <v-spacer></v-spacer>
 
+          <span> 임상시험 가중치 </span>
           <v-slider
             v-model="clinical.val"
             :color="clinical.color"
-            :label="clinical.label"
             thumb-label="always"
             max="10"
           ></v-slider>
-
-          <v-slider
-            v-model="paper.val"
-            :label="paper.label"
-            :color="paper.color"
-            thumb-label="always"
-            max="10"
-          ></v-slider>
-
+          <span> 논문 가중치 </span>
           <v-btn
             color="light-blue darken-4"
             @click="changeWeight"
@@ -477,7 +469,7 @@ export default {
         const temp = this.input;
         const params = {
           input: temp,
-          weight_paper: this.paper.val,
+          weight_paper: 10 - this.clinical.val,
           weight_trial: this.clinical.val,
         };
         const res = await api.recommend(params);
@@ -486,13 +478,13 @@ export default {
         console.log(this.items);
         this.previous_items = this.items;
         this.loading = false;
-        for(var i = 0; i<this.items.length; i++){
-          const tmp_push = [this.items[i]['belong'],this.items[i]['name_kor']]
-          this.tmp_info.push(tmp_push)
+        for (var i = 0; i < this.items.length; i++) {
+          const tmp_push = [this.items[i]["belong"], this.items[i]["name_kor"]];
+          this.tmp_info.push(tmp_push);
         }
-        console.log(this.tmp_info)
-        console.log(JSON.stringify(this.tmp_info))
-        localStorage.setItem('itemArray', JSON.stringify(this.tmp_info));
+        console.log(this.tmp_info);
+        console.log(JSON.stringify(this.tmp_info));
+        localStorage.setItem("itemArray", JSON.stringify(this.tmp_info));
       } catch (err) {
         console.log(err);
       }
@@ -502,7 +494,7 @@ export default {
         const temp = this.input;
         const params = {
           input: temp,
-          weight_paper: this.paper.val,
+          weight_paper: 10 - this.clinical.val,
           weight_trial: this.clinical.val,
         };
         const res = await api.recommend2(params);
@@ -553,7 +545,7 @@ export default {
         const params = {
           input: temp,
         };
-        console.log(this.paper.val);
+        console.log(10 - this.clinical.val);
         console.log(this.clinical.val);
         const res = await api.getExtractDisease(params);
         let result = res["data"];

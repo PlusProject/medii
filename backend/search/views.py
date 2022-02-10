@@ -256,8 +256,8 @@ class Recommend2API(APIView):
 
     def get(self, request):
         input = request.GET.get('input', 'I20.9')
-        weight_paper = request.GET.get('weight_paper', 7)
-        weight_trial = request.GET.get('weight_trial', 3)
+        weight_paper = request.GET.get('weight_paper', 3)
+        weight_trial = request.GET.get('weight_trial', 7)
 
         weight_paper = int(weight_paper)
         weight_trial = int(weight_trial)
@@ -489,9 +489,8 @@ class RecommendAPI(APIView):
     def get(self, request):
         time1 = time.time()
         input = request.GET.get('input', 'I20.2')
-        weight_paper = request.GET.get('weight_paper', 7)
-        weight_trial = request.GET.get('weight_trial', 3)
-
+        weight_paper = request.GET.get('weight_paper', 3)
+        weight_trial = request.GET.get('weight_trial', 7)
         weight_paper = int(weight_paper)
         weight_trial = int(weight_trial)
 
@@ -664,24 +663,48 @@ class RecommendAPI(APIView):
                 explain = ""
                 for j in sdic:
                     explain += disease_match_one(j[0][2:])
-              
+                codes = ""
                 codes = ", ".join([str(_) for _ in sdic]).replace('p-','논문-').replace('t-','임상-')
                 codes = codes.replace('\',',':').replace('(','').replace(')','').replace(',',' ')
-                codes += explain
                 # print(codes + "," + explain)
                 # print(codes.split(" "))
-                code1 = (codes.split(" ")[0] + " "+ codes.split(" ")[1]).lstrip("\'")+"\n"
-                code2 = (codes.split(" ")[3] + " "+ codes.split(" ")[4]).lstrip("\'")+"\n"
-                code3 = (codes.split(" ")[6] + " "+ codes.split(" ")[7]).lstrip("\'")+"\n"
-                explain1 = (explain.split("} ")[0])+"}"
-                explain2 = (explain.split("} ")[1])+"}"
-                explain3 = (explain.split("} ")[2])+"}"
+
+                if len(codes.split(" "))>=2:
+                    code1 = (codes.split(" ")[0] + " "+ codes.split(" ")[1]).lstrip("\'")
+                    explain1 = (explain.split("} ")[0])+"}"
+                else:
+                    code1 = " "
+                    explain1 = " "
+                if len(codes.split(" "))>=5:
+                    code2 = (codes.split(" ")[3] + " "+ codes.split(" ")[4]).lstrip("\'")
+                    explain2 = (explain.split("} ")[1])+"}"
+                else:
+                    code2 = " "
+                    explain2 = " "
+                if len(codes.split(" "))>=8:
+                    code3 = (codes.split(" ")[6] + " "+ codes.split(" ")[7]).lstrip("\'")
+                    explain3 = (explain.split("} ")[2])+"}"
+                else:
+                    code3 = " "
+                    explain3 = " "
+                # if len(explain.split("} "))>=1:
+                #     explain1 = (explain.split("} ")[0])+"}"
+                # else:
+                #     explain1 = " "
+                # if len(explain.split("} "))>=2:
+                #     explain2 = (explain.split("} ")[1])+"}"
+                # else:
+                #     explain2 = " "
+                # if len(explain.split("} "))>=3:
+                #     explain3 = (explain.split("} ")[2])+"}"
+                # else:
+                #     explain3 = " "
                 if len(explain1)<5:
-                    explain1 = ""
+                    explain1 = " "
                 if len(explain2)<5:
-                    explain2 = ""
+                    explain2 = " "
                 if len(explain3)<5:
-                    explain3 = ""
+                    explain3 = " "
                 sorted_df['top1'][i] = code1 
                 sorted_df['top2'][i] = code2
                 sorted_df['top3'][i] = code3

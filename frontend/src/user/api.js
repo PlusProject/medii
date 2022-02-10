@@ -135,7 +135,7 @@ export default {
         const response = await axios.get('recommend', {
           params: {
             'input': params.input,
-            'weight_paper': params.weight_paper,
+            'weight_paper': 10-params.weight_trial,
             'weight_trial' : params.weight_trial
           }
         })
@@ -150,7 +150,7 @@ export default {
         const response = await axios.get('recommend2', {
           params: {
             'input': params.input,
-            'weight_paper': params.weight_paper,
+            'weight_paper': 10-params.weight_trial,
             'weight_trial' : params.weight_trial
           }
         })
