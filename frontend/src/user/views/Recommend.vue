@@ -257,6 +257,8 @@
         <a v-if="item.link" :href="item.link" target="_blank"
           >{{ item.name_kor }}
         </a>
+
+        <span v-else>{{ item.name_kor }}</span>
         <v-spacer></v-spacer>
         {{ item.belong }}
       </template>
