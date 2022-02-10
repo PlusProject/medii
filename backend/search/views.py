@@ -276,7 +276,6 @@ class Recommend2API(APIView):
                 disease_indexs = diseasecode_disease[diseasecode_disease['disease_code'] == word].index
                 if(len(disease_indexs)):
                     result[word] = diseasecode_disease['disease_kor'][disease_indexs[0]]
-
             return result
 
         def paper_score(input, w1, w2):
@@ -481,7 +480,6 @@ class Recommend2API(APIView):
             ranking['paper_impact'] = round(ranking['paper_impact'], 2)
             ranking['top1'] = ranking['major']
             temp = ranking.to_json(orient='records')
-
             return temp
 
         return Response(get_recommendation(input, weight_paper, weight_trial, weight_paper_impact=3, weight_sim=7))
@@ -535,6 +533,17 @@ class RecommendAPI(APIView):
                     if all(temp in clinical for temp in input_codes):
                         overlap += 1
                 return overlap
+            
+            def overlap2(text):
+                if text=="":
+                    return 0
+                count = 0
+                dic = eval(text)
+                input_code = "\'"+input.split('.')[0]
+                for i in dic:
+                    if  input_code==i.split('.')[0]:
+                        count+=1
+                return count
 
             def calcul_sim(x, y):
                 x = x[2:]
@@ -560,12 +569,13 @@ class RecommendAPI(APIView):
             df['explain3'] = ""
             df['explainp'] = ""
             df['explainc'] = ""
-            
             df['paper_count'] = df['paper_count'].fillna(0)
             df['clinical_count'] = df['clinical_count'].fillna(0)
             df['paper_impact'] = df['paper_impact'].fillna(0.0)
             df['paper_disease_all'] = df['paper_disease_all'].fillna("")
             df['clinical_disease_all'] = df['clinical_disease_all'].fillna("")
+            df['clinical_allcount'] = df['clinical_allcount'].fillna("")
+            df['paper_allcount'] = df['paper_allcount'].fillna("")
             
             time2 = time.time()
             print(str(round(time2-time1,3)) + "초 소요 : 1")
@@ -616,7 +626,6 @@ class RecommendAPI(APIView):
             df['o_p'] = df['o_p']-pmin
             df['o_p'] = df['o_p'] * pweight
             
-            
             cmax = df['o_c'].max()
             cmin = df['o_c'].min()
             cweight = 100*wt/((cmax-cmin)*wpt)
@@ -636,6 +645,7 @@ class RecommendAPI(APIView):
             sorted_df['total_ratio'] = sorted_df['total_score']/total_total_score
             # sorted_df['total_score'] = (sorted_df['total_score'] - tmin)/(tmax-tmin)
             
+            print(cweight, pweight)
             # sorted_df['paper_disease_all'] = sorted_df['paper_disease_all'].fillna("")
             # sorted_df['clinical_disease_all'] = sorted_df['clinical_disease_all'].fillna("")
             for i in sorted_df.index:
@@ -680,8 +690,8 @@ class RecommendAPI(APIView):
                 sorted_df['explain1'][i] = explain1
                 sorted_df['explain2'][i] = explain2
                 sorted_df['explain3'][i] = explain3
-                sorted_df['explainp'][i] = "("+str(overlap(sorted_df['paper_disease_all'][i])) + "건)"
-                sorted_df['explainc'][i] = "("+str(overlap(sorted_df['clinical_disease_all'][i]))+ "건)"
+                sorted_df['explainp'][i] = "("+str(overlap2(sorted_df['paper_allcount'][i])) + "건)"
+                sorted_df['explainc'][i] = "("+str(overlap2(sorted_df['clinical_allcount'][i]))+ "건)"
                 sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
                 sorted_df['o_p'][i] = str(round(sorted_df['o_p'][i],2)) 
@@ -697,7 +707,6 @@ class RecommendAPI(APIView):
             # sorted_df['o_c'] = round(sorted_df['o_c'],2)
 
             temp = sorted_df.to_json(orient='records')
-            
             time5 = time.time()
             print(str(round(time5-time4,3)) + "초 소요: 4")            
             print("총 소요 시간: " + str(round(time5-time1,3)) + "초")            

@@ -327,6 +327,8 @@ class DoctorAll2(models.Model):
     clinical_count = models.IntegerField(blank=True, null=True)
     clinical_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
     paper_disease_all = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    paper_allcount = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
+    clinical_allcount = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
 
     class Meta:
         managed = False
