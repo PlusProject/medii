@@ -631,8 +631,6 @@ class RecommendAPI(APIView):
             cweight = 100*wt/((cmax-cmin)*wpt)
             df['o_c'] = df['o_c']-cmin
             df['o_c'] = df['o_c']*cweight
-            
-            print(cweight, pweight)
             df['total_score'] = df['o_p'] + df['o_c']
             
             sorted_df = df.sort_values(
@@ -728,15 +726,15 @@ class CountAPI(APIView):
         q4 = Q()
         if diseases:
             for disease in diseases:
-                q1 &= Q(paper_disease_all__icontains=disease)
-                q2 &= Q(clinical_disease_all__icontains=disease)
-                q3 |= Q(paper_disease_all__icontains=disease)
-                q4 |= Q(clinical_disease_all__icontains=disease)
+                q1 &= Q(paper_allcount__icontains=disease)
+                q2 &= Q(clinical_allcount__icontains=disease)
+                q3 |= Q(paper_allcount__icontains=disease)
+                q4 |= Q(clinical_allcount__icontains=disease)
 
         q1 |= q2
         q3 |= q4
-        queryset1 = DoctorTotalDisease.objects.filter(q1)
-        queryset2 = DoctorTotalDisease.objects.filter(q3)
+        queryset1 = DoctorAll2.objects.filter(q1)
+        queryset2 = DoctorAll2.objects.filter(q3)
         overall_count = queryset1.count()
         partition_count = queryset2.count()
 
