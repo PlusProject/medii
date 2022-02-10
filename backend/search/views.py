@@ -662,9 +662,9 @@ class RecommendAPI(APIView):
                 codes += explain
                 # print(codes + "," + explain)
                 # print(codes.split(" "))
-                code1 = (codes.split(" ")[0] + codes.split(" ")[1]).lstrip("\'")+"\n"
-                code2 = (codes.split(" ")[3] + codes.split(" ")[4]).lstrip("\'")+"\n"
-                code3 = (codes.split(" ")[6] + codes.split(" ")[7]).lstrip("\'")+"\n"
+                code1 = (codes.split(" ")[0] + " "+ codes.split(" ")[1]).lstrip("\'")+"\n"
+                code2 = (codes.split(" ")[3] + " "+ codes.split(" ")[4]).lstrip("\'")+"\n"
+                code3 = (codes.split(" ")[6] + " "+ codes.split(" ")[7]).lstrip("\'")+"\n"
                 explain1 = (explain.split("} ")[0])+"}"
                 explain2 = (explain.split("} ")[1])+"}"
                 explain3 = (explain.split("} ")[2])+"}"

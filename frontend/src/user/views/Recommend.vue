@@ -272,13 +272,17 @@
       </template>
 
       <template v-slot:[`item.top2`]="{ item }">
-        {{ item.top2 }}
+        <span style="font-size: 110%">
+          {{ item.top2 }}
+        </span>
         <v-spacer></v-spacer>
         {{ item.explain2 }}
       </template>
 
       <template v-slot:[`item.top3`]="{ item }">
-        {{ item.top3 }}
+        <span style="font-size: 105%">
+          {{ item.top3 }}
+        </span>
         <v-spacer></v-spacer>
         {{ item.explain3 }}
       </template>
@@ -325,8 +329,8 @@ import api from "../api";
 export default {
   data() {
     return {
-      clinical: { label: "임상시험 가중치", val: 3, color: "primary darken-3" },
-      paper: { label: "논문 가중치", val: 7, color: "blue-grey darken-2" },
+      clinical: { label: "임상시험 가중치", val: 7, color: "primary darken-3" },
+      paper: { label: "논문 가중치", val: 3, color: "blue-grey darken-2" },
       loading: true,
       title: "",
       showextractdisease: false,
@@ -363,9 +367,9 @@ export default {
           value: "total_score",
         },
         { text: "Name", value: "name_kor", sortable: false },
-        { text: "Top1", value: "top1", sortable: false },
-        { text: "Top2", value: "top2", sortable: false },
-        { text: "Top3", value: "top3", sortable: false },
+        { text: "Code Top1", value: "top1", sortable: false },
+        { text: "Code Top2", value: "top2", sortable: false },
+        { text: "Code Top3", value: "top3", sortable: false },
         // { text: "Major", value: "major", sortable: false },
         { text: "논문", value: "o_p" },
         { text: "임상시험", value: "o_c" },
@@ -551,6 +555,31 @@ export default {
         const res = await api.getExtractDisease(params);
         let result = res["data"];
         this.extractdisease = JSON.parse(result);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async showParticipateInfo(item) {
+      this.clinicalTrialsSearch = "";
+      this.loadingDialog = true;
+      try {
+        const res = await api.getClinicalTrials(item.pid);
+        const clinicalTrialsData = res.data;
+        const clinicalTrialsItems = [];
+        for (let data of clinicalTrialsData) {
+          clinicalTrialsItems.push(data.clinical_trials);
+        }
+        clinicalTrialsItems.sort(function (a, b) {
+          if (a.start_date === "") {
+            return 1;
+          } else if (b.start_date === "") {
+            return -1;
+          }
+          return new Date(b.start_date) - new Date(a.start_date);
+        });
+        this.clinicalTrialsData = clinicalTrialsItems;
+        this.loadingDialog = false;
+        this.participateDialog = true;
       } catch (err) {
         console.log(err);
       }
