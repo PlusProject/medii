@@ -537,7 +537,7 @@ class RecommendAPI(APIView):
                 if(x == y):
                     return 100
                 if x.split('.')[0] == y.split('.')[0]:
-                    return 10
+                    return 1
                 if x[0] == y[0]:
                     return 0.01
                 return 0
