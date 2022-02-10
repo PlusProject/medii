@@ -671,19 +671,19 @@ class RecommendAPI(APIView):
 
                 if len(codes.split(" "))>=2:
                     code1 = (codes.split(" ")[0] + " "+ codes.split(" ")[1]).lstrip("\'")
-                    explain1 = (explain.split("} ")[0])+"}"
+                    explain1 = (explain.split("} ")[0])[2:]
                 else:
                     code1 = " "
                     explain1 = " "
                 if len(codes.split(" "))>=5:
                     code2 = (codes.split(" ")[3] + " "+ codes.split(" ")[4]).lstrip("\'")
-                    explain2 = (explain.split("} ")[1])+"}"
+                    explain2 = (explain.split("} ")[1])[2:]
                 else:
                     code2 = " "
                     explain2 = " "
                 if len(codes.split(" "))>=8:
                     code3 = (codes.split(" ")[6] + " "+ codes.split(" ")[7]).lstrip("\'")
-                    explain3 = (explain.split("} ")[2])+"}"
+                    explain3 = (explain.split("} ")[2])[2:]
                 else:
                     code3 = " "
                     explain3 = " "
