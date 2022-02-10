@@ -626,6 +626,7 @@ class RecommendAPI(APIView):
             
             for i in sorted_df.index:
                 dic = eval(sorted_df['disease'][i])
+                dic_code = {}
                 delete = []
                 for j in dic:
                     t=0.0
@@ -634,14 +635,15 @@ class RecommendAPI(APIView):
                             t += float(dic[j]) * float(calcul_sim(j, input_code)) * pweight
                         else:
                             t += float(dic[j]) * float(calcul_sim(j, input_code)) * cweight
-                    dic[j] = round(t, 2)
+                    code_only = j[2:]
+                    if t>0:
+                        dic_code[code_only] = round(t, 2)
                     if(t == 0.0): delete.append(j)
-                for j in delete: del dic[j]
                 sdic = sorted(
-                    dic.items(), key=lambda x: x[1], reverse=True)[0:5]
+                    dic_code.items(), key=lambda x: x[1], reverse=True)[0:5]
                 explain = ""
                 for j in sdic:
-                    explain += disease_match_one(j[0][2:])
+                    explain += disease_match_one(j[0])
                 codes = ", ".join([str(_) for _ in sdic]).replace('p-','논문-').replace('t-','임상-')
                 codes = codes.replace('\',',':').replace('(','').replace(')','').replace(',',' ')
                 
