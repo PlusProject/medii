@@ -11,6 +11,7 @@
     "axios": "^0.21.1",
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",
+    "jquery": "^3.6.0",
     "vis-data": "^7.1.2",
     "vis-network": "^9.1.0",
     "vis-util": "^5.0.2",

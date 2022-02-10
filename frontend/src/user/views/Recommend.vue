@@ -219,16 +219,10 @@
 
           <tr>
             <th colspan="3">
-              <input
-                type="checkbox"
-                id="all_check"
-                value="selectAll"
-                onclick="selectAll(this)"
-              />
               <v-btn
                 id="network"
                 x-small
-                class="indigo lighten-3 my-8 mx-1"
+                class="indigo lighten-3 mx-1"
                 dark
                 @click="
                   $router.push({
@@ -329,6 +323,7 @@ import api from "../api";
 export default {
   data() {
     return {
+      tmp_info: [],
       clinical: { label: "임상시험 가중치", val: 7, color: "primary darken-3" },
       paper: { label: "논문 가중치", val: 3, color: "blue-grey darken-2" },
       loading: true,
@@ -360,7 +355,6 @@ export default {
       groupDesc: [],
       headers: [
         { text: "추천순", value: "ranking" },
-        { text: "network", value: "checkbox" },
         { text: "", value: "img" },
         {
           text: "Totalscore",
@@ -490,6 +484,13 @@ export default {
         console.log(this.items);
         this.previous_items = this.items;
         this.loading = false;
+        for(var i = 0; i<this.items.length; i++){
+          const tmp_push = [this.items[i]['belong'],this.items[i]['name_kor']]
+          this.tmp_info.push(tmp_push)
+        }
+        console.log(this.tmp_info)
+        console.log(JSON.stringify(this.tmp_info))
+        localStorage.setItem('itemArray', JSON.stringify(this.tmp_info));
       } catch (err) {
         console.log(err);
       }
