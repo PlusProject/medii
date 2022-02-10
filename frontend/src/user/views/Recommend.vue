@@ -253,11 +253,46 @@
       <template v-slot:[`item.img`]="{ item }">
         <img :src="item.img" />
       </template>
-
       <template v-slot:[`item.name_kor`]="{ item }">
-        {{ item.name_kor }}
+        <a v-if="item.link" :href="item.link" target="_blank"
+          >{{ item.name_kor }}
+        </a>
         <v-spacer></v-spacer>
         {{ item.belong }}
+      </template>
+
+      <template v-slot:[`item.top1`]="{ item }">
+        <span style="font-size: 120%">
+          <strong>
+            {{ item.top1 }}
+          </strong>
+        </span>
+        <v-spacer></v-spacer>
+        {{ item.explain1 }}
+      </template>
+
+      <template v-slot:[`item.top2`]="{ item }">
+        {{ item.top2 }}
+        <v-spacer></v-spacer>
+        {{ item.explain2 }}
+      </template>
+
+      <template v-slot:[`item.top3`]="{ item }">
+        {{ item.top3 }}
+        <v-spacer></v-spacer>
+        {{ item.explain3 }}
+      </template>
+
+      <template v-slot:[`item.o_p`]="{ item }">
+        {{ item.o_p }}
+        <v-spacer></v-spacer>
+        {{ item.explainp }}
+      </template>
+
+      <template v-slot:[`item.o_c`]="{ item }">
+        {{ item.o_c }}
+        <v-spacer></v-spacer>
+        {{ item.explainc }}
       </template>
 
       <template v-slot:[`item.total_clinical`]="{ item }">
@@ -621,5 +656,18 @@ img {
   position: relative;
   left: 5px;
   top: 4px;
+}
+</style>
+
+
+<style scoped>
+a:link {
+  text-decoration: none;
+}
+a:visited {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 </style>

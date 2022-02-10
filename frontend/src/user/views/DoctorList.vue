@@ -1,5 +1,5 @@
 <template>
-  <div style="width:1185px; margin:auto; margin-top:40px">
+  <div style="width: 1185px; margin: auto; margin-top: 40px">
     <v-card>
       <v-card-title>
         <v-spacer></v-spacer>
@@ -23,7 +23,7 @@
         height="530px"
         fixed-header
       >
-      <!-- <v-data-table
+        <!-- <v-data-table
         :headers="tableHeaders"
         :items="tableData"
         item-key="name_kor"
@@ -41,42 +41,39 @@
           <v-toolbar flat>
             <v-chip
               class="ma-2"
-              color='primary'
-              v-if="getQuery.name_kor !== '' && !$store.state.showClinicalTrialsPage"
+              color="primary"
+              v-if="
+                getQuery.name_kor !== '' && !$store.state.showClinicalTrialsPage
+              "
             >
               {{ getQuery.name_kor }}
             </v-chip>
             <v-chip
               class="ma-2"
-              color='primary'
-              v-if="getQuery.belong !== '' && !$store.state.showClinicalTrialsPage"
+              color="primary"
+              v-if="
+                getQuery.belong !== '' && !$store.state.showClinicalTrialsPage
+              "
             >
               {{ getQuery.belong }}
             </v-chip>
             <v-chip
               class="ma-2"
-              color='primary'
-              v-if="getQuery.major !== '' && !$store.state.showClinicalTrialsPage"
+              color="primary"
+              v-if="
+                getQuery.major !== '' && !$store.state.showClinicalTrialsPage
+              "
             >
               {{ getQuery.major }}
             </v-chip>
-            <v-chip
-              class="ma-2"
-              color='primary'
-              v-if="getQuery.disease !== ''"
-            >
+            <v-chip class="ma-2" color="primary" v-if="getQuery.disease !== ''">
               {{ getQuery.disease }}
             </v-chip>
             <v-spacer></v-spacer>
             <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  {{ '정렬 기준: ' + currentSortByTitle }}
+                <v-btn color="primary" dark v-bind="attrs" v-on="on">
+                  {{ "정렬 기준: " + currentSortByTitle }}
                 </v-btn>
               </template>
               <v-list>
@@ -100,7 +97,12 @@
           </v-toolbar>
         </template>
         <template v-slot:[`item.name_kor`]="{ item }">
-          <a v-if="item.doctor_info" :href="item.doctor_info.url" target="_blank">{{ item.name_kor }}</a>
+          <a
+            v-if="item.doctor_info"
+            :href="item.doctor_info.url"
+            target="_blank"
+            >{{ item.name_kor }}</a
+          >
           <span v-else>{{ item.name_kor }}</span>
         </template>
         <template v-slot:[`item.participate_num`]="{ item }">
@@ -120,54 +122,38 @@
           </v-btn>
         </template>
         <template v-if="noData" v-slot:no-data>
-          <p style="font-size: 30px; margin: 180px 0px;">
-            <span v-if="checkQueryIsOne()" style="color: #f06060">'{{ noDataKeyword }}'</span>
+          <p style="font-size: 30px; margin: 180px 0px">
+            <span v-if="checkQueryIsOne()" style="color: #f06060"
+              >'{{ noDataKeyword }}'</span
+            >
             <span v-if="checkQueryIsOne()">에 대한 </span>
             검색 결과가 없습니다.
           </p>
         </template>
         <template v-slot:expanded-item="{ headers }">
-          <td :colspan="headers.length" style="margin-top:20px">
+          <td :colspan="headers.length" style="margin-top: 20px">
             <v-card>
-              <v-card-title>
-                임상 coworker
-              </v-card-title>
+              <v-card-title> 임상 coworker </v-card-title>
               {{ crisCoworker }}
             </v-card>
             <v-card>
-              <v-card-title>
-                논문 coworker
-              </v-card-title>
+              <v-card-title> 논문 coworker </v-card-title>
               {{ thesisCoworker }}
             </v-card>
           </td>
         </template>
       </v-data-table>
 
-      <v-dialog
-        v-model="loadingDialog"
-        hide-overlay
-        persistent
-        width="300"
-      >
-        <v-card
-          color="primary"
-          dark
-        >
+      <v-dialog v-model="loadingDialog" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
           <v-card-text>
-              Loading... Please wait
-            <v-progress-linear
-              indeterminate
-              color="white"
-            ></v-progress-linear>
+            Loading... Please wait
+            <v-progress-linear indeterminate color="white"></v-progress-linear>
           </v-card-text>
         </v-card>
       </v-dialog>
 
-      <v-dialog
-        v-model="participateDialog"
-        max-width="1000"
-      >
+      <v-dialog v-model="participateDialog" max-width="1000">
         <v-card>
           <v-card-title>
             <v-spacer></v-spacer>
@@ -186,16 +172,13 @@
             :search="clinicalTrialsSearch"
           >
             <template v-slot:[`item.index`]="{ index }">
-              {{ index + 1}}
+              {{ index + 1 }}
             </template>
           </v-data-table>
         </v-card>
       </v-dialog>
 
-      <v-dialog
-        v-model="writesDialog"
-        max-width="1000"
-      >
+      <v-dialog v-model="writesDialog" max-width="1000">
         <v-card>
           <v-card-title>
             <v-spacer></v-spacer>
@@ -214,7 +197,7 @@
             :search="thesisSearch"
           >
             <template v-slot:[`item.index`]="{ index }">
-              {{ index + 1}}
+              {{ index + 1 }}
             </template>
           </v-data-table>
         </v-card>
@@ -224,66 +207,76 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import api from '../api'
+import { mapGetters } from "vuex";
+import api from "../api";
 
 export default {
-  name: 'DoctorList',
-  data () {
+  name: "DoctorList",
+  data() {
     return {
       tableHeaders: [
         {
-          text: '이름',
-          align: 'start',
+          text: "이름",
+          align: "start",
           sortable: true,
-          value: 'name_kor',
-          width: '80px'
+          value: "name_kor",
+          width: "80px",
         },
-        { text: '병원', value: 'belong', width: '200px', align: 'center' },
-        { text: '진료분야', value: 'major', width: '50%', align: 'center'},
-        { text: '임상 시험', value: 'participate_num', align: 'center' },
-        { text: '논문', value: 'writes_num', align: 'center' },
+        { text: "병원", value: "belong", width: "200px", align: "center" },
+        { text: "진료분야", value: "major", width: "50%", align: "center" },
+        { text: "임상 시험", value: "participate_num", align: "center" },
+        { text: "논문", value: "writes_num", align: "center" },
       ],
       tableData: [],
-      rareDisease: '',
-      tableSearch: '',
+      rareDisease: "",
+      tableSearch: "",
       clinicalTrialsHeaders: [
-        { 
-          text: 'Index',
-          align: 'start',
+        {
+          text: "Index",
+          align: "start",
           sortable: true,
-          value: 'index'
+          value: "index",
         },
-        { text: '연구제목', value: 'title_kor', width: '30%', align: 'center' },
-        { text: 'Scientific Title', value: 'title_eng', width: '40%', align: 'center' },
-        { text: 'Source', value: 'source_name', width: '15%', align: 'center' },
-        { text: 'Start Date', value: 'start_date', width: '15%', align: 'center' }
+        { text: "연구제목", value: "title_kor", width: "30%", align: "center" },
+        {
+          text: "Scientific Title",
+          value: "title_eng",
+          width: "40%",
+          align: "center",
+        },
+        { text: "Source", value: "source_name", width: "15%", align: "center" },
+        {
+          text: "Start Date",
+          value: "start_date",
+          width: "15%",
+          align: "center",
+        },
       ],
       clinicalTrialsData: [],
-      clinicalTrialsSearch: '',
+      clinicalTrialsSearch: "",
       thesisHeaders: [
-        { 
-          text: 'Index',
-          align: 'start',
+        {
+          text: "Index",
+          align: "start",
           sortable: true,
-          value: 'index'
+          value: "index",
         },
-        { text: 'Title', value: 'title', width: '70%', align: 'center' },
-        { text: 'Journal', value: 'journal', width: '15%', align: 'center' },
-        { text: 'Year', value: 'publication_date', align: 'center' },
-        { text: 'Citation', value: 'citation', align: 'center' }
+        { text: "Title", value: "title", width: "70%", align: "center" },
+        { text: "Journal", value: "journal", width: "15%", align: "center" },
+        { text: "Year", value: "publication_date", align: "center" },
+        { text: "Citation", value: "citation", align: "center" },
       ],
       thesisData: [],
-      thesisSearch: '',
-      thesisCoworker: '',
-      crisCoworker: '',
+      thesisSearch: "",
+      thesisCoworker: "",
+      crisCoworker: "",
       sortByItems: [
-        { title: '이름', value: 'name_kor', align: 'center' },
-        { title: '임상 시험 수', value: 'participate_num', align: 'center' },
-        { title: '논문 개수', value: 'writes_num', align: 'center' }
+        { title: "이름", value: "name_kor", align: "center" },
+        { title: "임상 시험 수", value: "participate_num", align: "center" },
+        { title: "논문 개수", value: "writes_num", align: "center" },
       ],
-      currentSortByTitle: '임상 시험 수',
-      sortBy: 'participate_num',
+      currentSortByTitle: "임상 시험 수",
+      sortBy: "participate_num",
       sortDesc: true,
       expanded: [],
       participateDialog: false,
@@ -293,184 +286,190 @@ export default {
       loadingDialog: false,
       tableLoading: true,
       resultRender: {
-        name_kor: '',
-        belong: '',
-        major: '',
-        disease: ''
+        name_kor: "",
+        belong: "",
+        major: "",
+        disease: "",
       },
       noData: false,
-      noDataKeyword: ''
-    }
+      noDataKeyword: "",
+    };
   },
-  mounted () {
-    this.init()
+  mounted() {
+    this.init();
   },
   computed: {
-    ...mapGetters([ 'getQuery' ]),
+    ...mapGetters(["getQuery"]),
     // tableLoading () {
     //   return this.tableData.length === 0
     // },
-    sortOrder () {
-      return this.sortDesc ? '내림차순' : '오름차순'
-    }
+    sortOrder() {
+      return this.sortDesc ? "내림차순" : "오름차순";
+    },
   },
   watch: {
-    'getQuery' () {
-      this.resultRender = JSON.parse(JSON.stringify(this.getQuery))
-      this.init()
-    }
+    getQuery() {
+      this.resultRender = JSON.parse(JSON.stringify(this.getQuery));
+      this.init();
+    },
   },
   methods: {
-    async init () {
-      this.tableData = []
-      this.getSearchResults()
+    async init() {
+      this.tableData = [];
+      this.getSearchResults();
     },
-    async getSearchResults () {
-      this.tableLoading = true
+    async getSearchResults() {
+      this.tableLoading = true;
       try {
-        const condition = this.$store.state.showClinicalTrialsPage ? true : false
+        const condition = this.$store.state.showClinicalTrialsPage
+          ? true
+          : false;
         const params = {
-          name_kor: condition ? '' : this.getQuery.name_kor,
-          belong: condition ? '' : this.getQuery.belong,
-          major: condition? '' : this.getQuery.major,
+          name_kor: condition ? "" : this.getQuery.name_kor,
+          belong: condition ? "" : this.getQuery.belong,
+          major: condition ? "" : this.getQuery.major,
           disease: this.getQuery.disease,
-          rare: this.$store.state.showRareDisease
-        }
+          rare: this.$store.state.showRareDisease,
+        };
         // console.log(params)
-        const res = await api.search(params)
-        this.tableData = res.data.person
-        this.rareDisease = res.data.rare
-        if (this.tableData.length === 0){
-          this.noData = true
+        const res = await api.search(params);
+        this.tableData = res.data.person;
+        this.rareDisease = res.data.rare;
+        if (this.tableData.length === 0) {
+          this.noData = true;
         }
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
-      this.tableLoading = false
+      this.tableLoading = false;
     },
-    async getCoworker (id) {
+    async getCoworker(id) {
       try {
-        const res = await api.getCoworker(id)
-        this.thesisCoworker = res.data
+        const res = await api.getCoworker(id);
+        this.thesisCoworker = res.data;
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
-    async getCrisCoworker (id) {
+    async getCrisCoworker(id) {
       try {
-        const res = await api.getCrisCoworker(id)
-        this.crisCoworker = res.data
+        const res = await api.getCrisCoworker(id);
+        this.crisCoworker = res.data;
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
-    setSortBy (index) {
-      this.currentSortByTitle = this.sortByItems[index].title
-      this.sortBy = this.sortByItems[index].value
+    setSortBy(index) {
+      this.currentSortByTitle = this.sortByItems[index].title;
+      this.sortBy = this.sortByItems[index].value;
     },
-    async showParticipateInfo (item) {
-      this.clinicalTrialsSearch = ''
-      this.loadingDialog = true
+    async showParticipateInfo(item) {
+      this.clinicalTrialsSearch = "";
+      this.loadingDialog = true;
       try {
-        const res = await api.getClinicalTrials(item.pid)
-        const clinicalTrialsData = res.data
-        const clinicalTrialsItems = []
+        const res = await api.getClinicalTrials(item.pid);
+        const clinicalTrialsData = res.data;
+        const clinicalTrialsItems = [];
         for (let data of clinicalTrialsData) {
-          clinicalTrialsItems.push(data.clinical_trials)
+          clinicalTrialsItems.push(data.clinical_trials);
         }
-        clinicalTrialsItems.sort(function(a, b) {
-          if (a.start_date === '') {
+        clinicalTrialsItems.sort(function (a, b) {
+          if (a.start_date === "") {
             return 1;
-          }
-          else if (b.start_date === '') {
+          } else if (b.start_date === "") {
             return -1;
           }
-          return new Date(b.start_date) - new Date(a.start_date)
-        })
-        this.clinicalTrialsData = clinicalTrialsItems
-        this.loadingDialog = false
-        this.participateDialog = true
+          return new Date(b.start_date) - new Date(a.start_date);
+        });
+        this.clinicalTrialsData = clinicalTrialsItems;
+        this.loadingDialog = false;
+        this.participateDialog = true;
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
-    async showWritesInfo (item) {
-      this.thesisSearch = ''
-      this.loadingDialog = true
+    async showWritesInfo(item) {
+      this.thesisSearch = "";
+      this.loadingDialog = true;
       try {
-        const res = await api.getThesis(item.pid)
-        const thesisData = res.data
-        const thesisItems = []
+        const res = await api.getThesis(item.pid);
+        const thesisData = res.data;
+        const thesisItems = [];
         for (let data of thesisData) {
-          thesisItems.push(data.thesis)
+          thesisItems.push(data.thesis);
         }
         thesisItems.sort(function (a, b) {
-          if (a.citation === '') {
+          if (a.citation === "") {
             return 1;
-          }
-          else if (b.citation === '') {
+          } else if (b.citation === "") {
             return -1;
           }
-          return b.citation - a.citation
-        })
-        this.thesisData = thesisItems
-        this.loadingDialog = false
-        this.writesDialog = true
+          return b.citation - a.citation;
+        });
+        this.thesisData = thesisItems;
+        this.loadingDialog = false;
+        this.writesDialog = true;
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
-    checkQueryIsOne () {
-      let query = JSON.parse(JSON.stringify(this.getQuery))
-      let flag = 0
+    checkQueryIsOne() {
+      let query = JSON.parse(JSON.stringify(this.getQuery));
+      let flag = 0;
       for (let keyword in query) {
         if (query[keyword] && flag === 1) {
-          return false
+          return false;
         }
         if (query[keyword]) {
-          this.noDataKeyword = query[keyword]
-          flag = 1
+          this.noDataKeyword = query[keyword];
+          flag = 1;
         }
       }
-      return true
+      return true;
     },
-    async onExapnd (item) {
+    async onExapnd(item) {
       if (this.expanded.length === 0) {
         try {
-          const id = item.item.pid
-          this.getCoworker(id)
-          this.getCrisCoworker(id)
+          const id = item.item.pid;
+          this.getCoworker(id);
+          this.getCrisCoworker(id);
         } catch (err) {
-          console.log(err)
+          console.log(err);
         }
       }
     },
-    expandParticipateInfo (item) {
+    expandParticipateInfo(item) {
       const currentRowExpanded = this.expanded[0] === item;
-      this.expanded = []
+      this.expanded = [];
       const rowExpanded = this.expanded[0] === item;
       if (rowExpanded || currentRowExpanded) {
-        this.expanded.pop()
+        this.expanded.pop();
       } else {
         this.expanded.push(item);
       }
     },
-    expandWritesInfo (item) {
+    expandWritesInfo(item) {
       const currentRowExpanded = this.expanded[0] === item;
-      this.expanded = []
+      this.expanded = [];
       const rowExpanded = this.expanded[0] === item;
       if (rowExpanded || currentRowExpanded) {
-        this.expanded.pop()
+        this.expanded.pop();
       } else {
         this.expanded.push(item);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
-  a:link { text-decoration: none;}
-  a:visited { text-decoration: none;}
-  a:hover { text-decoration: underline;}
+a:link {
+  text-decoration: none;
+}
+a:visited {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
 </style>

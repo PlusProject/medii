@@ -555,6 +555,11 @@ class RecommendAPI(APIView):
             df['top1'] = ""
             df['top2'] = ""
             df['top3'] = ""
+            df['explain1'] = ""
+            df['explain2'] = ""
+            df['explain3'] = ""
+            df['explainp'] = ""
+            df['explainc'] = ""
             
             df['paper_count'] = df['paper_count'].fillna(0)
             df['clinical_count'] = df['clinical_count'].fillna(0)
@@ -669,13 +674,18 @@ class RecommendAPI(APIView):
                     explain2 = ""
                 if len(explain3)<5:
                     explain3 = ""
-                sorted_df['top1'][i] = code1 + explain1
-                sorted_df['top2'][i] = code2 + explain2
-                sorted_df['top3'][i] = code3 + explain3
+                sorted_df['top1'][i] = code1 
+                sorted_df['top2'][i] = code2
+                sorted_df['top3'][i] = code3
+                sorted_df['explain1'][i] = explain1
+                sorted_df['explain2'][i] = explain2
+                sorted_df['explain3'][i] = explain3
+                sorted_df['explainp'][i] = "("+str(overlap(sorted_df['paper_disease_all'][i])) + "건)"
+                sorted_df['explainc'][i] = "("+str(overlap(sorted_df['clinical_disease_all'][i]))+ "건)"
                 sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
-                sorted_df['o_p'][i] = str(round(sorted_df['o_p'][i],2)) +"\n"+"(" +str(overlap(sorted_df['paper_disease_all'][i])) +")"+"건"
-                sorted_df['o_c'][i] = str(round(sorted_df['o_c'][i],2)) +"\n"+"(" +str(overlap(sorted_df['clinical_disease_all'][i])) +")"+"건"
+                sorted_df['o_p'][i] = str(round(sorted_df['o_p'][i],2)) 
+                sorted_df['o_c'][i] = str(round(sorted_df['o_c'][i],2)) 
                 # sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  +"\n"+"(" +str(round(sorted_df['total_ratio'][i],2)) +"%)"
                 sorted_df['total_score'][i] = str(round(sorted_df['total_score'][i],2))  
                 sorted_df['paper_impact'][i] = str(round(float(sorted_df['paper_impact'][i]), 2))
