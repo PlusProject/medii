@@ -191,56 +191,17 @@ class NodeCrisCnt(models.Model):
         db_table = 'node_cris_cnt'
 
 
-class SnPaper50(models.Model):
-    id = models.AutoField(primary_key=True)
-    label = models.TextField(blank=True, null=True)
-    title = models.TextField(blank=True, null=True)
-    shape = models.TextField(blank=True, null=True)
-    color = models.TextField(blank=True, null=True)
-    size = models.FloatField(blank=True, null=True)
-    borderWidth = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'SN_paper50'
 
 
-class SnPaperCnt50(models.Model):
-    id = models.IntegerField(primary_key=True)
-    fromit = models.IntegerField(blank=True, null=True)
-    toit = models.IntegerField(blank=True, null=True)
-    width = models.FloatField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'SN_paper_cnt50'
-class PartPaperEdge(models.Model):
-    id = models.IntegerField(primary_key=True)
-    fromit = models.IntegerField(blank=True, null=True)
-    toit = models.IntegerField(blank=True, null=True)
-    width = models.FloatField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'part_paper_edge'
 
 
-class PartPaperNode(models.Model):
-    id = models.IntegerField(primary_key=True)
-    label = models.TextField(blank=True, null=True)
-    title = models.TextField(blank=True, null=True)
-    shape = models.TextField(blank=True, null=True)
-    color = models.TextField(blank=True, null=True)
-    size = models.FloatField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'part_paper_node'
 
 class SnPaperEdgeYear(models.Model):
     id = models.IntegerField(primary_key=True)
     fromit = models.IntegerField(blank=True, null=True)
     toit = models.IntegerField(blank=True, null=True)
+    disease = models.TextField(blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
     y2021 = models.IntegerField(blank=True, null=True)
     y2020 = models.IntegerField(blank=True, null=True)
@@ -264,7 +225,30 @@ class SnPaperEdgeYear(models.Model):
         managed = False
         db_table = 'SN_paper_edge_year'
         
-        
+class Nodes(models.Model):
+    id = models.IntegerField(primary_key=True)
+    label = models.TextField(blank=True, null=True)
+    disease = models.TextField(blank=True, null=True)
+    color = models.TextField(blank=True, null=True)
+    paper_cnt = models.IntegerField(blank=True, null=True)
+    clinical_cnt = models.IntegerField(blank=True, null=True)
+    belong = models.TextField(blank=True, null=True)
+    borderwidth = models.IntegerField(db_column='borderWidth', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'Nodes'
+
+class CrisEdge(models.Model):
+    id = models.IntegerField(primary_key=True)
+    fromit = models.IntegerField(blank=True, null=True)
+    toit = models.IntegerField(blank=True, null=True)
+    cnt = models.IntegerField(blank=True, null=True)
+    title = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'cris_edge'
 #acm 추천
 class DoctorAll(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -334,47 +318,3 @@ class DoctorAll2(models.Model):
         managed = False
         db_table = 'doctor_all2'
 
-class DoctorAll3(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    name_kor = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
-    belong = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
-    major = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
-    education = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
-    career = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
-    img = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
-    link = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
-    hospital_code = models.TextField(db_collation='utf8mb4_general_ci', blank=True, null=True)
-    disease = models.TextField(db_collation='utf8_general_ci', blank=True, null=True)
-    a = models.TextField(db_column='A', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    b = models.TextField(db_column='B', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    c = models.TextField(db_column='C', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    d = models.TextField(db_column='D', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    e = models.TextField(db_column='E', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    f = models.TextField(db_column='F', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    g = models.TextField(db_column='G', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    h = models.TextField(db_column='H', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    i = models.TextField(db_column='I', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    j = models.TextField(db_column='J', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    k = models.TextField(db_column='K', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    l = models.TextField(db_column='L', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    m = models.TextField(db_column='M', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    n = models.TextField(db_column='N', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    o = models.TextField(db_column='O', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    p = models.TextField(db_column='P', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    q = models.TextField(db_column='Q', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    r = models.TextField(db_column='R', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    s = models.TextField(db_column='S', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    t = models.TextField(db_column='T', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    u = models.TextField(db_column='U', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    v = models.TextField(db_column='V', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    w = models.TextField(db_column='W', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    x = models.TextField(db_column='X', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    y = models.TextField(db_column='Y', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    z = models.TextField(db_column='Z', db_collation='latin1_swedish_ci', blank=True, null=True)  # Field name made lowercase.
-    paper_count = models.IntegerField(blank=True, null=True)
-    paper_impact = models.FloatField(blank=True, null=True)
-    clinical_count = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'doctor_all3'

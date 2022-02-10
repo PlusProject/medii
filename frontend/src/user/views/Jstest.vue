@@ -1,22 +1,57 @@
 <template>
   <body>
-    <v-card>
-      <v-container fluid>
-        <v-row align="center">
-          <v-col cols="12">
-            <v-autocomplete
-              v-model="value"
-              :items="items"
-              dense
-              filled
-              label="Filled"
-            ></v-autocomplete>
-          </v-col>
-        </v-row>
+    <v-toolbar flat class="pt-10 pe-10" color="#F3F5FF">
+      <v-container fluid style="width: 300px">
+        <v-autocomplete
+          v-model="value"
+          :items="items"
+          dense
+          filled
+          label="Filled"
+        ></v-autocomplete>
       </v-container>
-    </v-card>
-    <v-btn elevation="2" @click="makenetwork">make</v-btn>
-    <div style="height: 800px; width: 100%; border: 1px solid gold">
+      <v-btn-toggle v-model="text" mandatory group color="deep-purple accent-3">
+        <v-btn value="left"> 논문 </v-btn>
+
+        <v-btn value="center"> 임상시험 </v-btn>
+
+        <v-btn value="right"> 전체 </v-btn>
+      </v-btn-toggle>
+      <v-range-slider
+        v-model="yearrange"
+        :color="years.color"
+        :label="years.label"
+        thumb-label="always"
+        max="2022"
+        min="2005"
+      ></v-range-slider>
+      <v-slider
+        v-model="toget"
+        :color="togets.color"
+        :label="togets.label"
+        thumb-label="always"
+        max="50"
+        min="1"
+      ></v-slider>
+      <v-btn elevation="2" @click="makenetwork">make</v-btn>
+      <v-menu bottom :offset-y="true" :close-on-click="false">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="primary" dark v-bind="attrs" v-on="on">
+            소속병원
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item v-for="(item, index) in belongs" :key="index">
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-toolbar>
+    <div
+      style="height: 800px; width: 100%; border: 1px solid gold"
+      class="mt-10"
+    >
       <network
         style="height: 800px"
         ref="network"
@@ -26,13 +61,30 @@
       >
       </network>
     </div>
+    {{ this.$route.params.id }}
   </body>
 </template>
 <script>
 export default {
   data: () => ({
+    belongs: [
+      { title: "노랑: 연세대 세브란스" },
+      { title: "초록: 아산" },
+      { title: "하늘: 삼성" },
+      { title: "빨강: 가톨릭" },
+      { title: "분홍: 고려대" },
+      { title: "주황: 계명대" },
+      { title: "보라: 서울대" },
+      { title: "회색: 나머지" },
+    ],
+    closeOnClick: true,
     items: [],
+    toget: 50,
+    togets: { label: "연관성", color: "purple" },
+    yearrange: [2005, 2022],
+    years: { color: "green", fyear: 2005, label: "년도", lyear: 2022 },
     value: null,
+    lastvalue: null,
     nodes: [],
     edges: [],
     allnodes: [],
@@ -40,9 +92,10 @@ export default {
     options: {
       nodes: {
         borderWidth: 2,
+        font: { strokeWidth: 3, strokeColor: "white" },
       },
       edges: {
-        color: "#024B28",
+        font: { strokeWidth: 2, strokeColor: "white" },
       },
       physics: {
         enabled: true,
@@ -74,11 +127,24 @@ export default {
   }),
   mounted() {
     this.init();
+    if (this.$route.params.id != null) {
+      this.yearrange = [this.$route.params.fyear, this.$route.params.lyear];
+      this.toget = this.$route.params.toget;
+      const snpaper = this.$store.state.nodes;
+      for (let an of snpaper) {
+        if (an["id"] == this.$route.params.id) {
+          this.value = an["label"] + "|" + an["belong"];
+          break;
+        }
+      }
+      console.log(this.$route.params);
+      this.makenetwork();
+    }
   },
   methods: {
     async init() {
       try {
-        for (var ed of this.$store.state.snpaper) {
+        for (var ed of this.$store.state.nodes) {
           this.items.push(ed["label"] + "|" + ed["belong"]);
           this.allnodes.push(ed);
         }
@@ -88,11 +154,24 @@ export default {
         console.log(err);
       }
     },
+    range(start, end) {
+      let array = [];
+      for (let i = start; i < end; ++i) {
+        array.push(i);
+      }
+      return array;
+    },
     makenetwork() {
       if (this.value != null) {
+        this.lastvalue = this.value;
         this.nodes = [];
         this.edges = [];
-        for (var an of this.allnodes) {
+
+        const snpaperedgeyear = this.$store.state.snpaperedgeyear;
+        const snpaper1 = this.$store.state.nodes;
+        //const cris = this.$store.state.nodecris;
+        //const criscnt = this.$store.state.nodecriscnt;
+        for (let an of snpaper1) {
           if (
             this.value.includes(an["label"]) &&
             this.value.includes(an["belong"])
@@ -105,73 +184,112 @@ export default {
         var maxed = 0;
         var maxd = 0;
         var maxdd = [];
-        for (an of this.$store.state.snpaperedgeyear) {
-          if (an["2020"] + an["2021"] != 0) {
+        for (let an of snpaperedgeyear) {
+          var width = 0;
+          for (let y of this.range(this.yearrange[0], this.yearrange[1]))
+            width += an[String(y)];
+          an["width"] = width;
+          if (an["width"] >= this.toget) {
             if (an["from"] == this.ma) {
               toget.push(an["to"]);
-              if (an["2020"] + an["2021"] > maxd) {
-                maxd = an["2020"] + an["2021"];
+              if (an["width"] > maxd) {
+                maxd = an["width"];
                 maxdd = [];
                 maxdd.push(an["to"]);
-              } else if (an["2020"] + an["2021"] == maxd) {
+              } else if (an["width"] == maxd) {
                 maxdd.push(an["to"]);
               }
             } else if (an["to"] == this.ma) {
               toget.push(an["from"]);
-              if (an["2020"] + an["2021"] > maxd) {
-                maxd = an["2020"] + an["2021"];
+              if (an["width"] > maxd) {
+                maxd = an["width"];
                 maxdd = [];
                 maxdd.push(an["from"]);
-              } else if (an["2020"] + an["2021"] == maxd) {
+              } else if (an["width"] == maxd) {
                 maxdd.push(an["from"]);
               }
             }
           }
         }
         toget.push(this.ma);
-        for (an of this.$store.state.snpaperedgeyear) {
+        for (let an of snpaperedgeyear) {
           if (
-            an["2020"] + an["2021"] != 0 &&
+            an["width"] != 0 &&
             toget.includes(an["from"]) &&
             toget.includes(an["to"])
           ) {
-            if (an["2020"] + an["2021"] > maxed)
-              maxed = an["2020"] + an["2021"];
+            if (an["width"] > maxed) maxed = an["width"];
           }
         }
-        for (an of this.$store.state.snpaperedgeyear) {
+        for (let an of snpaperedgeyear) {
+          if (an["width"] < this.toget) continue;
           var edge = {};
           edge["from"] = an["from"];
           edge["to"] = an["to"];
-          edge["width"] = ((an["2020"] + an["2021"]) / maxed) * 10;
+          edge["color"] = "#024B28";
+          edge["label"] = an["label"] + "(" + an["width"] + ")";
+          edge["width"] =
+            ((an["width"] - this.toget + 1) / (maxd - this.toget)) * 10;
           if (
             edge["width"] != 0 &&
             toget.includes(edge["from"]) &&
             toget.includes(edge["to"])
           ) {
             if (edge["from"] == this.ma || edge["to"] == this.ma)
-              edge["color"] = "#FF6C7E";
+              edge["color"] = "#0400BB";
             edge["title"] =
               "공동 작성 논문 수: " +
-              String(an["2020"] + an["2021"]) +
-              "\n대표 질병 코드:";
+              String(an["width"]) +
+              " | 대표 질병 코드:";
 
             this.edges.push(edge);
           }
         }
+        const crisedge = this.$store.state.crisedge;
+        for (let an of crisedge) {
+          var ce = {};
+          ce["from"] = an["from"];
+          ce["to"] = an["to"];
+          ce["color"] = an["color"];
+          if (an["from"] == this.ma || an["to"] == this.ma)
+            ce["color"] = "#A839FF";
+          ce["label"] = an["label"];
+          ce["width"] = (an["width"] / 11) * 10;
+          ce["title"] = an["title"];
+          if (toget.includes(an["from"]) && toget.includes(an["to"]))
+            this.edges.push(ce);
+        }
         toget = [];
-        for (an of this.edges) {
+        for (let an of this.edges) {
           if (toget.includes(an["from"]) == false) toget.push(an["from"]);
           if (toget.includes(an["to"]) == false) toget.push(an["to"]);
         }
-        var temp = null;
-        for (an of this.$store.state.snpaper) {
+        var temp = {};
+        for (let an of snpaper1) {
           if (toget.includes(an["id"])) {
-            temp = an;
-            if (maxdd.includes(temp["id"])) temp["borderWidth"] = 10;
-            this.nodes.push(an);
+            temp = {};
+            temp["id"] = an["id"];
+            temp["color"] = an["color"];
+            temp["value"] = an["value"];
+            temp["label"] = an["label"];
+            temp["title"] = an["title"];
+            temp["shape"] = "dot";
+            temp["belong"] = an["belong"];
+            temp["borderWidth"] = an["borderWidth"];
+            if (maxdd.includes(an["id"])) temp["borderWidth"] = 10;
+            if (temp["id"] == this.ma) {
+              var co = {};
+              co["background"] = temp["color"];
+              co["border"] = "#0400BB";
+              temp["color"] = co;
+              temp["borderWidth"] = 10;
+            }
+            this.nodes.push(temp);
           }
         }
+        this.edges.sort(function (a, b) {
+          return a["width"] - b["width"];
+        });
       }
     },
   },

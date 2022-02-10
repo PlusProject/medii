@@ -258,4 +258,20 @@ export default {
       console.error(error);
     }
   },
+  async getNodes() {
+    try {
+      const response = await axios.get("nodes");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getCrisEdge() {
+    try {
+      const response = await axios.get("crisedge");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 }

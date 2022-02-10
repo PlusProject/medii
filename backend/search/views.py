@@ -2,12 +2,12 @@ from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, DoctorAll, DoctorAll2,DoctorAll3,PartPaperNode,PartPaperEdge,SnPaperEdgeYear
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt,  DoctorAll, DoctorAll2,SnPaperEdgeYear,Nodes,CrisEdge
 from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer,
                           PersonSerializer, ParticipateSerializer, WritesSerializer,
                           CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer, DiseaseSerializer, DoctorTotalDiseaseSerializer, Totaldisease, DoctorAllscoreSerializer,
-                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,SnPaper50Serializer,SnPaperCnt50Serializer,DoctorAllSerializer,DoctorAll2Serializer,DoctorAll3Serializer
-                          ,PartPaperNodeSerializer,PartPaperEdgeSerializer,SnPaperEdgeYearSerializer)
+                          SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,DoctorAllSerializer,DoctorAll2Serializer,DoctorAll3Serializer
+                          ,SnPaperEdgeYearSerializer,NodesSerializer,CrisEdgeSerializer)
 from django.db.models import Q
 import re
 import pandas as pd
@@ -137,20 +137,22 @@ class ThesisAPI(APIView):
         return Response(writes.data)
 
 
-@api_view(['GET'])
-def partpapernode_view(request):
-    partpapernode=PartPaperNode.objects.all()
-    return Response(PartPaperNodeSerializer(partpapernode, many=True).data)
 
-@api_view(['GET'])
-def partpaperedge_view(request):
-    partpaperedge=PartPaperEdge.objects.all()
-    return Response(PartPaperEdgeSerializer(partpaperedge, many=True).data)
 
 @api_view(['GET'])
 def snpaperedgeyear_view(request):
     snpaperedgeyear=SnPaperEdgeYear.objects.all()
     return Response(SnPaperEdgeYearSerializer(snpaperedgeyear, many=True).data)
+
+@api_view(['GET'])
+def nodes_view(request):
+    nodes=Nodes.objects.all()
+    return Response(NodesSerializer(nodes, many=True).data)
+
+@api_view(['GET'])
+def crisedge_view(request):
+    crisedge=CrisEdge.objects.all()
+    return Response(CrisEdgeSerializer(crisedge, many=True).data)
 
 
 @api_view(['GET'])
@@ -173,15 +175,7 @@ def nodecriscnt_view(request):
     nodecriscnts=NodeCrisCnt.objects.all()
     return Response(NodeCrisCntSerializer(nodecriscnts, many=True).data)
 
-@api_view(['GET'])
-def snpaper50_view(request):
-    snpapers50=SnPaper50.objects.all()
-    return Response(SnPaper50Serializer(snpapers50, many=True).data)
 
-@api_view(['GET'])
-def snpapercnt50_view(request):
-    snpapercnts50=SnPaperCnt50.objects.all()
-    return Response(SnPaperCnt50Serializer(snpapercnts50, many=True).data)
     
 @api_view(['GET'])
 def name_list(request):

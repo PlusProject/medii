@@ -22,7 +22,7 @@
         >
           <v-text-field
             class="toobar-textfield"
-            placeholder="질병명을 입력하세용!(고혈압, 심근경색, 순환계통 / I00, C00, ...)"
+            placeholder="질병명을 입력하세요(고혈압, 심근경색, 순환계통 / I00, C00, ...)"
             solo
             flat
             hide-details

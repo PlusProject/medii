@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import {
-  Home, DoctorList, ClinicalTrialsList, SocialNetwork, Recommend,PartialNetwork,Jstest
+  Home, DoctorList, ClinicalTrialsList,Recommend,Jstest,Vvis
 } from './views'
 Vue.use(VueRouter)
 
@@ -25,19 +25,14 @@ const router = new VueRouter({
       component: ClinicalTrialsList
     },
     {
-      name: "socialnetwork",
-      path: "/socialnetwork",
-      component: SocialNetwork,
+      path: "/vvis",
+      name: "vvis",
+      component: Vvis,
     },
     {
       path: "/recommend",
       name: 'recommend',
       component: Recommend,
-    },
-    {
-      name: 'PartialNetwork',
-      path: '/partialnetwork',
-      component: PartialNetwork,
     },
     {
       path: "/jstest",

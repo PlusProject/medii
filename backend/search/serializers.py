@@ -1,24 +1,25 @@
 from django.db import models
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from .models import ClinicalTrials, Disease, Doctor, Person, Participate,Thesis, DoctorAll, DoctorAll2,DoctorAll3, Writes, Totaldisease, DoctorTotalDisease, DoctorAllscore, SnPaper, SnPaperCnt, NodeCris,NodeCrisCnt, SnPaper50, SnPaperCnt50, PartPaperNode,PartPaperEdge, SnPaperEdgeYear
+from .models import ClinicalTrials, Disease, Doctor, Person, Participate,Thesis, DoctorAll, DoctorAll2, Writes, Totaldisease, DoctorTotalDisease, DoctorAllscore, SnPaper, SnPaperCnt, NodeCris,NodeCrisCnt,SnPaperEdgeYear, Nodes,CrisEdge
 
-class PartPaperNodeSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = PartPaperNode
-        fields = "__all__"
-
-class PartPaperEdgeSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = PartPaperEdge
-        fields = "__all__"
 
 class SnPaperEdgeYearSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SnPaperEdgeYear
+        fields = "__all__"
+
+class NodesSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Nodes
+        fields = "__all__"
+
+class CrisEdgeSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = CrisEdge
         fields = "__all__"
         
 class DoctorSerializer(serializers.ModelSerializer):
@@ -168,18 +169,7 @@ class NodeCrisCntSerializer(serializers.ModelSerializer):
         model = NodeCrisCnt
         fields = "__all__"
 
-class SnPaper50Serializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = SnPaper50
-        fields = "__all__"
 
-
-class SnPaperCnt50Serializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = SnPaperCnt50
-        fields = "__all__"
         
 
 

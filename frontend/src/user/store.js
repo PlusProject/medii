@@ -20,52 +20,16 @@ const state = {
   doctor_info: [],
   participate: [],
   writes: [],
-  snpaper50: [],
-  snpapercnt50: [],
-  snpaper: [],
-  snpapercnt: [],
-  nodecris: [],
-  nodecriscnt: [],
-  partpapernode: [],
-  partpaperedge: [],
+  doctors: [
+    "권현철|삼성서울병원",
+    "박승정|서울아산병원",
+    "나승운|고려대학교구로병원",
+    "유상용|강릉아산병원",
+  ],
   snpaperedgeyear: [],
+  nodes: [],
+  crisedge: [],
   //allnetwork: null,
-  options: {
-    nodes: {},
-    edges: {
-      color: "#024B28",
-      /*
-          arrows: {
-            to: { enabled: true, scaleFactor: 1, type: "arrow" },
-          },
-          */
-    },
-    groups: {
-      myGroup: { color: { background: "red" }, borderWidth: 3 },
-    },
-    physics: {
-      enabled: true,
-      barnesHut: {
-        theta: 0.5,
-        gravitationalConstant: -80000,
-        springLength: 200,
-        springConstant: 0.001,
-      },
-      maxVelocity: 50,
-      minVelocity: 0.1,
-      solver: "barnesHut",
-      stabilization: {
-        enabled: true,
-        iterations: 1000,
-        updateInterval: 100,
-        onlyDynamicEdges: false,
-        fit: true,
-      },
-      timestep: 0.5,
-      adaptiveTimestep: true,
-      wind: { x: 0, y: 0 },
-    },
-  },
   showRareDisease: false,
   showClinicalTrialsPage: false,
 };
@@ -127,15 +91,9 @@ const mutations = {
     state.hospitalList = data.hospitalList;
     state.diseaseList = data.diseaseList;
     state.rareDiseaseList = data.rareDiseaseList;
-    state.snpaper50 = data.snpaper50;
-    state.snpapercnt50 = data.snpapercnt50;
-    state.snpaper = data.snpaper;
-    state.snpapercnt = data.snpapercnt;
-    state.nodecris = data.nodecris;
-    state.nodecriscnt = data.nodecriscnt;
-    state.partpapernode = data.partpapernode;
-    state.partpaperedge = data.partpaperedge;
     state.snpaperedgeyear = data.snpaperedgeyear;
+    state.nodes = data.nodes;
+    state.crisedge = data.crisedge;
     //state.allnetwork = data.network;
   },
   savePersonInfo(state, data) {
@@ -187,71 +145,14 @@ const actions = {
       rareDiseaseList.push(name.name_kor);
     }
 
-    const paper50 = await api.getSnPaper50();
-    const snpaper50 = [];
-    const papercnt50 = await api.getSnPaperCnt50();
-    const snpapercnt50 = [];
-    const paper = await api.getSnPaper();
-    const snpaper = [];
-    const papercnt = await api.getSnPaperCnt();
-    const snpapercnt = [];
-    const cris = await api.getNodeCris();
-    const nodecris = [];
-    const criscnt = await api.getNodeCrisCnt();
-    const nodecriscnt = [];
-    for (let name of paper50.data) {
-      snpaper50.push(name);
-    }
-    for (let name of papercnt50.data) {
-      var edge50 = {};
-      edge50["from"] = name["fromit"];
-      edge50["to"] = name["toit"];
-      edge50["width"] = name["width"];
-      snpapercnt50.push(edge50);
-    }
-    for (let name of cris.data) {
-      nodecris.push(name);
-    }
-    for (let name of criscnt.data) {
-      var crisedge = {};
-      crisedge["from"] = name["fromit"];
-      crisedge["to"] = name["toit"];
-      crisedge["width"] = name["width"];
-      crisedge["title"] = name["title"];
-      nodecriscnt.push(crisedge);
-    }
-    for (let name of paper.data) {
-      snpaper.push(name);
-    }
-    for (let name of papercnt.data) {
-      var edge = {};
-      edge["from"] = name["fromit"];
-      edge["to"] = name["toit"];
-      edge["width"] = name["width"];
-      snpapercnt.push(edge);
-    }
-
-    const papernode = await api.getPartPaperNode();
-    const partpapernode = [];
-    const paperedge = await api.getPartPaperEdge();
-    const partpaperedge = [];
-    for (let name of papernode.data) {
-      partpapernode.push(name);
-    }
-    for (let name of paperedge.data) {
-      var pnedge = {};
-      pnedge["from"] = name["fromit"];
-      pnedge["to"] = name["toit"];
-      pnedge["width"] = name["width"];
-      partpaperedge.push(pnedge);
-    }
     const snedgeyear = await api.getSnPaperEdgeYear();
     const snpaperedgeyear = [];
     for (let name of snedgeyear.data) {
       var edgeyear = {};
       edgeyear["from"] = name["fromit"];
       edgeyear["to"] = name["toit"];
-      edgeyear["width"] = name["total"];
+      edgeyear["label"] = name["disease"];
+      edgeyear["total"] = name["total"];
       edgeyear["2021"] = name["y2021"];
       edgeyear["2020"] = name["y2020"];
       edgeyear["2019"] = name["y2019"];
@@ -271,39 +172,59 @@ const actions = {
       edgeyear["2005"] = name["to2005"];
       snpaperedgeyear.push(edgeyear);
     }
-    /*
-    var nodes = new vis.DataSet(snpaper);
 
-    // create an array with edges
-    var edges = new vis.DataSet(snpaperedgeyear);
+    const nds = await api.getNodes();
+    const nodes = [];
+    for (let name of nds.data) {
+      var ns = {};
+      ns["id"] = name["id"];
+      ns["label"] = name["label"];
+      ns["belong"] = name["belong"];
+      ns["color"] = name["color"];
+      ns["value"] = ((name["paper_cnt"] + name["clinical_cnt"]) / 457) * 50;
+      ns["title"] =
+        "소속병원: " +
+        name["belong"] +
+        " | 대표 질병코드: " +
+        name["disease"] +
+        " | 논문 수: " +
+        String(name["paper_cnt"]) +
+        " | 임상시험 수: " +
+        String(name["clinical_cnt"]);
+      ns["shape"] = "dot";
+      ns["borderWidth"] = 2;
+      ns["clinical"] = name["clinical_cnt"];
+      nodes.push(ns);
+    }
 
-    // create a network
-    var container = document.getElementById("mynetwork");
+    const ce = await api.getCrisEdge();
+    const crisedge = [];
+    for (let name of ce.data) {
+      var c = {};
+      c["from"] = name["fromit"];
+      c["to"] = name["toit"];
+      c["width"] = (name["cnt"] / 11) * 10;
+      c["cnt"] = name["cnt"];
+      c["label"] = name["title"] + "(" + name["cnt"] + ")";
+      c["color"] = "#BC091F";
+      c["title"] =
+        "임상시험 수: " +
+        String(name["cnt"]) +
+        " | 질병코드: " +
+        String(name["title"]);
 
-    // provide the data in the vis format
-    var data1 = {
-      nodes: nodes,
-      edges: edges,
-    };
-    var options = {};
-
+      crisedge.push(c);
+    }
     // initialize your network!
-    var network = new vis.Network(container, data1, options);*/
 
     const data = {
       doctorList,
       hospitalList,
       diseaseList,
       rareDiseaseList,
-      snpaper50,
-      snpapercnt50,
-      snpaper,
-      snpapercnt,
-      nodecris,
-      nodecriscnt,
-      partpapernode,
-      partpaperedge,
+      crisedge,
       snpaperedgeyear,
+      nodes
       //network,
     };
     commit("initAutocomplete", data);

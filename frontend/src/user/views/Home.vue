@@ -75,11 +75,11 @@
           dark
           @click="
             $router.push({
-              name: 'socialnetwork',
+              name: 'vvis',
             })
           "
         >
-          전체 네트워크
+          전체 의료진 네트워크
         </v-btn>
         <v-btn
           elevation="8"
