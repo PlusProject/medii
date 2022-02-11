@@ -10,13 +10,6 @@
           label="Filled"
         ></v-autocomplete>
       </v-container>
-      <v-btn-toggle v-model="text" mandatory group color="deep-purple accent-3">
-        <v-btn value="left"> 논문 </v-btn>
-
-        <v-btn value="center"> 임상시험 </v-btn>
-
-        <v-btn value="right"> 전체 </v-btn>
-      </v-btn-toggle>
       <v-range-slider
         v-model="yearrange"
         :color="years.color"
@@ -29,20 +22,34 @@
         v-model="toget"
         :color="togets.color"
         :label="togets.label"
+        class="ml-10"
         thumb-label="always"
         max="50"
         min="1"
       ></v-slider>
-      <v-btn elevation="2" @click="makenetwork">make</v-btn>
+      <v-btn elevation="2" @click="makenetwork" class="ml-5">make</v-btn>
       <v-menu bottom :offset-y="true" :close-on-click="false">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn color="primary" dark v-bind="attrs" v-on="on">
+          <v-btn color="primary" dark v-bind="attrs" v-on="on" class="ml-5">
             소속병원
           </v-btn>
         </template>
 
         <v-list>
           <v-list-item v-for="(item, index) in belongs" :key="index">
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+      <v-menu bottom :offset-y="true" :close-on-click="false">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="teal" dark v-bind="attrs" v-on="on" class="ml-5">
+            순위
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item v-for="(item, index) in ranks" :key="index">
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
@@ -61,7 +68,6 @@
       >
       </network>
     </div>
-    {{ this.$route.params.id }}
   </body>
 </template>
 <script>
@@ -87,6 +93,7 @@ export default {
     lastvalue: null,
     nodes: [],
     edges: [],
+    ranks: [],
     allnodes: [],
     alledges: [],
     options: {

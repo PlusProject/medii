@@ -152,6 +152,8 @@
     </v-dialog>
 
     <v-data-table
+      v-model="selected"
+      show-select
       :headers="headers"
       :items="items"
       hide-default-footer
@@ -160,6 +162,7 @@
       loading-text="Loading... Please wait"
       :items-per-page="20"
     >
+
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>
@@ -208,8 +211,9 @@
                 class="indigo lighten-3 mx-1"
                 dark
                 @click="
-                  $router.push({
-                    name: 'PartialNetwork',
+                  $router.push({                    
+                    name: 'choice',
+                    params: { select: selected },
                   })
                 "
               >
@@ -338,6 +342,7 @@ export default {
       previous_items2: null,
       groupBy: [],
       groupDesc: [],
+      selected:[],
       headers: [
         { text: "추천순", value: "ranking" },
         { text: "", value: "img" },
