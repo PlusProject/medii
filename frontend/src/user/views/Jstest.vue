@@ -50,7 +50,9 @@
 
         <v-list>
           <v-list-item v-for="(item, index) in ranks" :key="index">
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <v-list-item-title>{{
+              index + 1 + ": " + item.name + ", " + item.count
+            }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -173,6 +175,7 @@ export default {
         this.lastvalue = this.value;
         this.nodes = [];
         this.edges = [];
+        this.ranks = [];
 
         const snpaperedgeyear = this.$store.state.snpaperedgeyear;
         const snpaper1 = this.$store.state.nodes;
@@ -191,6 +194,7 @@ export default {
         var maxed = 0;
         var maxd = 0;
         var maxdd = [];
+        var rank = {};
         for (let an of snpaperedgeyear) {
           var width = 0;
           for (let y of this.range(this.yearrange[0], this.yearrange[1]))
@@ -198,6 +202,10 @@ export default {
           an["width"] = width;
           if (an["width"] >= this.toget) {
             if (an["from"] == this.ma) {
+              rank = {};
+              rank["id"] = an["to"];
+              rank["count"] = an["width"];
+              this.ranks.push(rank);
               toget.push(an["to"]);
               if (an["width"] > maxd) {
                 maxd = an["width"];
@@ -208,6 +216,10 @@ export default {
               }
             } else if (an["to"] == this.ma) {
               toget.push(an["from"]);
+              rank = {};
+              rank["id"] = an["from"];
+              rank["count"] = an["width"];
+              this.ranks.push(rank);
               if (an["width"] > maxd) {
                 maxd = an["width"];
                 maxdd = [];
@@ -297,6 +309,17 @@ export default {
         this.edges.sort(function (a, b) {
           return a["width"] - b["width"];
         });
+        this.ranks.sort(function (a, b) {
+          return -a["count"] + b["count"];
+        });
+        for (let rk of this.ranks) {
+          for (let nd of this.nodes) {
+            if (nd["id"] == rk["id"]) {
+              rk["name"] = nd["label"] + "|" + nd["belong"];
+              break;
+            }
+          }
+        }
       }
     },
   },
