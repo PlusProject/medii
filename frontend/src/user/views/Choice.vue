@@ -42,12 +42,16 @@
       </v-menu>
     </v-toolbar>
     <div
-      style="height: 800px; width: 100%; border: 1px solid gold"
+      style="height: 800px; width: 100%; border: 1px solid gold; background-color:#F3F5FF"
+      background="#F3F5FF"
+      background-color="#F3F5FF"
       class="mt-10"
     >
       <network
-        style="height: 800px"
+        style="height: 800px; background-color:#F3F5FF"
         ref="network"
+        background="#F3F5FF"
+        background-color="#F3F5FF"
         :nodes="nodes"
         :edges="edges"
         :options="options"
