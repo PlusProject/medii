@@ -309,17 +309,21 @@ export default {
         this.edges.sort(function (a, b) {
           return a["width"] - b["width"];
         });
-        this.ranks.sort(function (a, b) {
-          return -a["count"] + b["count"];
-        });
         for (let rk of this.ranks) {
           for (let nd of this.nodes) {
             if (nd["id"] == rk["id"]) {
               rk["name"] = nd["label"] + "|" + nd["belong"];
+              rk["size"] = nd["value"];
               break;
             }
           }
         }
+        this.ranks.sort(function (a, b) {
+          if (a["count"] == b["count"]) {
+            return -a["size"] + b["size"];
+          }
+          return -a["count"] + b["count"];
+        });
       }
     },
   },
