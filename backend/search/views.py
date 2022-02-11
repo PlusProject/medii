@@ -638,7 +638,7 @@ class RecommendAPI(APIView):
                     code_only = j[2:]
                     if t>0:
                         if code_only in dic_code:
-                            dic_code[code_only] += float(round(t, 2))
+                            dic_code[code_only] = float(round(dic_code[code_only]+t, 2))
                         else:
                             dic_code[code_only] = float(round(t, 2))
                             
