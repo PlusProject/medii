@@ -54,7 +54,6 @@
       >
       </network>
     </div>
-    {{ values }}
   </body>
 </template>
 <script>
