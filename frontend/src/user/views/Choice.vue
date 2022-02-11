@@ -42,16 +42,12 @@
       </v-menu>
     </v-toolbar>
     <div
-      style="height: 800px; width: 100%; border: 1px solid gold; background-color:#F3F5FF"
-      background="#F3F5FF"
-      background-color="#F3F5FF"
+      style="height: 800px; width: 100%; border: 1px solid gold"
       class="mt-10"
     >
       <network
-        style="height: 800px; background-color:#F3F5FF"
+        style="height: 800px"
         ref="network"
-        background="#F3F5FF"
-        background-color="#F3F5FF"
         :nodes="nodes"
         :edges="edges"
         :options="options"
@@ -123,6 +119,7 @@ export default {
   mounted() {
     this.getValues();
     this.makenetwork();
+    this.$refs.network.moveTo({ scale: 0.3 });
   },
   methods: {
     range(start, end) {
@@ -243,7 +240,10 @@ export default {
         edge["width"] =
           ((an["width"] - this.toget + 1) / (maxd - this.toget)) * 10;
         edge["title"] =
-          "공동 작성 논문 수: " + String(an["width"]) + "\n대표 질병 코드:";
+          "공동 작업 논문 수: " +
+          String(an["width"]) +
+          "\n대표 질병 코드: " +
+          an["label"];
         this.edges.push(edge);
       }
       this.edges.sort(function (a, b) {

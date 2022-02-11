@@ -208,7 +208,7 @@ const actions = {
       c["label"] = name["title"] + "(" + name["cnt"] + ")";
       c["color"] = "#BC091F";
       c["title"] =
-        "임상시험 수: " +
+        "공동 작업 임상시험 수: " +
         String(name["cnt"]) +
         " | 질병코드: " +
         String(name["title"]);

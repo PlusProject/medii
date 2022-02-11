@@ -637,7 +637,14 @@ class RecommendAPI(APIView):
                             t += float(dic[j]) * float(calcul_sim(j, input_code)) * cweight
                     code_only = j[2:]
                     if t>0:
-                        dic_code[code_only] = round(t, 2)
+                        if code_only in dic_code:
+                            dic_code[code_only] += float(round(t, 2))
+                        else:
+                            dic_code[code_only] = float(round(t, 2))
+                            
+                    # else:
+                    #     dic_code[code_only] += float(round(t, 2))
+                        
                     if(t == 0.0): delete.append(j)
                 sdic = sorted(
                     dic_code.items(), key=lambda x: x[1], reverse=True)[0:5]
@@ -646,7 +653,7 @@ class RecommendAPI(APIView):
                     explain += disease_match_one(j[0])
                 codes = ", ".join([str(_) for _ in sdic]).replace('p-','논문-').replace('t-','임상-')
                 codes = codes.replace('\',',':').replace('(','').replace(')','').replace(',',' ')
-                
+                print(codes)
                 if len(codes.split(" "))>=2:
                     code1 = (codes.split(" ")[0] + " "+ codes.split(" ")[1]).lstrip("\'")
                     explain1 = (explain.split("} ")[0])[2:]

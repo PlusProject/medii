@@ -244,7 +244,10 @@ export default {
         edge["width"] = (an["width"] / (maxd - this.toget)) * 10;
         if (edge["width"] != 0) {
           edge["title"] =
-            "공동 작성 논문 수: " + String(an["width"]) + "\n대표 질병 코드:";
+            "공동 작업 논문 수: " +
+            String(an["width"]) +
+            "\n대표 질병 코드: " +
+            an["label"];
           this.edges.push(edge);
         }
       }

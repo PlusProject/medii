@@ -257,9 +257,10 @@ export default {
             if (edge["from"] == this.ma || edge["to"] == this.ma)
               edge["color"] = "#0400BB";
             edge["title"] =
-              "공동 작성 논문 수: " +
+              "공동 작업 논문 수: " +
               String(an["width"]) +
-              " | 대표 질병 코드:";
+              " | 대표 질병 코드: " +
+              an["label"];
 
             this.edges.push(edge);
           }
