@@ -521,15 +521,18 @@ class RecommendAPI(APIView):
             
         # 새로운 추천 알고리즘
         def get_recommendation(input, weight_paper, weight_trial):
-            def overlap(text):      
+            def overlap(text):
                 if text=="":
                     return 0
                 count = 0
                 dic = eval(text)
-                input_code = "\'"+input.split('.')[0]
-                for i in dic:
-                    if  input_code==i.split('.')[0]:
-                        count+=1
+                input_code = "\'"+input+"\'"
+                if input_code in dic:
+                    count = dic[input_code]
+                # for i in dic:
+                #     if input_code==i:
+                #         print("i는",i)
+                #         count = i.get(i)
                 return count
 
             def calcul_sim(x, y):
