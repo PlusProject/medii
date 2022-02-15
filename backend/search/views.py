@@ -687,8 +687,23 @@ class RecommendAPI(APIView):
                 sorted_df['explain1'][i] = explain1
                 sorted_df['explain2'][i] = explain2
                 sorted_df['explain3'][i] = explain3
-                sorted_df['explainp'][i] = "("+str(overlap(sorted_df['paper_allcount'][i])) + "건)"
-                sorted_df['explainc'][i] = "("+str(overlap(sorted_df['clinical_allcount'][i]))+ "건)"
+
+
+                sorted_df['explainp'][i] = overlap(sorted_df['paper_allcount'][i])
+                sorted_df['explainc'][i] = overlap(sorted_df['clinical_allcount'][i])
+                
+                if (overlap(sorted_df['paper_allcount'][i]) > sorted_df['paper_count'][i]):
+                    sorted_df['explainp'][i] = "("+str(int(sorted_df['paper_count'][i])) + "건)"
+                if (overlap(sorted_df['paper_allcount'][i]) <= sorted_df['paper_count'][i]):
+                    sorted_df['explainp'][i] = "("+str(overlap(sorted_df['paper_allcount'][i])) + "건)"
+
+                if (overlap(sorted_df['clinical_allcount'][i]) > sorted_df['clinical_count'][i]):
+                    sorted_df['explainc'][i] = "("+str(int(sorted_df['clinical_count'][i])) + "건)"
+                if (overlap(sorted_df['clinical_allcount'][i]) <= sorted_df['clinical_count'][i]):
+                    sorted_df['explainc'][i] = "("+str(overlap(sorted_df['clinical_allcount'][i])) + "건)"
+                
+
+
                 sorted_df['name_kor'][i] = sorted_df['name_kor'][i]
                 sorted_df['major'][i] = codes
                 sorted_df['o_p'][i] = str(round(sorted_df['o_p'][i],2)) 
