@@ -29,6 +29,8 @@ const state = {
   snpaperedgeyear: [],
   nodes: [],
   crisedge: [],
+  scholaryear: [],
+  alldisease: [],
   //allnetwork: null,
   showRareDisease: false,
   showClinicalTrialsPage: false,
@@ -94,6 +96,8 @@ const mutations = {
     state.snpaperedgeyear = data.snpaperedgeyear;
     state.nodes = data.nodes;
     state.crisedge = data.crisedge;
+    state.scholaryear = data.scholaryear;
+    state.alldisease = data.alldisease;
     //state.allnetwork = data.network;
   },
   savePersonInfo(state, data) {
@@ -217,6 +221,40 @@ const actions = {
     }
     // initialize your network!
 
+    const scyear = await api.getScholarYear();
+    const scholaryear = [];
+    for (let name of scyear.data) {
+      edgeyear = {};
+      edgeyear["from"] = name["fromit"];
+      edgeyear["to"] = name["toit"];
+      edgeyear["total"] = name["total"];
+      edgeyear["match"] = 0;
+      edgeyear["2021"] = name["y2021"];
+      edgeyear["2020"] = name["y2020"];
+      edgeyear["2019"] = name["y2019"];
+      edgeyear["2018"] = name["y2018"];
+      edgeyear["2017"] = name["y2017"];
+      edgeyear["2016"] = name["y2016"];
+      edgeyear["2015"] = name["y2015"];
+      edgeyear["2014"] = name["y2014"];
+      edgeyear["2013"] = name["y2013"];
+      edgeyear["2012"] = name["y2012"];
+      edgeyear["2011"] = name["y2011"];
+      edgeyear["2010"] = name["y2010"];
+      edgeyear["2009"] = name["y2009"];
+      edgeyear["2008"] = name["y2008"];
+      edgeyear["2007"] = name["y2007"];
+      edgeyear["2006"] = name["y2006"];
+      edgeyear["2005"] = name["to2005"];
+      scholaryear.push(edgeyear);
+    }
+    const ad = await api.getAllDisease();
+    const alldisease = [];
+    for (let d of ad.data) {
+      if (!alldisease.includes(d["disease_code"]))
+        alldisease.push(d["disease_code"]);
+    }
+
     const data = {
       doctorList,
       hospitalList,
@@ -224,8 +262,9 @@ const actions = {
       rareDiseaseList,
       crisedge,
       snpaperedgeyear,
-      nodes
-      //network,
+      nodes,
+      scholaryear,
+      alldisease,
     };
     commit("initAutocomplete", data);
   },

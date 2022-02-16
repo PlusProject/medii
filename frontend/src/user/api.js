@@ -274,4 +274,20 @@ export default {
       console.error(error);
     }
   },
+  async getScholarYear() {
+    try {
+      const response = await axios.get("scholaryear");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async getAllDisease() {
+    try {
+      const response = await axios.get("alldisease");
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 }

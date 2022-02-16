@@ -318,3 +318,40 @@ class DoctorAll2(models.Model):
         managed = False
         db_table = 'doctor_all2'
 
+class ScholarYear(models.Model):
+    id = models.IntegerField(primary_key=True)
+    fromit = models.IntegerField(blank=True, null=True)
+    toit = models.IntegerField(blank=True, null=True)
+    total = models.IntegerField(blank=True, null=True)
+    y2021 = models.TextField(blank=True, null=True)
+    y2020 = models.TextField(blank=True, null=True)
+    y2019 = models.TextField(blank=True, null=True)
+    y2018 = models.TextField(blank=True, null=True)
+    y2017 = models.TextField(blank=True, null=True)
+    y2016 = models.TextField(blank=True, null=True)
+    y2015 = models.TextField(blank=True, null=True)
+    y2014 = models.TextField(blank=True, null=True)
+    y2013 = models.TextField(blank=True, null=True)
+    y2012 = models.TextField(blank=True, null=True)
+    y2011 = models.TextField(blank=True, null=True)
+    y2010 = models.TextField(blank=True, null=True)
+    y2009 = models.TextField(blank=True, null=True)
+    y2008 = models.TextField(blank=True, null=True)
+    y2007 = models.TextField(blank=True, null=True)
+    y2006 = models.TextField(blank=True, null=True)
+    to2005 = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'scholar_year'
+
+class Alldisease(models.Model):
+    id = models.IntegerField(primary_key=True)
+    disease_code = models.TextField(blank=True, null=True)
+    disease_kor = models.TextField(blank=True, null=True)
+    disease_eng = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'alldisease'
+

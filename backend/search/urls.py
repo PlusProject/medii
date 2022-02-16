@@ -25,5 +25,7 @@ urlpatterns = [
     path('snpaperedgeyear', views.snpaperedgeyear_view, name="snpaperedgeyear_view"),
     path('nodes', views.nodes_view, name="nodes_view"),
     path('crisedge', views.crisedge_view, name="crisedge_view"),
+    path('scholaryear', views.scholaryear_view, name="scholaryear_view"),
+    path('alldisease', views.alldisease_view, name="alldisease_view"),
     # path('coworker_cris', views.get_cris_coworker, name="CrisCoworker"),
 ]

@@ -28,6 +28,7 @@
         min="1"
       ></v-slider>
       <v-btn elevation="2" @click="makenetwork" class="ml-5">make</v-btn>
+      <v-btn elevation="2" class="ml-5" @click="move">move</v-btn>
       <v-menu bottom :offset-y="true" :close-on-click="false">
         <template v-slot:activator="{ on, attrs }">
           <v-btn color="primary" dark v-bind="attrs" v-on="on" class="ml-5">
@@ -56,6 +57,34 @@
           </v-list-item>
         </v-list>
       </v-menu>
+      <v-btn fab color="cyan accent-2" @click="dialog = !dialog" class="ml-5">
+        <v-icon> mdi-comment-question </v-icon>
+      </v-btn>
+
+      <v-dialog v-model="dialog" max-width="850px">
+        <v-card class="text-sm-left pa-7">
+          <v-card-title>버튼 설명</v-card-title>
+
+          <p class="blue lighten-3">MAKE</p>
+          <v-spacer></v-spacer>
+          <p>원하는 설정으로 바꾼 뒤 클릭 시 해당 설정에 맞춰서 네트워킹</p>
+          <p class="blue lighten-3">MOVE</p>
+          <p>
+            <v-spacer></v-spacer>
+          </p>
+
+          <p>
+            보고 싶은 의료진의 노드 선택 후 클릭 시 해당 의료진의 개별 네트워크
+            페이지로 가짐
+          </p>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn text color="primary" @click="dialog = false"> Close </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-toolbar>
     <div
       style="height: 800px; width: 100%; border: 1px solid gold"
@@ -86,6 +115,7 @@ export default {
       { title: "회색: 나머지" },
     ],
     closeOnClick: true,
+    dialog: false,
     items: [],
     toget: 50,
     togets: { label: "연관성", color: "purple" },
@@ -162,6 +192,14 @@ export default {
       } catch (err) {
         console.log(err);
       }
+    },
+    move() {
+      const node = this.$store.state.nodes;
+      for (let nd of node) {
+        if (nd["id"] == this.$refs.network.getSelection().nodes[0])
+          this.value = nd["label"] + "|" + nd["belong"];
+      }
+      this.makenetwork();
     },
     range(start, end) {
       let array = [];

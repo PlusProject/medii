@@ -184,36 +184,36 @@
           <span> 논문 가중치 </span>
           <v-btn
             color="light-blue darken-4"
-            @click="changeWeight"
+            @click="changeWeight" 
             class="font-weight-black white--text px-3 ma-5"
           >
             가중치 변경
           </v-btn>
+          <th colspan="3">
+            <v-btn rounded :color="color" dark small @click="chageapi">
+              {{ click }} 추천 알고리즘으로 변경 ->
+            </v-btn>
+          </th>
         </v-toolbar>
       </template>
 
       <template v-slot:header>
         <thead>
-          <tr>
-            <th colspan="1" scope="colgroup">추천 결과</th>
-            <th colspan="3">
-              <v-btn rounded :color="color" dark @click="chageapi">
-                {{ click }} 추천 알고리즘으로 변경 ->
-              </v-btn>
-            </th>
-          </tr>
+          <!-- <tr>
+          <th colspan="1" scope="colgroup"></th>
+          </tr> -->
 
           <tr>
-            <th colspan="3">
+            <th colspan="4">
               <v-btn
                 id="network"
-                x-small
-                class="indigo lighten-3 mx-1"
+                
+                class="indigo lighten-3 my-8 mx-1"
                 dark
                 @click="
-                  $router.push({                    
-                    name: 'choice',
-                    params: { select: selected },
+                  $router.push({
+                    name: 'allnetwork',
+                    params: { select: selected, disease: previous },
                   })
                 "
               >
@@ -221,8 +221,8 @@
               </v-btn>
             </th>
 
-            <th colspan="5.5"><p class="text-center">질병 전문성</p></th>
-            <th colspan="3"><p class="text-center">저명성</p></th>
+            <th colspan="5"><p class="text-center">질병 전문성</p></th>
+            <th colspan="2"><p class="text-center">저명성</p></th>
             <th colspan="3"><p class="text-center">활동성</p></th>
           </tr>
         </thead>

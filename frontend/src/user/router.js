@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import {
-  Home, DoctorList, ClinicalTrialsList,Recommend,Jstest,Vvis,Choice
+  Home, DoctorList, ClinicalTrialsList,Recommend,Jstest,Vvis,Choice,AllNetwork
 } from './views'
 Vue.use(VueRouter)
 
@@ -43,6 +43,11 @@ const router = new VueRouter({
       path: "/choice",
       name: "choice",
       component: Choice,
+    },
+    {
+      path: "/allnetwork",
+      name: "allnetwork",
+      component: AllNetwork,
     }
   ]
 })

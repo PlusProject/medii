@@ -1,7 +1,7 @@
 from django.db import models
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from .models import ClinicalTrials, Disease, Doctor, Person, Participate,Thesis, DoctorAll, DoctorAll2, Writes, Totaldisease, DoctorTotalDisease, DoctorAllscore, SnPaper, SnPaperCnt, NodeCris,NodeCrisCnt,SnPaperEdgeYear, Nodes,CrisEdge
+from .models import ClinicalTrials, Disease, Doctor, Person, Participate,Thesis, DoctorAll, DoctorAll2, Writes, Totaldisease, DoctorTotalDisease, DoctorAllscore, SnPaper, SnPaperCnt, NodeCris,NodeCrisCnt,SnPaperEdgeYear, Nodes,CrisEdge,ScholarYear,Alldisease
 
 
 class SnPaperEdgeYearSerializer(serializers.ModelSerializer):
@@ -192,4 +192,16 @@ class DoctorAll3Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoctorAll2
+        fields = "__all__"
+
+class ScholarYearSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ScholarYear
+        fields = "__all__"
+
+class AlldiseaseSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Alldisease
         fields = "__all__"

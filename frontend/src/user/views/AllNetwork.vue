@@ -1,13 +1,30 @@
 <template>
   <body>
     <v-toolbar flat class="pt-10 pe-10" color="#F3F5FF">
-      <v-btn-toggle v-model="text" mandatory group color="deep-purple accent-3">
-        <v-btn value="left"> 전체 </v-btn>
-
-        <v-btn value="center"> 임상시험 </v-btn>
-
-        <v-btn value="right"> 논문 </v-btn>
-      </v-btn-toggle>
+      <v-container fluid style="width: 250px">
+        <v-autocomplete
+          v-model="doctors"
+          :items="doctorlist"
+          dense
+          chips
+          small-chips
+          multiple
+          filled
+          label="의료진"
+        ></v-autocomplete>
+      </v-container>
+      <v-container fluid style="width: 300px">
+        <v-autocomplete
+          v-model="diseases"
+          :items="diseaselist"
+          dense
+          chips
+          small-chips
+          multiple
+          filled
+          label="질병코드"
+        ></v-autocomplete>
+      </v-container>
       <v-range-slider
         v-model="yearrange"
         :color="years.color"
@@ -22,7 +39,7 @@
         :label="togets.label"
         class="ml-10"
         thumb-label="always"
-        max="50"
+        max="20"
         min="1"
         style="width: 50px"
       ></v-slider>
@@ -88,7 +105,6 @@
 <script>
 export default {
   data: () => ({
-    items: [],
     belongs: [
       { title: "노랑: 연세대 세브란스" },
       { title: "초록: 아산" },
@@ -99,12 +115,18 @@ export default {
       { title: "보라: 서울대" },
       { title: "회색: 나머지" },
     ],
+    doctorlist: [],
+    diseaselist: [],
+    doctors: [],
+    ids: [],
+    diseases: [],
+    dialog: false,
     value: null,
+    values: [],
     nodes: [],
     edges: [],
-    dialog: false,
     text: "논문",
-    toget: 50,
+    toget: 7,
     togets: { label: "연관성", color: "purple" },
     yearrange: [2005, 2022],
     years: { color: "green", fyear: 2005, label: "년도", lyear: 2022 },
@@ -142,44 +164,6 @@ export default {
         wind: { x: 0, y: 0 },
       },
     },
-    // options: {
-    //   nodes: {
-    //     borderWidth: 2,
-    //     shape: "dot",
-    //     font: { strokeWidth: 3, strokeColor: "white" },
-    //   },
-    //   edges: {
-    //     color: "#024B28",
-    //   },
-    //   physics: {
-    //     enabled: true,
-    //     barnesHut: {
-    //       theta: 0.5,
-    //       gravitationalConstant: -10000,
-    //       centralGravity: 0.3,
-    //       springLength: 95,
-    //       springConstant: 0.04,
-    //       damping: 0.09,
-    //       avoidOverlap: 0,
-    //     },
-    //     maxVelocity: 50,
-    //     minVelocity: 0.1,
-    //     solver: "barnesHut",
-    //     stabilization: {
-    //       enabled: true,
-    //       iterations: 1000,
-    //       updateInterval: 100,
-    //       onlyDynamicEdges: false,
-    //       fit: true,
-    //     },
-    //     timestep: 0.5,
-    //     adaptiveTimestep: true,
-    //     wind: { x: 0, y: 0 },
-    //   },
-    //   interaction: {
-    //     hover: true,
-    //   },
-    // },
   }),
   mounted() {
     this.init();
@@ -187,12 +171,40 @@ export default {
   methods: {
     async init() {
       try {
+        this.getParams();
+        this.makedoctorlist();
+        this.makediseaselist();
         this.makeallnetwork();
-        this.$refs.network.moveTo({ scale: 0.3 });
+        this.$refs.network.moveTo({ scale: 1 });
         console.log("hi");
       } catch (err) {
         console.log(err);
       }
+    },
+    getParams() {
+      var select = this.$route.params.select;
+      this.doctors = [];
+      for (let sl of select) {
+        this.doctors.push(sl["name_kor"] + "|" + sl["belong"]);
+      }
+      var dis = this.$route.params.disease;
+      var di = [];
+      this.diseases = [];
+      if (dis.includes(",")) {
+        di = dis.split(",");
+        for (var d of di) {
+          if (d[0] == " ") d = d.substring(1);
+          this.diseases.push(d);
+        }
+      } else this.diseases = [dis];
+    },
+    makedoctorlist() {
+      for (var ed of this.$store.state.nodes) {
+        this.doctorlist.push(ed["label"] + "|" + ed["belong"]);
+      }
+    },
+    makediseaselist() {
+      this.diseaselist = this.$store.state.alldisease;
     },
     move() {
       this.$router.push({
@@ -216,29 +228,75 @@ export default {
       this.nodes = [];
       this.edges = [];
 
-      const snpaperedgeyear = this.$store.state.snpaperedgeyear;
-      const snpaper = this.$store.state.nodes;
+      const scholaryear = this.$store.state.scholaryear;
+      const node = this.$store.state.nodes;
+      const crisedge = this.$store.state.crisedge;
       var maxd = 0;
       var together = [];
-      for (let an of snpaperedgeyear) {
-        var width = 0;
-        for (let y of this.range(this.yearrange[0], this.yearrange[1]))
-          width += an[String(y)];
+      var str = "";
+      var array = [];
+      var dis = [];
+      var width = 0;
+      var dict = {};
+      var label = "";
+      this.ids = [];
+      for (let value of this.doctors) {
+        for (let an of node) {
+          if (value.includes(an["label"]) && value.includes(an["belong"]))
+            this.ids.push(an["id"]);
+        }
+      }
+      for (let an of scholaryear) {
+        width = 0;
+        label = "";
+        dict = {};
+        for (let y of this.range(this.yearrange[0], this.yearrange[1])) {
+          if (an[String(y)] == "") continue;
+          str = an[String(y)];
+          array = str.split("|");
+          for (let ar of array) {
+            dis = ar.split(":");
+            if (this.diseases.includes(dis[0])) {
+              width += Number(dis[1]);
+              if (dis[0] in dict) dict[dis[0]] += Number(dis[1]);
+              else dict[dis[0]] = Number(dis[1]);
+            }
+          }
+        }
+        for (var key in dict) {
+          label += key + "(" + String(dict[key]) + ")|";
+        }
+        an["label"] = label;
         an["width"] = width;
-        if (an["width"] >= this.toget && this.text != "center") {
-          if (!together.includes(an["from"])) {
-            together.push(an["from"]);
+        if (an["width"] >= this.toget) {
+          if (this.ids.includes(an["to"]) && this.ids.includes(an["from"])) {
+            if (an["width"] > maxd) maxd = an["width"];
+            continue;
           }
-          if (!together.includes(an["to"])) {
+          if (this.ids.includes(an["from"]) && !together.includes(an["to"])) {
             together.push(an["to"]);
-          }
-          if (an["width"] > maxd) {
-            maxd = an["width"];
+            if (an["width"] > maxd) maxd = an["width"];
+          } else if (
+            this.ids.includes(an["to"]) &&
+            !together.includes(an["from"])
+          ) {
+            together.push(an["from"]);
+            if (an["width"] > maxd) maxd = an["width"];
           }
         }
       }
+      for (let an of crisedge) {
+        if (this.ids.includes(an["to"]) && this.ids.includes(an["from"]))
+          continue;
+        if (this.ids.includes(an["from"]) && !together.includes(an["to"]))
+          together.push(an["to"]);
+        else if (this.ids.includes(an["to"]) && !together.includes(an["from"]))
+          together.push(an["from"]);
+      }
+      for (let id of this.ids) together.push(id);
+
       var temp = {};
-      for (let an of snpaper) {
+      for (let an of node) {
         if (together.includes(an["id"])) {
           temp = {};
           temp["id"] = an["id"];
@@ -249,8 +307,11 @@ export default {
           temp["shape"] = "dot";
           temp["belong"] = an["belong"];
           temp["borderWidth"] = an["borderWidth"];
+          if (this.ids.includes(an["id"])) temp["borderWidth"] = 10;
+
           this.nodes.push(temp);
-        } else if (an["clinical"] != 0 && this.text != "right") {
+        } /*
+        else if (an["clinical"] != 0) {
           temp = {};
           temp["id"] = an["id"];
           temp["color"] = an["color"];
@@ -260,16 +321,19 @@ export default {
           temp["shape"] = "dot";
           temp["belong"] = an["belong"];
           temp["borderWidth"] = an["borderWidth"];
+          if (this.ids.includes(an["id"])) temp["borderWidth"] = 10;
+
           this.nodes.push(temp);
-        }
+        }//*/
       }
-      for (let an of snpaperedgeyear) {
-        if (an["width"] < this.toget || this.text == "center") continue;
+      for (let an of scholaryear) {
+        if (an["width"] < this.toget) continue;
+        if (this.value != null && this.value != an["label"]) continue;
         var edge = {};
         edge["from"] = an["from"];
         edge["to"] = an["to"];
         edge["color"] = "#024B28";
-        edge["label"] = an["label"] + "(" + an["width"] + ")";
+        edge["label"] = an["label"].substring(0, an["label"].length - 1);
         edge["width"] =
           ((an["width"] - this.toget + 1) / (maxd - this.toget)) * 10;
         if (edge["width"] != 0) {
@@ -277,14 +341,14 @@ export default {
             "공동 작업 논문 수: " +
             String(an["width"]) +
             "\n대표 질병 코드: " +
-            an["label"];
+            an["label"].substring(1);
           this.edges.push(edge);
         }
       }
       this.edges.sort(function (a, b) {
         return a["width"] - b["width"];
       });
-      const crisedge = this.$store.state.crisedge;
+
       for (let an of crisedge) {
         var ce = {};
         ce["from"] = an["from"];
@@ -293,7 +357,7 @@ export default {
         ce["label"] = an["label"];
         ce["width"] = (an["width"] / 11) * 10;
         ce["title"] = an["title"];
-        if (this.text != "right") this.edges.push(ce);
+        this.edges.push(ce);
       }
     },
   },

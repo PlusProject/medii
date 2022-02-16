@@ -2,12 +2,12 @@ from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt,  DoctorAll, DoctorAll2,SnPaperEdgeYear,Nodes,CrisEdge
+from .models import ClinicalTrials, Disease, Person, Participate, Writes, Thesis, DoctorTotalDisease, Totaldisease, DoctorAllscore, SnPaper, SnPaperCnt,NodeCris,NodeCrisCnt,  DoctorAll, DoctorAll2,SnPaperEdgeYear,Nodes,CrisEdge,ScholarYear,Alldisease
 from .serializers import (ClinicalTrialsSerializer, HospitalSerializer, ThesisSerializer, NameSerializer,
                           PersonSerializer, ParticipateSerializer, WritesSerializer,
                           CrisCoworkerSerializer, ThesisCoworkerSerializer, DiseaseSerializer, DiseaseSerializer, DoctorTotalDiseaseSerializer, Totaldisease, DoctorAllscoreSerializer,
                           SnPaperSerializer,SnPaperCntSerializer,NodeCrisSerializer,NodeCrisCntSerializer,DoctorAllSerializer,DoctorAll2Serializer,DoctorAll3Serializer
-                          ,SnPaperEdgeYearSerializer,NodesSerializer,CrisEdgeSerializer)
+                          ,SnPaperEdgeYearSerializer,NodesSerializer,CrisEdgeSerializer,ScholarYearSerializer,AlldiseaseSerializer)
 from django.db.models import Q
 import re
 import pandas as pd
@@ -138,7 +138,15 @@ class ThesisAPI(APIView):
 
 
 
+@api_view(['GET'])
+def scholaryear_view(request):
+    scholaryear=ScholarYear.objects.all()
+    return Response(ScholarYearSerializer(scholaryear, many=True).data)
 
+@api_view(['GET'])
+def alldisease_view(request):
+    alldisease=Alldisease.objects.all()
+    return Response(AlldiseaseSerializer(alldisease, many=True).data)
 @api_view(['GET'])
 def snpaperedgeyear_view(request):
     snpaperedgeyear=SnPaperEdgeYear.objects.all()
