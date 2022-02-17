@@ -45,19 +45,19 @@
       ></v-slider>
       <v-btn elevation="2" class="ml-5" @click="makeallnetwork">make</v-btn>
       <v-btn elevation="2" class="ml-5" @click="move">move</v-btn>
-      <v-menu bottom :offset-y="true" :close-on-click="false">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="primary" dark v-bind="attrs" v-on="on" class="ml-5">
-            소속병원
-          </v-btn>
-        </template>
-
-        <v-list>
-          <v-list-item v-for="(item, index) in belongs" :key="index">
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+<v-btn color="primary" v-on:click="toggleShow">
+        소속병원
+      </v-btn>
+      <div id = "list" v-if="show">
+        <a style="background-color:#FBFF38">연세대</a><br>
+        <a style="background-color:#67F942">아산</a><br>
+        <a style="background-color:#4ED4FE">삼성</a><br>
+        <a style="background-color:#FFA7B1">가톨릭</a><br>
+        <a style="background-color:#FF6C7E">고려대</a><br>
+        <a style="background-color:#FFB169">계명대</a><br>
+        <a style="background-color:#DDB1FF">서울대</a><br>
+        <a style="background-color:#C4C4C4">나머지</a>
+      </div>
       <v-btn fab color="cyan accent-2" @click="dialog = !dialog" class="ml-5">
         <v-icon> mdi-comment-question </v-icon>
       </v-btn>
@@ -105,6 +105,7 @@
 <script>
 export default {
   data: () => ({
+    show:true,
     belongs: [
       { title: "노랑: 연세대 세브란스" },
       { title: "초록: 아산" },
@@ -169,6 +170,9 @@ export default {
     this.init();
   },
   methods: {
+    toggleShow(){
+      this.show = !this.show; 
+    },
     async init() {
       try {
         this.getParams();
@@ -363,3 +367,13 @@ export default {
   },
 };
 </script>
+<style scoped>
+#list{
+  background-color: rgba(219, 219, 219, 0.5); 
+  width:100px;
+  position:absolute;
+  top:63px;
+  right:90px;
+  border-radius:0.5rem;
+}
+</style>
