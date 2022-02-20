@@ -180,7 +180,10 @@
             :color="clinical.color"
             thumb-label="always"
             max="10"
-          ></v-slider>
+          >
+            <template v-slot:thumb-label="{ value }">
+              {{ satisfactionEmojis[Math.min(Math.floor(value), 10)] }}
+            </template></v-slider>
           <span> 논문 가중치 </span>
           <v-btn
             color="light-blue darken-4"
@@ -361,6 +364,8 @@ export default {
         { text: "전체 논문 수", value: "paper_count" },
         { text: "전체 임상 수", value: "clinical_count" },
       ],
+      satisfactionEmojis: ['0:10', '1:9', '2:8', '3:7', '4:6', '5:5', '6:4', '7:3', '8:2', '9:1','10:0'],
+        
     };
   },
 
@@ -646,6 +651,7 @@ export default {
     this.re2();
   },
 };
+
 </script>
 
 
@@ -677,6 +683,7 @@ img {
   left: 5px;
   top: 4px;
 }
+
 </style>
 
 
