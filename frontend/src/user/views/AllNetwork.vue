@@ -1,6 +1,13 @@
 <template>
   <body>
     <v-toolbar flat class="pt-10 pe-10" color="#F3F5FF">
+      <v-btn-toggle v-model="text" mandatory group color="deep-purple accent-3">
+        <v-btn value="left"> 전체 </v-btn>
+
+        <v-btn value="center"> 임상시험 </v-btn>
+
+        <v-btn value="right"> 논문 </v-btn>
+      </v-btn-toggle>
       <v-container fluid style="width: 250px">
         <v-autocomplete
           v-model="doctors"
@@ -45,19 +52,19 @@
       ></v-slider>
       <v-btn elevation="2" class="ml-5" @click="makeallnetwork">make</v-btn>
       <v-btn elevation="2" class="ml-5" @click="move">move</v-btn>
-<v-btn color="primary" v-on:click="toggleShow">
-        소속병원
-      </v-btn>
-      <div id = "list" v-if="show">
-        <a style="background-color:#FBFF38">연세대</a><br>
-        <a style="background-color:#67F942">아산</a><br>
-        <a style="background-color:#4ED4FE">삼성</a><br>
-        <a style="background-color:#FFA7B1">가톨릭</a><br>
-        <a style="background-color:#FF6C7E">고려대</a><br>
-        <a style="background-color:#FFB169">계명대</a><br>
-        <a style="background-color:#DDB1FF">서울대</a><br>
-        <a style="background-color:#C4C4C4">나머지</a>
-      </div>
+      <v-menu bottom :offset-y="true" :close-on-click="false">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="primary" dark v-bind="attrs" v-on="on" class="ml-5">
+            소속병원
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item v-for="(item, index) in belongs" :key="index">
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <v-btn fab color="cyan accent-2" @click="dialog = !dialog" class="ml-5">
         <v-icon> mdi-comment-question </v-icon>
       </v-btn>
@@ -105,7 +112,7 @@
 <script>
 export default {
   data: () => ({
-    show:true,
+    text: "left",
     belongs: [
       { title: "노랑: 연세대 세브란스" },
       { title: "초록: 아산" },
@@ -126,7 +133,6 @@ export default {
     values: [],
     nodes: [],
     edges: [],
-    text: "논문",
     toget: 7,
     togets: { label: "연관성", color: "purple" },
     yearrange: [2005, 2022],
@@ -170,9 +176,6 @@ export default {
     this.init();
   },
   methods: {
-    toggleShow(){
-      this.show = !this.show; 
-    },
     async init() {
       try {
         this.getParams();
@@ -272,7 +275,7 @@ export default {
         }
         an["label"] = label;
         an["width"] = width;
-        if (an["width"] >= this.toget) {
+        if (an["width"] >= this.toget && this.text != "center") {
           if (this.ids.includes(an["to"]) && this.ids.includes(an["from"])) {
             if (an["width"] > maxd) maxd = an["width"];
             continue;
@@ -290,6 +293,7 @@ export default {
         }
       }
       for (let an of crisedge) {
+        if (this.text == "right") continue;
         if (this.ids.includes(an["to"]) && this.ids.includes(an["from"]))
           continue;
         if (this.ids.includes(an["from"]) && !together.includes(an["to"]))
@@ -331,7 +335,7 @@ export default {
         }//*/
       }
       for (let an of scholaryear) {
-        if (an["width"] < this.toget) continue;
+        if (an["width"] < this.toget || this.text == "center") continue;
         if (this.value != null && this.value != an["label"]) continue;
         var edge = {};
         edge["from"] = an["from"];
@@ -361,19 +365,9 @@ export default {
         ce["label"] = an["label"];
         ce["width"] = (an["width"] / 11) * 10;
         ce["title"] = an["title"];
-        this.edges.push(ce);
+        if (this.text != "right") this.edges.push(ce);
       }
     },
   },
 };
 </script>
-<style scoped>
-#list{
-  background-color: rgba(219, 219, 219, 0.5); 
-  width:100px;
-  position:absolute;
-  top:63px;
-  right:90px;
-  border-radius:0.5rem;
-}
-</style>

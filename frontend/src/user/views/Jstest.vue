@@ -1,6 +1,13 @@
 <template>
   <body>
     <v-toolbar flat class="pt-10 pe-10" color="#F3F5FF">
+      <v-btn-toggle v-model="text" mandatory group color="deep-purple accent-3">
+        <v-btn value="left"> 전체 </v-btn>
+
+        <v-btn value="center"> 임상시험 </v-btn>
+
+        <v-btn value="right"> 논문 </v-btn>
+      </v-btn-toggle>
       <v-container fluid style="width: 300px">
         <v-autocomplete
           v-model="value"
@@ -29,19 +36,19 @@
       ></v-slider>
       <v-btn elevation="2" @click="makenetwork" class="ml-5">make</v-btn>
       <v-btn elevation="2" class="ml-5" @click="move">move</v-btn>
-<v-btn color="primary" v-on:click="toggleShow">
-        소속병원
-      </v-btn>
-      <div id = "list" v-if="show">
-        <a style="background-color:#FBFF38">연세대</a><br>
-        <a style="background-color:#67F942">아산</a><br>
-        <a style="background-color:#4ED4FE">삼성</a><br>
-        <a style="background-color:#FFA7B1">가톨릭</a><br>
-        <a style="background-color:#FF6C7E">고려대</a><br>
-        <a style="background-color:#FFB169">계명대</a><br>
-        <a style="background-color:#DDB1FF">서울대</a><br>
-        <a style="background-color:#C4C4C4">나머지</a>
-      </div>
+      <v-menu bottom :offset-y="true" :close-on-click="false">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="primary" dark v-bind="attrs" v-on="on" class="ml-5">
+            소속병원
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item v-for="(item, index) in belongs" :key="index">
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <v-menu bottom :offset-y="true" :close-on-click="false">
         <template v-slot:activator="{ on, attrs }">
           <v-btn color="teal" dark v-bind="attrs" v-on="on" class="ml-5">
@@ -104,7 +111,6 @@
 <script>
 export default {
   data: () => ({
-    show:true,
     belongs: [
       { title: "노랑: 연세대 세브란스" },
       { title: "초록: 아산" },
@@ -116,6 +122,7 @@ export default {
       { title: "회색: 나머지" },
     ],
     closeOnClick: true,
+    text: "left",
     dialog: false,
     items: [],
     toget: 50,
@@ -182,9 +189,6 @@ export default {
     }
   },
   methods: {
-    toggleShow(){
-      this.show = !this.show; 
-    },
     async init() {
       try {
         for (var ed of this.$store.state.nodes) {
@@ -221,6 +225,7 @@ export default {
 
         const snpaperedgeyear = this.$store.state.snpaperedgeyear;
         const snpaper1 = this.$store.state.nodes;
+        const crisedge = this.$store.state.crisedge;
         //const cris = this.$store.state.nodecris;
         //const criscnt = this.$store.state.nodecriscnt;
         for (let an of snpaper1) {
@@ -242,7 +247,7 @@ export default {
           for (let y of this.range(this.yearrange[0], this.yearrange[1]))
             width += an[String(y)];
           an["width"] = width;
-          if (an["width"] >= this.toget) {
+          if (an["width"] >= this.toget && this.text != "center") {
             if (an["from"] == this.ma) {
               rank = {};
               rank["id"] = an["to"];
@@ -272,6 +277,12 @@ export default {
             }
           }
         }
+        for (let an of crisedge) {
+          if (this.text != "right") {
+            if (an["from"] == this.ma) toget.push(an["to"]);
+            else if (an["to"] == this.ma) toget.push(an["from"]);
+          }
+        }
         toget.push(this.ma);
         for (let an of snpaperedgeyear) {
           if (
@@ -283,21 +294,19 @@ export default {
           }
         }
         for (let an of snpaperedgeyear) {
-          if (an["width"] < this.toget) continue;
+          if (an["width"] < this.toget || this.text == "center") continue;
           var edge = {};
           edge["from"] = an["from"];
           edge["to"] = an["to"];
           edge["color"] = "#024B28";
           edge["label"] = an["label"] + "(" + an["width"] + ")";
           edge["width"] =
-            ((an["width"] - this.toget + 1) / (maxd - this.toget)) * 10;
+            ((an["width"] - this.toget + 1) / (maxed - this.toget)) * 10;
           if (
             edge["width"] != 0 &&
             toget.includes(edge["from"]) &&
             toget.includes(edge["to"])
           ) {
-            if (edge["from"] == this.ma || edge["to"] == this.ma)
-              edge["color"] = "#0400BB";
             edge["title"] =
               "공동 작업 논문 수: " +
               String(an["width"]) +
@@ -307,19 +316,45 @@ export default {
             this.edges.push(edge);
           }
         }
-        const crisedge = this.$store.state.crisedge;
+
         for (let an of crisedge) {
           var ce = {};
           ce["from"] = an["from"];
           ce["to"] = an["to"];
           ce["color"] = an["color"];
-          if (an["from"] == this.ma || an["to"] == this.ma)
-            ce["color"] = "#A839FF";
           ce["label"] = an["label"];
           ce["width"] = (an["width"] / 11) * 10;
           ce["title"] = an["title"];
-          if (toget.includes(an["from"]) && toget.includes(an["to"]))
+          if (
+            toget.includes(an["from"]) &&
+            toget.includes(an["to"]) &&
+            this.text != "right"
+          )
             this.edges.push(ce);
+        }
+        if (toget.length == 1) {
+          for (let an of snpaper1) {
+            if (an["id"] == this.ma) {
+              temp = {};
+              temp["id"] = an["id"];
+              temp["color"] = an["color"];
+              temp["value"] = an["value"];
+              temp["label"] = an["label"];
+              temp["title"] = an["title"];
+              temp["shape"] = "dot";
+              temp["belong"] = an["belong"];
+              temp["borderWidth"] = an["borderWidth"];
+              if (temp["id"] == this.ma) {
+                co = {};
+                co["background"] = temp["color"];
+                co["border"] = "#0400BB";
+                temp["color"] = co;
+                temp["borderWidth"] = 10;
+              }
+              this.nodes.push(temp);
+              break;
+            }
+          }
         }
         toget = [];
         for (let an of this.edges) {
@@ -372,13 +407,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-#list{
-  background-color: rgba(219, 219, 219, 0.5); 
-  width:100px;
-  position:absolute;
-  top:63px;
-  right:90px;
-  border-radius:0.5rem;
-}
-</style>
