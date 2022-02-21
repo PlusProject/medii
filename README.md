@@ -12,7 +12,7 @@
 이번 프로젝트에서는 심장희귀질병에 관하여 임상시험이 가능한 의료진을 추천해주는 시스템을 만들고자 하였습니다.
 
 
-![image](https://user-images.githubusercontent.com/66810905/146679402-0e36c9cf-4541-47a3-924e-74508b100345.png)
+![new](https://user-images.githubusercontent.com/94899919/154899220-a73c8d41-a714-4547-b2c7-fee38b89b26f.JPG)
 
 
 
@@ -72,13 +72,18 @@ npm run serve
 5. 추천된 의사들 간의 네트워킹을 볼 수 있습니다.
 6. 오른쪽 상단에 추천방식을 나타내주는 버튼이 있습니다. 기본은 신규 방식인 acm score를 활용한 추천으로 설정되어 있고, 해당 버튼을 누르면 기존 추천 결과(질병코드의 tf-idf를 사용한 추천)가 보여집니다.
 
-![image](https://user-images.githubusercontent.com/66810905/146680544-fe95348f-93dc-4722-ac1a-c74f509fe699.png)
+![main](https://user-images.githubusercontent.com/94899919/154899284-afaf2c30-9efb-4622-8cdb-ff507a6a57eb.JPG)
 
 
-![image](https://user-images.githubusercontent.com/66810905/146680309-85e891cd-8ed7-48be-9db4-8d914daffd32.png)
+
+![network](https://user-images.githubusercontent.com/94899919/154899095-3e85cbb3-c79f-4adf-860e-f99edbea668f.JPG)
 
 
-![image](https://user-images.githubusercontent.com/66810905/146680379-69bca297-2679-42d8-b6b5-cdf53b4647b5.png)
+
+![new](https://user-images.githubusercontent.com/94899919/154899220-a73c8d41-a714-4547-b2c7-fee38b89b26f.JPG)
+
+
+![old](https://user-images.githubusercontent.com/94899919/154899409-7f301d5a-ef98-4407-bef0-3bed9cf0dbf6.JPG)
 
   
 ## Contribute Guide 🚩
